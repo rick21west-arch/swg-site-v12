@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Porch Archive — Southern Writers Guild</title>
+  <link rel="stylesheet" href="../../css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="../../assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="/the-porch/" class="active">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-md);">
+    <div class="container">
+      <span class="hero-eyebrow">The Porch</span>
+      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">All Porch stories.</h1>
+      <p class="hero-sub">Every story, most recent first. <a href="/the-porch/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to Porch</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-tabs" style="padding:0 0 1rem;border-bottom:0.5px solid var(--border);margin-bottom:1.5rem;">
+        <button class="filter-tab active" onclick="filterStories('all', this)">All</button>
+        <button class="filter-tab" onclick="filterStories('Hank', this)">By Hank</button>
+        <button class="filter-tab" onclick="filterStories('Beau', this)">By Beau</button>
+        <button class="filter-tab" onclick="filterStories('Gray', this)">By Gray</button>
+        <button class="filter-tab" onclick="filterStories('three', this)">All three</button>
+      </div>
+      <div id="archive-grid" class="grid grid--3"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2025 Southern Writers Guild</span>
+      <span class="footer-text">southernwritersguild.com</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchAllPorchStories, renderPorchCard, showLoading, showError } from '../../js/sanity.js'
+
+    const grid = document.getElementById('archive-grid')
+    let allStories = []
+
+    showLoading(grid)
+
+    fetchAllPorchStories()
+      .then(stories => {
+        allStories = stories
+        renderGrid(stories)
+      })
+      .catch(() => showError(grid, 'Archive unavailable — visit us on Substack.'))
+
+    function renderGrid(stories) {
+      grid.innerHTML = stories.length
+        ? stories.map(renderPorchCard).join('')
+        : '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">No stories found.</div>'
+    }
+
+    window.filterStories = function(term, btn) {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      if (term === 'all') return renderGrid(allStories)
+      if (term === 'three') return renderGrid(allStories.filter(s => s.authors && s.authors.toLowerCase().includes('three')))
+      renderGrid(allStories.filter(s => s.authors && s.authors.includes(term)))
+    }
+  </script>
+
+  <script src="../../js/nav.js"></script>
+</body>
+</html>

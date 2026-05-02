@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Southern Writers Guild</title>
+  <meta name="description" content="Three Southern writers. One Porch. Real work.">
+  <link rel="stylesheet" href="../css/swg.css">
+  <style>
+    /* Full-page centered layout — no nav, no footer */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+    }
+
+    .lp-wrap {
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .lp-logo {
+      height: 64px;
+      width: auto;
+      border-radius: 3px;
+      margin-bottom: 2.5rem;
+      opacity: 0.92;
+    }
+
+    .lp-kicker {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .lp-headline {
+      font-family: var(--font-serif);
+      font-size: clamp(1.75rem, 5vw, 2.6rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.18;
+      margin-bottom: 1.75rem;
+    }
+
+    .lp-headline em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .lp-body {
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      margin-bottom: 2.25rem;
+    }
+
+    .lp-body p + p {
+      margin-top: 0.85rem;
+    }
+
+    .lp-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.4;
+      margin: 0 auto 2.25rem;
+    }
+
+    .lp-form-label {
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: block;
+      margin-bottom: 0.85rem;
+    }
+
+    .lp-form {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .lp-form input[type="email"] {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(237,229,208,0.18);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: 2px;
+      min-width: 230px;
+      flex: 1;
+      outline: none;
+      transition: border-color 0.2s;
+      max-width: 280px;
+    }
+
+    .lp-form input[type="email"]::placeholder {
+      color: rgba(237,229,208,0.3);
+    }
+
+    .lp-form input[type="email"]:focus {
+      border-color: var(--accent);
+    }
+
+    /* Confirmation state — hidden until submit */
+    .lp-confirm {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .lp-confirm-mark {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .lp-confirm-head {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 0.85rem;
+    }
+
+    .lp-confirm-body {
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .lp-form { flex-direction: column; align-items: center; }
+      .lp-form input[type="email"] { min-width: 0; width: 100%; max-width: 100%; }
+      .lp-form .btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="lp-wrap">
+
+    <!-- LOGO -->
+    <img src="../assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="lp-logo">
+
+    <!-- MAIN CONTENT — shown until subscribe -->
+    <div class="lp-main" id="lp-main">
+
+      <span class="lp-kicker">Southern Writers Guild</span>
+
+      <h1 class="lp-headline">
+        Three Southern writers.<br>
+        One Porch. <em>Real work.</em>
+      </h1>
+
+      <div class="lp-body">
+        <p>Gators in a Cape Coral convenience store. A peacock at a flower show. A cooler nobody opens, duct-taped and labeled <em>MISC. BIOMEDICAL</em>, with a pink bow Grace tied on it.</p>
+        <p>That's The Porch — where Hank, Beau, and Grace go on adventures and write about them from three different angles. Jean-Paul witnesses everything. The humor is load-bearing.</p>
+      </div>
+
+      <div class="lp-divider"></div>
+
+      <span class="lp-form-label">New stories, when they're ready. No noise.</span>
+
+      <!--
+        ⚠ Wire action to your list provider before going live.
+        For Mailchimp: action="https://yourdomain.us1.list-manage.com/subscribe/post?u=XXX&id=XXX"
+        For Kit/ConvertKit: action="https://app.kit.com/forms/XXXXXXX/subscriptions"
+        Set method="post" and add any hidden fields your provider requires.
+      -->
+      <form class="lp-form" id="lp-form" action="#" method="post">
+        <input type="email" name="email" placeholder="your@email.com" required autocomplete="email">
+        <button type="submit" class="btn btn--primary">Follow the Porch</button>
+      </form>
+
+    </div>
+
+    <!-- CONFIRMATION STATE — Grace's voice -->
+    <div class="lp-confirm" id="lp-confirm">
+      <span class="lp-confirm-mark">✦</span>
+      <h2 class="lp-confirm-head">You're in. The Porch light's on.</h2>
+      <p class="lp-confirm-body">
+        We'll find you when the next one's ready.<br>
+        Jean-Paul already knew you'd sign up.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    // Swap to confirmation on submit.
+    // Remove this script block once you wire the real form action —
+    // your list provider will handle the redirect/confirmation.
+    document.getElementById('lp-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('lp-main').style.display = 'none';
+      const confirm = document.getElementById('lp-confirm');
+      confirm.style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>

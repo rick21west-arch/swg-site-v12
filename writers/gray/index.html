@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grace Lynn — Southern Writers Guild</title>
+  <meta name="description" content="Gray writes as Grace Lynn. Lyrical confessional precision. Stories sometimes fiction, always true.">
+  <link rel="stylesheet" href="../../css/swg.css">
+  <style>
+    .writer-hero {
+      padding: var(--sp-xl) 0 var(--sp-lg);
+      border-bottom: 1px solid rgba(237,229,208,0.08);
+    }
+    .writer-hero-inner {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .writer-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 1px solid rgba(237,229,208,0.12);
+      display: block;
+    }
+    .writer-meta { padding-top: 0.5rem; }
+    .writer-persona {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .writer-name {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.1;
+      margin: 0 0 0.4rem;
+    }
+    .writer-tag {
+      font-family: var(--font-ui);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin: 0 0 1.5rem;
+      line-height: 1.6;
+    }
+    .writer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .writer-body { padding: var(--sp-lg) 0; }
+    .writer-body h2 {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 1rem;
+    }
+    .writer-body p {
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      max-width: 620px;
+      margin-bottom: 1rem;
+    }
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .back-link {
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: var(--sp-sm) 0;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+    @media (max-width: 600px) {
+      .writer-hero-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .writer-photo { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link"><img src="/assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo"></a>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="writer-hero">
+    <div class="container">
+      <a href="/writers/" class="back-link">← The Writers</a>
+      <div class="writer-hero-inner">
+        <img src="/assets/images/char-grace.jpg" alt="Gray" class="writer-photo">
+        <div class="writer-meta">
+          <span class="writer-persona">Gray writing as</span>
+          <h1 class="writer-name">Grace Lynn</h1>
+          <!-- ⚠ PLACEHOLDER — Gray to provide her own line when ready -->
+          <p class="writer-tag">Stories sometimes fiction, always true.</p>
+          <div class="writer-links">
+            <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener" class="btn btn--ghost">Turtle Meat Mixtapes →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="writer-body">
+    <div class="container">
+
+      <!-- BIO -->
+      <h2>The Writer</h2>
+      <!-- ⚠ PLACEHOLDER — Gray to write her own bio in her own register when ready -->
+      <p>Gray is a Southern writer. Southern goth, softer around the edges. She writes with lyrical confessional precision — run-on sentences and Oxford commas with reckless abandon — and the result is work that sits at the edge of memoir and invention without apologizing for either.</p>
+      <p>She also makes music. Turtle Meat Mixtapes is where that lives.</p>
+
+      <div style="height:2rem;"></div>
+
+      <!-- THE CHARACTER -->
+      <h2>The Character</h2>
+      <p>Grace Lynn runs on intuition and consecrates everything she touches — commerce as ministry, chaos as liturgy. On the Porch she's the one who tied the pink bow on the cooler. She didn't ask anyone if that was appropriate. It wasn't a question.</p>
+      <p>The Porch version of Grace is the resolution of a longer story. You can feel the distance she's traveled in how lightly she moves now.</p>
+
+      <div style="height:2rem;"></div>
+
+      <!-- PUBLISHED WORK -->
+      <h2>Published Work</h2>
+      <div class="work-grid">
+        <div class="card card--dim">
+          <div style="display:grid;grid-template-columns:70px 1fr;gap:0.85rem;align-items:start;">
+            <div class="sk-img sk-img--book" style="height:90px;">
+              <img src="/assets/images/cover-grace.jpg" alt="Opera Rose" style="width:100%;height:100%;object-fit:cover;display:block;">
+            </div>
+            <div>
+              <span class="card-label">Trilogy · In progress</span>
+              <h3 class="card-title card-title--sm">Opera Rose</h3>
+              <p class="card-body" style="font-size:0.82rem;margin-top:0.25rem;">Releasing now.</p>
+              <a href="/the-work/opera-rose/" class="btn btn--ghost" style="margin-top:0.5rem;font-size:0.58rem;">Read →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:2rem;"></div>
+
+      <!-- PORCH STORIES -->
+      <h2>On the Porch</h2>
+      <p>Grace appears across the Porch stories alongside Hank and Beau. Find everything she's been part of in the Porch archive.</p>
+      <a href="/the-porch/" class="btn btn--ghost" style="margin-top:0.5rem;">Browse the Porch →</a>
+
+    </div>
+  </section>
+
+  <div class="jp-strip">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <p class="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
+      <a href="/writers/jean-paul/" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;">Who is Jean-Paul?</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2025 Southern Writers Guild</span>
+      <span class="footer-text">southernwritersguild.com</span>
+    </div>
+  </footer>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>

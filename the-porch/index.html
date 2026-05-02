@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Porch — Southern Writers Guild</title>
+  <meta name="description" content="Where writers show up as themselves. Songs, stories, tall tales, poems — all mingle with the quiet.">
+  <link rel="stylesheet" href="../css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="../assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="/the-porch/" class="active">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="text-align:center;padding-bottom:var(--sp-md);">
+    <div class="container--narrow">
+      <img src="../assets/images/swg-logo.jpg" alt="Southern Writers Guild"
+           style="height:72px;width:auto;margin:0 auto var(--sp-sm);border-radius:6px;display:block;">
+      <h1 class="section-title" style="font-size:3rem;">The Porch</h1>
+      <p class="hero-sub" style="margin:0.75rem auto 0;text-align:center;">
+        Where writers show up as themselves. Songs, stories, tall tales, poems —
+        all mingle with the quiet. The porch doesn't rush you.
+      </p>
+    </div>
+  </section>
+
+  <div class="start-here">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;">
+      <div>
+        <span class="start-here-text" style="display:block;margin-bottom:0.2rem;"><strong>New here?</strong></span>
+        <span class="start-here-text">Start with the Cooler — it explains everything.</span>
+      </div>
+      <a href="/the-porch/start-here/" class="btn btn--primary" style="white-space:nowrap;flex-shrink:0;">Start here →</a>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterStories('all', this)">Latest</button>
+    <button class="filter-tab" onclick="filterStories('Hank', this)">By Hank</button>
+    <button class="filter-tab" onclick="filterStories('Beau', this)">By Beau</button>
+    <button class="filter-tab" onclick="filterStories('Gray', this)">By Gray</button>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div id="porch-grid" class="grid grid--3">
+        <!-- Populated by Sanity -->
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" style="background:var(--bg-2);text-align:center;">
+    <div class="container">
+      <p class="card-body" style="margin-bottom:1rem;">Every story from the Porch, most recent first.</p>
+      <a href="/the-porch/archive/" class="btn btn--primary">Browse the full archive →</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2025 Southern Writers Guild</span>
+      <span class="footer-text">southernwritersguild.com</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchPorchStories, renderPorchCard, showLoading, showError } from '../js/sanity.js'
+
+    const grid = document.getElementById('porch-grid')
+    let allStories = []
+
+    showLoading(grid)
+
+    fetchPorchStories(9)
+      .then(stories => {
+        allStories = stories
+        renderGrid(stories)
+      })
+      .catch(() => showError(grid, 'Stories unavailable — visit us on Substack.'))
+
+    function renderGrid(stories) {
+      if (!stories || !stories.length) {
+        showError(grid, 'No stories found.')
+        return
+      }
+      grid.innerHTML = stories.map(renderPorchCard).join('')
+    }
+
+    window.filterStories = function(term, btn) {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      if (term === 'all') {
+        renderGrid(allStories)
+      } else {
+        renderGrid(allStories.filter(s => s.authors && s.authors.includes(term)))
+      }
+    }
+  </script>
+
+  <script src="../js/nav.js"></script>
+</body>
+</html>
