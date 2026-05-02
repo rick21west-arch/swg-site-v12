@@ -3,134 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Southern Writers Guild</title>
-  <meta name="description" content="A deliberate assembly of stubborn scribes who stake our claim on this tangled South.">
-  <link rel="stylesheet" href="css/swg.css">
+  <title>Hank Cotton — Southern Writers Guild</title>
+  <meta name="description" content="MJ Polk writes as Hank Cotton. Street-level moral realism from the road, the ditch, and the mountain.">
+  <link rel="stylesheet" href="../../css/swg.css">
   <style>
-    /* ── Email capture ──────────────────────────────────── */
-    .email-capture {
-      text-align: center;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: var(--sp-lg) 0;
+    .writer-hero {
+      padding: var(--sp-xl) 0 var(--sp-lg);
+      border-bottom: 1px solid rgba(237,229,208,0.08);
     }
-    .email-capture .capture-label {
-      display: block;
-      font-family: var(--font-ui);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: var(--sp-sm);
-    }
-    .email-capture h3 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.4rem, 3vw, 1.9rem);
-      font-weight: 400;
-      color: var(--text);
-      margin: 0 0 0.35rem;
-      line-height: 1.25;
-    }
-    .email-capture .capture-sub {
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      margin: 0 0 var(--sp-md);
-    }
-    .email-form {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .email-form input[type="email"] {
-      background: var(--bg-3, rgba(255,255,255,0.05));
-      border: 1px solid rgba(237,229,208,0.2);
-      color: var(--text);
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      padding: 0.6rem 1rem;
-      border-radius: 2px;
-      min-width: 220px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .email-form input[type="email"]::placeholder {
-      color: var(--text-dim);
-    }
-    .email-form input[type="email"]:focus {
-      border-color: var(--accent);
-    }
-
-    /* ── Writers strip ──────────────────────────────────── */
-    .writers-grid {
+    .writer-hero-inner {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
+      grid-template-columns: 200px 1fr;
+      gap: 3rem;
+      align-items: start;
     }
-    .writer-card {
-      text-align: center;
-    }
-    .writer-card img {
-      width: 88px;
-      height: 88px;
+    .writer-photo {
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
       object-fit: cover;
       object-position: center top;
+      border: 1px solid rgba(237,229,208,0.12);
       display: block;
-      margin: 0 auto var(--sp-sm);
-      border: 1px solid rgba(237,229,208,0.15);
     }
-    .writer-card .writer-name {
-      font-family: var(--font-serif);
-      font-size: 1.05rem;
-      font-weight: 400;
-      color: var(--text);
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    .writer-card .writer-persona {
+    .writer-meta { padding-top: 0.5rem; }
+    .writer-persona {
       font-family: var(--font-ui);
       font-size: 0.7rem;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--accent);
       display: block;
       margin-bottom: 0.5rem;
     }
-    .writer-card .writer-line {
+    .writer-name {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.1;
+      margin: 0 0 0.4rem;
+    }
+    .writer-tag {
       font-family: var(--font-ui);
       font-size: 0.82rem;
       color: var(--text-dim);
-      line-height: 1.5;
+      margin: 0 0 1.5rem;
+      line-height: 1.6;
     }
-
-    /* ── JOIN band ──────────────────────────────────────── */
-    .join-band {
-      text-align: center;
-      padding: var(--sp-xl) 0;
+    .writer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
-    .join-band h3 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      font-weight: 400;
-      color: var(--text);
-      margin: 0 0 0.5rem;
-      line-height: 1.2;
-    }
-    .join-band p {
+    .writer-body { padding: var(--sp-lg) 0; }
+    .writer-body h2 {
       font-family: var(--font-ui);
-      font-size: 0.88rem;
-      color: var(--text-dim);
-      max-width: 420px;
-      margin: 0 auto var(--sp-md);
-      line-height: 1.65;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 1rem;
     }
-
-    @media (max-width: 640px) {
-      .writers-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-      .email-form { flex-direction: column; align-items: center; }
-      .email-form input[type="email"] { min-width: 0; width: 100%; max-width: 320px; }
+    .writer-body p {
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      max-width: 620px;
+      margin-bottom: 1rem;
+    }
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .back-link {
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: var(--sp-sm) 0;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+    @media (max-width: 600px) {
+      .writer-hero-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .writer-photo { width: 120px; height: 120px; }
     }
   </style>
 </head>
@@ -149,249 +114,75 @@
     </div>
   </nav>
 
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 1 — HERO
-       CTA changed: JOIN deferred, START HERE leads
-  ════════════════════════════════════════════════════ -->
-  <section class="hero">
+  <section class="writer-hero">
     <div class="container">
-      <div class="hero-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
-
-        <div>
-          <img src="/assets/images/swg-logo.jpg" alt="Southern Writers Guild"
-               style="height:90px;width:auto;margin-bottom:var(--sp-md);border-radius:4px;">
-          <span class="hero-eyebrow">Southern Writers Guild &nbsp;·&nbsp; Est. 2025</span>
-          <h1 class="hero-headline">
-            Stubborn scribes who stake<br>
-            our claim on this <em>tangled South.</em>
-          </h1>
-          <p class="hero-sub">
-            A deliberate assembly of poets, novelists, essayists, playwrights, and songwriters —
-            writing out of pine thickets and futuristic data centers, from the weight of old ghosts
-            and the flicker of new possibilities.
-          </p>
-          <div class="hero-ctas">
-            <a href="/the-porch/start-here/" class="btn btn--primary">Start Here →</a>
-            <a href="/the-work/" class="btn btn--ghost">Read Our Work</a>
+      <a href="/writers/" class="back-link">← The Writers</a>
+      <div class="writer-hero-inner">
+        <img src="/assets/images/char-hank-cotton.jpg" alt="Hank Cotton" class="writer-photo">
+        <div class="writer-meta">
+          <span class="writer-persona">MJ Polk writing as</span>
+          <h1 class="writer-name">Hank Cotton</h1>
+          <!-- ⚠ PLACEHOLDER — replace with MJ's line in Guild register -->
+          <p class="writer-tag">Street-level moral realism. Charges twenty bucks for anticipation. Usually right.</p>
+          <div class="writer-links">
+            <a href="https://thesouthernwritersguild.substack.com/s/hank-cotton" target="_blank" rel="noopener" class="btn btn--ghost">Hank on Substack →</a>
           </div>
         </div>
-
-        <div>
-          <img src="/assets/images/hero-bg.png"
-               alt="A farm and tractor in the foreground, a gleaming Southern city skyline rising at golden hour behind it"
-               style="width:100%;border-radius:4px;display:block;aspect-ratio:4/3;object-fit:cover;">
-        </div>
-
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 2 — LATEST FROM THE PORCH
-       Moved up from Section 3. First proof of voice.
-  ════════════════════════════════════════════════════ -->
-  <section class="section">
+  <section class="writer-body">
     <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Latest from the Porch</span>
-        <a href="/the-porch/" class="section-see-all">See all →</a>
-      </div>
-      <div class="grid grid--3">
 
-        <a href="https://thesouthernwritersguild.substack.com/p/sarah-macdougals-mushroom-pie" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="https://substackcdn.com/image/fetch/w_800,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Ffdae70d9-2162-48a4-b54c-039b1a847e4f_1402x1122.png"
-               alt="Sarah MacDougal's Mushroom Pie" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Beau + Gray &nbsp;·&nbsp; Apr 27</span>
-          <h3 class="card-title card-title--sm">Sarah MacDougal's Mushroom Pie</h3>
-          <p class="card-body" style="font-size:0.9rem;">The Trio goes to FloydFest. Jean-Paul emits observational signal.</p>
-        </a>
+      <!-- BIO -->
+      <h2>The Writer</h2>
+      <!-- ⚠ PLACEHOLDER — MJ to rewrite in Guild register when ready -->
+      <p>Three hundred thousand miles OTR. Plumber's apprentice. Farm hand. Twenty-five years in sales. MJ Polk has read more roads, rooms, and people than most writers will invent in a lifetime.</p>
+      <p>He graduated from Valdosta State's creative writing program in 2025 and is currently writing a novel. The miles are in the work.</p>
 
-        <a href="https://thesouthernwritersguild.substack.com/p/the-little-shops-that-were" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="assets/images/thumb-little-shops.jpg"
-               alt="The Little Shops That Were" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center top;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">All three &nbsp;·&nbsp; Mar 16</span>
-          <h3 class="card-title card-title--sm">The Little Shops That Were</h3>
-          <p class="card-body" style="font-size:0.9rem;">Gators in a Cape Coral convenience store. Bootleggers behind the Quality Inn.</p>
-        </a>
+      <div style="height:2rem;"></div>
 
-        <a href="https://thesouthernwritersguild.substack.com/p/best-in-show" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="https://substackcdn.com/image/fetch/w_800,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Feb964193-43c3-422d-80f8-4961f6f2cf56_1536x1024.png"
-               alt="Best in Show" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">All three &nbsp;·&nbsp; Mar 9</span>
-          <h3 class="card-title card-title--sm">Best in Show</h3>
-          <p class="card-body" style="font-size:0.9rem;">Airlie Gardens, Wilmington. A flower show. A peacock. Zero surprises.</p>
-        </a>
+      <!-- THE CHARACTER -->
+      <h2>The Character</h2>
+      <p>Hank Cotton is the vessel. Practical intelligence as instinct — he reads the road, the ditch, the mountain. His moral realism isn't a philosophy, it's a habit built from watching what people actually do when nobody's keeping score.</p>
 
-      </div>
-    </div>
-  </section>
+      <div style="height:2rem;"></div>
 
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 3 — EMAIL CAPTURE
-       New. Low-friction follow. The owned relationship.
-       ⚠ Wire form action to your list provider (Mailchimp,
-         ConvertKit, etc.) before going live.
-  ════════════════════════════════════════════════════ -->
-  <section class="section section--tight" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="email-capture">
-        <span class="capture-label">Stay in the loop</span>
-        <h3>New stories, when they're ready.</h3>
-        <p class="capture-sub">No noise. No schedule. Just the work, straight to you.</p>
-        <form class="email-form" action="#" method="post">
-          <input type="email" name="email" placeholder="your@email.com" required>
-          <button type="submit" class="btn btn--primary">Subscribe</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 4 — FEATURED FICTION
-       Moved down from Section 2. Earns its place now.
-       Opera Rose copy: PROVISIONAL — replace when Gray
-       provides her own description.
-  ════════════════════════════════════════════════════ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Featured this month</span>
-        <a href="/the-work/#archive" class="section-see-all">All features →</a>
-      </div>
-      <div class="grid grid--featured">
-
-        <div class="card card--highlight">
-          <span class="card-badge">Current feature</span>
-          <div class="sk-img sk-img--hero" style="margin-bottom:1.25rem;">
-            <img src="assets/images/cover-grace.jpg" alt="Opera Rose by Gray" style="width:100%;height:100%;object-fit:cover;display:block;">
-          </div>
-          <span class="card-label">Gray &nbsp;·&nbsp; Fiction</span>
-          <h2 class="card-title">Opera Rose</h2>
-          <p class="card-body">
-            A trilogy about what we bury in the South's soft ground — and what refuses to stay there.
-            Grace, and the cost of losing it. Rose, and what grows in the dark.
-          </p>
-          <div style="margin-top:1.25rem;">
-            <a href="/the-work/opera-rose/" class="btn btn--primary">Read it</a>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:1rem;">
-
-          <div class="card card--dim">
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start;">
-              <div class="sk-img sk-img--book" style="height:100px;"><img src="assets/images/cover-first-light.jpg" alt="Book cover" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-              <div>
-                <span class="card-label">Previously featured</span>
-                <h3 class="card-title card-title--sm">First Light</h3>
-                <p class="card-body" style="font-size:0.88rem;">Rick West · Beau Pritchett IV</p>
-                <a href="/the-work/first-light/" class="btn btn--ghost" style="margin-top:0.6rem;font-size:0.58rem;">Read →</a>
-              </div>
+      <!-- PUBLISHED WORK -->
+      <h2>Published Work</h2>
+      <div class="work-grid">
+        <div class="card card--dim">
+          <div style="display:grid;grid-template-columns:70px 1fr;gap:0.85rem;align-items:start;">
+            <div class="sk-img sk-img--book" style="height:90px;">
+              <img src="/assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling" style="width:100%;height:100%;object-fit:cover;display:block;">
+            </div>
+            <div>
+              <span class="card-label">Novella</span>
+              <h3 class="card-title card-title--sm">The Ugly Duckling</h3>
+              <p class="card-body" style="font-size:0.82rem;margin-top:0.25rem;">Serialized. Ten chapters.</p>
+              <a href="/the-work/ugly-duckling/" class="btn btn--ghost" style="margin-top:0.5rem;font-size:0.58rem;">Read →</a>
             </div>
           </div>
-
-          <div class="card card--dim">
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start;">
-              <div class="sk-img sk-img--book" style="height:100px;"><img src="assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-              <div>
-                <span class="card-label">Previously featured</span>
-                <h3 class="card-title card-title--sm">The Ugly Duckling</h3>
-                <p class="card-body" style="font-size:0.88rem;">Hank Cotton</p>
-                <a href="/the-work/ugly-duckling/" class="btn btn--ghost" style="margin-top:0.6rem;font-size:0.58rem;">Read →</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="border-style:dashed;">
-            <span class="card-label">Open to writers</span>
-            <p class="card-body" style="font-size:0.9rem;">
-              The feature rotates monthly. Southern writers may submit for consideration.
-            </p>
-            <a href="/the-house/#submit" class="btn btn--ghost" style="margin-top:0.75rem;font-size:0.58rem;">Submit work →</a>
-          </div>
-
         </div>
       </div>
+
+      <div style="height:2rem;"></div>
+
+      <!-- PORCH STORIES -->
+      <h2>On the Porch</h2>
+      <p>Hank appears across the Porch stories alongside Beau and Grace. Find everything he's been part of in the Porch archive.</p>
+      <a href="/the-porch/" class="btn btn--ghost" style="margin-top:0.5rem;">Browse the Porch →</a>
+
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 5 — THE WRITERS (inline, abbreviated)
-       New block. Full bios live at /writers/.
-       Three names. One sentence each. The ensemble argument.
-  ════════════════════════════════════════════════════ -->
-  <section class="section section--tight" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">The Writers</span>
-        <a href="/writers/" class="section-see-all">Meet them →</a>
-      </div>
-      <div class="writers-grid">
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-mj-polk.jpg" alt="MJ Polk">
-          <span class="writer-name">MJ Polk</span>
-          <span class="writer-persona">Hank Cotton</span>
-          <p class="writer-line">300,000 miles OTR, twenty-five years in sales, and a moral realism built from the road, the ditch, and the mountain.</p>
-        </div>
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-rick-west.jpg" alt="Rick West">
-          <span class="writer-name">Rick West</span>
-          <span class="writer-persona">Beau Pritchett IV</span>
-          <p class="writer-line">Atmospheric psychological fiction, a strong sense of place, and the particular weight of what's been left unsaid.</p>
-        </div>
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-gray.jpg" alt="Gray">
-          <span class="writer-name">Gray</span>
-          <span class="writer-persona">Grace Lynn</span>
-          <p class="writer-line">Lyrical confessional precision — Southern goth with softer edges, and stories that are sometimes fiction but always true.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 6 — INTERVIEW
-       Stays. Establishes range and the music throughline.
-  ════════════════════════════════════════════════════ -->
-  <section class="section section--tight">
-    <div class="container">
-      <div class="card card--band">
-        <span class="card-label">Interview &nbsp;·&nbsp; Music &amp; Culture</span>
-        <h3 class="card-title">Bob Beatty on the Allman Brothers and the Changing South</h3>
-        <p class="card-body">
-          A deep dive into <em>Play All Night</em> — and into the South that shaped the band,
-          and the band that shaped the South.
-        </p>
-        <a href="/the-work/interviews/beatty/" class="btn btn--ghost" style="margin-top:1rem;">Read the interview →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- JEAN-PAUL STRIP -->
   <div class="jp-strip">
     <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <p class="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
-      <a href="/writers/#jean-paul" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;">Who is Jean-Paul?</a>
+      <a href="/writers/jean-paul/" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;">Who is Jean-Paul?</a>
     </div>
   </div>
-
-  <!-- ═══════════════════════════════════════════════════
-       SECTION 7 — JOIN (final CTA)
-       Conclusion, not opener. By now they've earned it.
-  ════════════════════════════════════════════════════ -->
-  <section class="section" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="join-band">
-        <h3>Join the Guild.</h3>
-        <p>You've spent some time here. You know what this is. If it's yours, come in.</p>
-        <a href="/join/" class="btn btn--primary">Join the Guild →</a>
-      </div>
-    </div>
-  </section>
 
   <footer class="site-footer">
     <div class="footer-inner">
@@ -400,6 +191,6 @@
     </div>
   </footer>
 
-  <script src="js/nav.js"></script>
+  <script src="/js/nav.js"></script>
 </body>
 </html>
