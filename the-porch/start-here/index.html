@@ -24,9 +24,9 @@
 
   <section class="hero">
     <div class="container--narrow">
-      <span class="hero-eyebrow">New here? Start with the Cooler.</span>
+      <span class="hero-eyebrow">The Porch</span>
       <h1 class="hero-headline" style="font-size:clamp(2rem,4vw,3rem);">
-        Everything you need to know<br>about this place.
+        A place where the South<br>still remembers itself.
       </h1>
     </div>
   </section>
@@ -34,18 +34,34 @@
   <section class="section">
     <div class="container--narrow prose">
 
-      <div class="sk-section" style="min-height:200px;">
-        [ The Cooler Backstory — full text from Substack migrated here ]<br><br>
-        Source: thesouthernwritersguild.substack.com/p/backstory-of-the-cooler<br><br>
-        Who the Trio is. How they met. What the cooler is. Where Jean-Paul came from.
-        This is the permanent onramp for cold readers.
+      <p style="font-family:var(--font-serif);font-size:1.2rem;line-height:1.8;color:var(--text);margin-bottom:1.5rem;">
+        The Porch is where people show up as themselves. Songs, stories, jokes, poems — they all mingle with the quiet. The Porch doesn't rush you. Anything shared — tall tales, sketches, poems, or just your own breathing — might land here.
+      </p>
+
+      <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.5rem;">
+        This porch draws people who've learned — often the hard way — that noise is a currency and silence is usually sold too cheap. It keeps out the opinionated, the evangelical (of any stripe), the folks who mistake volume for truth.
+      </p>
+
+      <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.5rem;">
+        It attracts those who have been wrong and survived it. Those who know the cost of certainty. Those tired of defending themselves.
+      </p>
+
+      <p style="font-family:var(--font-ui);font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:3rem;">
+        The Porch isn't neutral. It's selective. It entertains those who can shut up long enough to hear the evening settle.
+      </p>
+
+      <div class="section-rule" style="margin-bottom:3rem;"></div>
+
+      <!-- Cooler Backstory -->
+      <div id="cooler-block" style="margin-bottom:3rem;">
+        <div style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">Loading...</div>
       </div>
 
-      <hr>
+      <div class="section-rule" style="margin-bottom:3rem;"></div>
 
-      <h2>The three voices on the Porch</h2>
+      <h2 style="font-family:var(--font-serif);font-size:1.75rem;color:var(--text);margin-bottom:1.5rem;">The three voices on the Porch</h2>
 
-      <div class="grid grid--3" style="margin-top:1rem;">
+      <div class="grid grid--3" style="margin-bottom:3rem;">
         <div class="card">
           <span class="card-label">MJ Polk</span>
           <h3 class="card-title card-title--sm">Hank Cotton</h3>
@@ -66,18 +82,15 @@
         </div>
       </div>
 
-      <hr>
+      <div class="section-rule" style="margin-bottom:3rem;"></div>
 
-      <h2>And then there is Jean-Paul</h2>
-
-      <div class="sk-section" style="min-height:160px;">
-        [ Jean-Paul origin — drawn from the Jean-Paul Substack piece and Pensacola Incident ]<br><br>
-        Strangely sentient. Taxidermied. One eye cracked, one glowing blue-green since Pensacola.
-        He answers to French curses and banana pudding. He already knows what's in the cooler.
+      <!-- Jean-Paul -->
+      <div id="jeanpaul-block" style="margin-bottom:3rem;">
+        <div style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">Loading...</div>
       </div>
 
-      <div style="margin-top:var(--sp-md); text-align:center;">
-        <a href="/the-porch/" class="btn btn--primary">Now go read the Porch</a>
+      <div style="margin-top:2rem;text-align:center;">
+        <a href="/the-porch/" class="btn btn--primary">Now go read the Porch →</a>
       </div>
 
     </div>
@@ -89,6 +102,41 @@
       <span class="footer-text">southernwritersguild.com</span>
     </div>
   </footer>
+
+  <script type="module">
+    import { sanityFetch, thumbSrc } from '../../js/sanity.js'
+
+    function renderFeatureBlock(story) {
+      const thumb = thumbSrc(story)
+      const img = thumb
+        ? `<img src="${thumb}" alt="${story.title}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:4px;margin-bottom:1.25rem;">`
+        : ''
+      return `
+        <span class="card-label" style="display:block;margin-bottom:0.5rem;">${story.authors || ''}</span>
+        <h2 style="font-family:var(--font-serif);font-size:1.75rem;color:var(--text);margin-bottom:1rem;">${story.title}</h2>
+        ${img}
+        ${story.excerpt ? `<p style="font-family:var(--font-serif);font-size:1.05rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.25rem;">${story.excerpt}</p>` : ''}
+        <a href="${story.substackUrl}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.62rem;">Read on Substack →</a>
+      `
+    }
+
+    const coolerUrl  = 'https://thesouthernwritersguild.substack.com/p/backstory-of-the-cooler'
+    const jeanpaulUrl = 'https://thesouthernwritersguild.substack.com/p/jean-paul'
+
+    sanityFetch(`*[_type == "porchStory" && substackUrl == "${coolerUrl}"][0]`)
+      .then(story => {
+        document.getElementById('cooler-block').innerHTML = story
+          ? renderFeatureBlock(story)
+          : '<p style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">Story unavailable.</p>'
+      })
+
+    sanityFetch(`*[_type == "porchStory" && substackUrl == "${jeanpaulUrl}"][0]`)
+      .then(story => {
+        document.getElementById('jeanpaul-block').innerHTML = story
+          ? renderFeatureBlock(story)
+          : '<p style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">Story unavailable.</p>'
+      })
+  </script>
 
   <script src="../../js/nav.js"></script>
 </body>
