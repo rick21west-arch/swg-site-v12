@@ -67,9 +67,9 @@
        <div class="card card--highlight">
          <span class="card-badge">Current</span>
          ${current.coverUrl
-           ? `<div class="sk-img sk-img--hero" style="margin-bottom:1.25rem;">
-                <img src="${esc(current.coverUrl)}" alt="${esc(current.title)}" style="width:100%;height:100%;object-fit:cover;display:block;">
-              </div>`
+           ? `<div style="margin-bottom:1.25rem;">
+             <img src="${esc(current.coverUrl)}" alt="${esc(current.title)}" style="width:100%;height:auto;display:block;">
+           </div>`
            : ''}
          <span class="card-label">${esc(current.author || '')} &nbsp;·&nbsp; Fiction</span>
          <h2 class="card-title">${esc(current.title)}</h2>
