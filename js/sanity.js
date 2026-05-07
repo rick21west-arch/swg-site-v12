@@ -68,8 +68,8 @@ export function renderFeaturedFiction(items) {
     <div class="card card--highlight">
       <span class="card-badge">Current</span>
       ${current.coverUrl
-        ? `<div style="margin-bottom:1.25rem;">
-             <img src="${esc(current.coverUrl)}" alt="${esc(current.title)}" style="width:100%;height:auto;display:block;">
+        ? `<div style="margin-bottom:1.25rem;text-align:center;">
+             <img src="${esc(current.coverUrl)}" alt="${esc(current.title)}" style="width:60%;height:auto;display:inline-block;">
            </div>`
         : ''}
       <span class="card-label">${esc(current.author || '')} &nbsp;·&nbsp; Fiction</span>
