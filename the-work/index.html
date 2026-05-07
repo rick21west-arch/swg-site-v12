@@ -31,52 +31,11 @@
         <a href="/the-work/featured/" class="section-see-all">Full catalog →</a>
       </div>
       <div id="featured-fiction-grid"></div>
-    </div>
+    </div><div id="featured-fiction-archive"></div>
   </section>
   
 
-      <!-- Archive -->
-      <div id="archive" style="margin-top:var(--sp-lg);padding-top:var(--sp-md);border-top:0.5px solid var(--border);">
-        <div class="section-header" style="margin-bottom:1rem;">
-          <span class="section-header-title">Archive</span>
-          <span class="card-label" style="color:var(--text-faint);margin:0;">All featured works</span>
-        </div>
-        <div class="grid grid--3">
-
-          <a href="/the-work/opera-rose/" class="card">
-            <div class="sk-img sk-img--book" style="height:140px;margin-bottom:0.75rem;"><img src="../assets/images/cover-grace.jpg" alt="Opera Rose by Gray" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-            <span class="card-label">Gray &nbsp;·&nbsp; Current</span>
-            <h3 class="card-title card-title--sm">Opera Rose</h3>
-            <p class="card-note">Trilogy · 2026</p>
-          </a>
-
-          <a href="/the-work/first-light/" class="card">
-            <div class="sk-img sk-img--book" style="height:140px;margin-bottom:0.75rem;"><img src="../assets/images/cover-first-light.jpg" alt="Book cover" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-            <span class="card-label">Rick West · Beau</span>
-            <h3 class="card-title card-title--sm">First Light</h3>
-            <p class="card-note">Novel · Feb–Mar 2026</p>
-          </a>
-
-          <a href="/the-work/ugly-duckling/" class="card">
-            <div class="sk-img sk-img--book" style="height:140px;margin-bottom:0.75rem;"><img src="../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-            <span class="card-label">Hank Cotton</span>
-            <h3 class="card-title card-title--sm">The Ugly Duckling</h3>
-            <p class="card-note">Novella · Jan–Feb 2026</p>
-          </a>
-
-          <!-- Future features slot in here as cards, grid expands automatically -->
-          <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:240px;">
-            <span class="card-body" style="text-align:center;font-size:0.9rem;font-style:italic;">
-              Future features<br>added here
-            </span>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
+ 
   <!-- CONVERSATIONS -->
   <section class="section">
     <div class="container">
@@ -276,17 +235,17 @@
 
   <script src="../js/nav.js"></script>
   <script type="module">
-    import { fetchFeaturedFiction, renderFeaturedFiction, showLoading, showError } from '../js/sanity.js'
+    import { fetchFeaturedFiction, renderFeaturedFiction, renderFeaturedArchive, showLoading, showError } from '../js/sanity.js'
   
     const grid = document.getElementById('featured-fiction-grid')
+    const archiveEl = document.getElementById('featured-fiction-archive')
     showLoading(grid)
   
     fetchFeaturedFiction()
       .then(items => {
         if (!items || !items.length) { showError(grid, 'Content unavailable.'); return }
         grid.innerHTML = renderFeaturedFiction(items)
+        archiveEl.innerHTML = renderFeaturedArchive(items)
       })
       .catch(() => showError(grid, 'Content unavailable.'))
   </script>
-  </body>
-</html>
