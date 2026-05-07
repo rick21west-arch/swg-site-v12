@@ -81,7 +81,7 @@ export async function fetchAllVideos() {
 export function renderPorchCard(story) {
   const thumb = thumbSrc(story)
   const img = thumb
-    ? `<img src="${thumb}" alt="${esc(story.title)}" style="width:100%;aspect-ratio:16/9;object-fit:contain;display:block;margin-bottom:0.75rem;background:var(--bg-3);">`
+    ? `<img src="${thumb}" alt="${esc(story.title)}" style="width:100%;aspect-ratio:16/9;object-fit:contain;display:block;margin-bottom:0.75rem">`
     : `<div style="aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
          <span style="font-family:var(--font-serif);font-style:italic;color:var(--text-faint);font-size:0.95rem;text-align:center;padding:1rem;">${esc(story.excerpt || story.title)}</span>
        </div>`
