@@ -30,63 +30,10 @@
         <span class="section-header-title">Featured fiction</span>
         <a href="/the-work/featured/" class="section-see-all">Full catalog →</a>
       </div>
-
-      <!-- Current + two most recent -->
-      <div class="grid grid--featured" style="margin-bottom:1rem;">
-
-        <!-- Current — Opera Rose -->
-        <div class="card card--highlight">
-          <span class="card-badge">Current</span>
-          <div class="sk-img sk-img--hero" style="margin-bottom:1.25rem;">
-            <img src="../assets/images/cover-opera-rose.png" alt="Opera Rose by Gray" style="width:100%;height:100%;object-fit:cover;display:block;">
-          </div>
-          <span class="card-label">Gray &nbsp;·&nbsp; Fiction</span>
-          <h2 class="card-title">Opera Rose</h2>
-          <p class="card-body">[ Description — TBD from Gray ]</p>
-          <p class="card-note">Trilogy · In progress</p>
-          <a href="/the-work/opera-rose/" class="btn btn--primary" style="margin-top:1rem;">Read it</a>
-          <a href="https://www.amazon.com/Opera-Rose-Other-Devotions-Becoming-ebook/dp/B0GZJV9TCN/" class="btn btn--ghost" style="margin-top:0.6rem;">Buy on Amazon →</a>
-        </div>
-
-        <!-- Two most recent stacked -->
-        <div style="display:flex;flex-direction:column;gap:1rem;">
-
-          <div class="card card--dim">
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start;">
-              <div class="sk-img sk-img--book" style="height:110px;"><img src="../assets/images/cover-first-light.jpg" alt="Book cover" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-              <div>
-                <span class="card-label">Previously featured</span>
-                <h3 class="card-title card-title--sm">First Light</h3>
-                <p class="card-body" style="font-size:0.88rem;">Rick West · Beau Pritchett IV</p>
-                <p class="card-note">Featured Feb–Mar 2026</p>
-                <a href="/the-work/first-light/" class="btn btn--ghost" style="margin-top:0.6rem;font-size:0.58rem;">Read →</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card--dim">
-            <div style="display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start;">
-              <div class="sk-img sk-img--book" style="height:110px;"><img src="../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-              <div>
-                <span class="card-label">Previously featured</span>
-                <h3 class="card-title card-title--sm">The Ugly Duckling</h3>
-                <p class="card-body" style="font-size:0.88rem;">Hank Cotton</p>
-                <p class="card-note">Featured Jan–Feb 2026</p>
-                <a href="/the-work/ugly-duckling/" class="btn btn--ghost" style="margin-top:0.6rem;font-size:0.58rem;">Read →</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="border-style:dashed;">
-            <span class="card-label">Open to Southern writers</span>
-            <p class="card-body" style="font-size:0.9rem;">
-              The feature rotates monthly. Your work could live here.
-            </p>
-            <a href="/the-house/#submit" class="btn btn--primary" style="margin-top:0.75rem;">Submit your work →</a>
-          </div>
-
-        </div>
-      </div>
+      <div id="featured-fiction-grid"></div>
+    </div>
+  </section>
+  
 
       <!-- Archive -->
       <div id="archive" style="margin-top:var(--sp-lg);padding-top:var(--sp-md);border-top:0.5px solid var(--border);">
@@ -328,5 +275,18 @@
   </footer>
 
   <script src="../js/nav.js"></script>
-</body>
+  <script type="module">
+    import { fetchFeaturedFiction, renderFeaturedFiction, showLoading, showError } from '../js/sanity.js'
+  
+    const grid = document.getElementById('featured-fiction-grid')
+    showLoading(grid)
+  
+    fetchFeaturedFiction()
+      .then(items => {
+        if (!items || !items.length) { showError(grid, 'Content unavailable.'); return }
+        grid.innerHTML = renderFeaturedFiction(items)
+      })
+      .catch(() => showError(grid, 'Content unavailable.'))
+  </script>
+  </body>
 </html>
