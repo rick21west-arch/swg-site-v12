@@ -1,5 +1,4 @@
-You accidentally opened sanity.js and it got wiped. Paste this entire block back in — it's the full file exactly as it was:
-javascript/* ============================================================
+/* ============================================================
    Southern Writers Guild — Sanity CMS fetch layer
    js/sanity.js
    ============================================================ */
