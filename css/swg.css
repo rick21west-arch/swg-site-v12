@@ -650,19 +650,70 @@ ul, ol { list-style: none; }
 }
 
 /* ============================================================
-   Responsive
+   Mobile nav toggle
    ============================================================ */
 
-@media (max-width: 900px) {
-  .grid--3, .grid--writers { grid-template-columns: repeat(2, 1fr); }
-  .grid--featured { grid-template-columns: 1fr; }
-  .hero-headline { font-size: clamp(2.2rem, 7vw, 3.5rem); }
-  .hero-two-col { grid-template-columns: 1fr !important; }
-}
-
-@media (max-width: 600px) {
-  :root { --sp-md: 1.25rem; }
-  .grid--3, .grid--2, .grid--writers { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
-  .hero { padding: var(--sp-lg) 0 var(--sp-md); }
-}
+   .nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  
+  .nav-toggle span {
+    display: block;
+    width: 20px;
+    height: 0.5px;
+    background: var(--text);
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  
+  .nav-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(5.5px) rotate(45deg);
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-5.5px) rotate(-45deg);
+  }
+  
+  /* ============================================================
+     Responsive
+     ============================================================ */
+  
+  @media (max-width: 900px) {
+    .grid--3, .grid--writers { grid-template-columns: repeat(2, 1fr); }
+    .grid--featured { grid-template-columns: 1fr; }
+    .hero-headline { font-size: clamp(2.2rem, 7vw, 3.5rem); }
+    .hero-two-col { grid-template-columns: 1fr !important; }
+  }
+  
+  @media (max-width: 600px) {
+    :root { --sp-md: 1.25rem; }
+    .grid--3, .grid--2, .grid--writers { grid-template-columns: 1fr; }
+    .nav-toggle { display: flex; }
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: var(--nav-h);
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border-bottom: 0.5px solid var(--border);
+      padding: 1.25rem var(--sp-md);
+      gap: 1.25rem;
+      z-index: 99;
+    }
+    .hero { padding: var(--sp-lg) 0 var(--sp-md); }
+  }
