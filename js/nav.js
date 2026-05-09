@@ -1,9 +1,17 @@
-/* Nav injection — marks active page based on current path */
-document.addEventListener('DOMContentLoaded', () => {
-  const path = window.location.pathname;
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    const href = a.getAttribute('href');
-    if (href !== '/' && path.includes(href)) a.classList.add('active');
-    if (href === '/' && (path === '/' || path === '/index.html')) a.classList.add('active');
+(function () {
+  var toggle = document.querySelector('.nav-toggle');
+  var links = document.querySelector('.nav-links');
+  if (!toggle || !links) return;
+
+  toggle.addEventListener('click', function () {
+    var open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
   });
-});
+
+  links.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      links.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
