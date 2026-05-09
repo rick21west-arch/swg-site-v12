@@ -1,4 +1,5 @@
-/* ============================================================
+You accidentally opened sanity.js and it got wiped. Paste this entire block back in — it's the full file exactly as it was:
+javascript/* ============================================================
    Southern Writers Guild — Sanity CMS fetch layer
    js/sanity.js
    ============================================================ */
@@ -220,4 +221,3 @@
    export function showError(el, msg = 'Content unavailable.') {
      el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;">${msg}</div>`
    }
-    
