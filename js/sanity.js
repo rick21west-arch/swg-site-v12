@@ -151,7 +151,13 @@
      )
    }
     
-   /* ── Card renderers ─────────────────────────────────────────── */
+   export async function fetchConversations(limit = 6) {
+    return sanityFetch(
+      `*[_type == "guildVideo" && type == "conversation"] | order(publishedAt desc) [0...${limit}]`
+    )
+  }
+  
+  /* ── Card renderers ─────────────────────────────────────────── /* ── Card renderers ─────────────────────────────────────────── */
     
    export function renderPorchCard(story) {
      const thumb = thumbSrc(story)

@@ -245,4 +245,21 @@
         archiveEl.innerHTML = renderFeaturedArchive(items)
       })
       .catch(() => showError(grid, 'Content unavailable.'))
-  </script>
+
+const convGrid = document.getElementById('conversations-grid')
+showLoading(convGrid)
+fetchConversations()
+  .then(items => {
+    if (!items || !items.length) {
+      convGrid.innerHTML = `
+        <div class="card card--dim" style="border-style:dashed;">
+          <span class="card-label">Coming soon</span>
+          <h2 class="card-title" style="color:var(--text-muted);">First conversation</h2>
+          <p class="card-body">Writers, musicians, the South in motion.</p>
+        </div>`
+      return
+    }
+    convGrid.innerHTML = items.map(v => renderVideoCard(v, 'small')).join('')
+  })
+  .catch(() => showError(convGrid, 'Content unavailable.'))
+</script>  
