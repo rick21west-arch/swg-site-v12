@@ -3,13 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Work â€” Southern Writers Guild</title>
-  <meta name="description" content="Featured fiction, interviews, music, and books from the Southern Writers Guild.">
+  <title>The Work — Southern Writers Guild</title>
+  <meta name="description" content="Books, conversations, and music from the Southern Writers Guild.">
   <link rel="stylesheet" href="../css/swg.css">
+  <style>
+    .work-header { padding: 52px 60px 44px; }
+    .work-eyebrow { font-size: 9px; letter-spacing: 0.22em; color: #5a5048; text-transform: uppercase; margin-bottom: 10px; }
+    .work-tagline { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 15px; font-style: italic; font-weight: 300; color: #6a6056; line-height: 1.5; }
+    .work-divider { border: none; border-top: 1px solid rgba(200,150,80,0.12); margin: 0; }
+    .work-section { padding: 52px 60px 56px; }
+    .section-label { font-size: 9px; letter-spacing: 0.22em; color: #8a7e72; text-transform: uppercase; margin-bottom: 0; }
+    .section-rule { width: 28px; height: 1px; background: #c8703a; opacity: 0.55; margin-top: 9px; }
+    .section-desc { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 13px; font-style: italic; font-weight: 300; color: #5a5048; margin: 12px 0 28px; line-height: 1.5; }
+    .books-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 28px; }
+    .book-cover { aspect-ratio: 2/3; background: rgba(0,0,0,0.45); border: 1px solid rgba(200,150,80,0.1); margin-bottom: 16px; overflow: hidden; }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .book-author { font-size: 8px; letter-spacing: 0.14em; color: #6a6056; text-transform: uppercase; margin-bottom: 6px; }
+    .book-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1.1rem; font-weight: 400; color: #ede5d8; margin-bottom: 8px; line-height: 1.25; }
+    .book-desc { font-size: 0.75rem; color: #8a7e72; line-height: 1.6; margin-bottom: 14px; font-weight: 300; }
+    .text-link { font-size: 9px; letter-spacing: 0.12em; color: #c8703a; text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+    .text-link:hover { color: #d4824e; }
+    .convos-list { display: flex; flex-direction: column; gap: 14px; }
+    .convo-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(200,150,80,0.1); display: grid; grid-template-columns: 200px 1fr; overflow: hidden; text-decoration: none; transition: border-color 0.25s; }
+    .convo-card:hover { border-color: rgba(200,150,80,0.28); }
+    .convo-card.dim { opacity: 0.45; pointer-events: none; }
+    .convo-thumb { overflow: hidden; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+    .convo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .convo-thumb span { font-size: 9px; color: rgba(255,255,255,0.1); letter-spacing: 0.12em; }
+    .convo-body { padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; }
+    .convo-date { font-size: 8px; letter-spacing: 0.14em; color: #6a6056; text-transform: uppercase; margin-bottom: 8px; }
+    .convo-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1rem; font-weight: 400; color: #ede5d8; margin-bottom: 8px; line-height: 1.3; }
+    .convo-desc { font-size: 0.75rem; color: #8a7e72; line-height: 1.6; margin-bottom: 12px; font-weight: 300; }
+    .booth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .booth-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(200,150,80,0.1); padding: 22px 24px 26px; transition: border-color 0.25s; }
+    .booth-card:hover { border-color: rgba(200,150,80,0.25); }
+    .booth-owner { font-size: 8px; letter-spacing: 0.14em; color: #6a6056; text-transform: uppercase; margin-bottom: 8px; }
+    .booth-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1rem; font-weight: 400; color: #ede5d8; margin-bottom: 10px; }
+    .booth-desc { font-size: 0.75rem; color: #8a7e72; line-height: 1.6; margin-bottom: 16px; font-weight: 300; }
+    @media (max-width: 768px) {
+      .work-header { padding: 36px 24px 28px; }
+      .work-section { padding: 36px 24px 40px; }
+      .books-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .booth-grid { grid-template-columns: 1fr; }
+      .convo-card { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
-  <nav<nav class="site-nav">
+  <nav class="site-nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo-link"><img src="../assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo"></a>
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -18,248 +59,130 @@
         <li><a href="/the-work/" class="active">The Work</a></li>
         <li><a href="/the-house/">The House</a></li>
         <li><a href="/writers/">Writers</a></li>
-        
         <li class="nav-join"><a href="/join/">Join</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- FEATURED FICTION -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Featured fiction</span>
-        <a href="/the-work/featured/" class="section-see-all">Full catalog â†’</a>
-      </div>
-      <div id="featured-fiction-grid"></div>
-      <div id="featured-fiction-archive"></div>
-  </section>
-  
+  <div class="work-header">
+    <p class="work-eyebrow">The Work</p>
+    <p class="work-tagline">Three writers. Everything they've made.</p>
+  </div>
 
- 
-  <!-- CONVERSATIONS -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Conversations</span>
-        <a href="/the-work/videos/#conversations" class="section-see-all">All conversations â†’</a>
-      </div>
-      <div class="grid grid--2">
+  <hr class="work-divider">
 
-        <a href="https://thesouthernwritersguild.substack.com/p/a-conversation-from-the-crossroads"
-           target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <span class="card-label">Video &nbsp;Â·&nbsp; Music &amp; Culture &nbsp;Â·&nbsp; Jan 27, 2026</span>
-          <h2 class="card-title">A Conversation From the Crossroads</h2>
-          <p class="card-body">Bob Beatty on the Allman Brothers, Southern soul, and <em>Play All Night</em>. The Guild's first live interview â€” two writers with noteworthy beards talking the music that built the South.</p>
-          <p class="card-note" style="margin-top:0.75rem;">Watch on Substack â†’</p>
-        </a>
+  <div class="work-section">
+    <p class="section-label">The Books</p>
+    <div class="section-rule"></div>
+    <div class="books-grid">
 
-        <div class="card card--dim" style="border-style:dashed;">
-          <span class="card-label">Coming soon</span>
-          <h2 class="card-title" style="color:var(--text-muted);">Next conversation</h2>
-          <p class="card-body">Writers, musicians, the South in motion. More conversations to follow.</p>
+      <div>
+        <div class="book-cover">
+          <img src="../assets/images/cover-opera-rose.png" alt="Opera Rose by Gray">
         </div>
-
+        <p class="book-author">Gray</p>
+        <p class="book-title">Opera Rose</p>
+        <p class="book-desc">A trilogy about what we bury in the South's soft ground — and what refuses to stay there.</p>
+        <a href="https://www.amazon.com/Opera-Rose-Other-Devotions-Becoming-ebook/dp/B0GZJV9TCN/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
       </div>
+
+      <div>
+        <div class="book-cover">
+          <img src="../assets/images/cover-first-light.jpg" alt="First Light by Rick West">
+        </div>
+        <p class="book-author">Rick West</p>
+        <p class="book-title">First Light</p>
+        <p class="book-desc">A man comes back to the place he once escaped, chasing a feeling he can't quite name.</p>
+        <a href="https://www.amazon.com/First-Light-Rick-West-ebook/dp/B0GTR2NJRP/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
+      </div>
+
+      <div>
+        <div class="book-cover">
+          <img src="../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton">
+        </div>
+        <p class="book-author">Hank Cotton</p>
+        <p class="book-title">The Ugly Duckling</p>
+        <p class="book-desc">A hotshot truck driver who doesn't know he's picked up an unlikely passenger.</p>
+        <a href="https://www.amazon.com/Ugly-Duckling-Hank-Cotton/dp/B0GPMRL9BK/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
+      </div>
+
     </div>
-  </section>
+  </div>
 
-  <!-- GUILD VIDEOS -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Guild videos</span>
-        <a href="/the-work/videos/" class="section-see-all">Full archive â†’</a>
-      </div>
-      <p class="card-body" style="margin-bottom:1.25rem;font-size:0.95rem;">
-        About twice a month â€” the Trio, occasionally with guests.
-        Conversations, readings, dispatches from wherever the road has taken them.
-      </p>
-      <div class="grid grid--featured">
+  <hr class="work-divider">
 
-        <!-- Most recent -->
-        <a href="https://thesouthernwritersguild.substack.com/p/first-light-opera-rose-and-graces"
-           target="_blank" rel="noopener" class="card card--highlight" style="display:block;text-decoration:none;">
-          <span class="card-badge">Latest &nbsp;Â·&nbsp; Apr 30, 2026</span>
-          <div style="position:relative;margin:1rem 0;">
-            <img src="https://substackcdn.com/image/fetch/w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F195972055%2F03ff0573-0e36-44bf-9fca-4ea77d594181%2Ftranscoded-03290.png"
-                 alt="First Light, Opera Rose, and Grace's Date With Destiny"
-                 style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-              <div style="width:52px;height:52px;border-radius:50%;background:rgba(184,92,56,0.9);display:flex;align-items:center;justify-content:center;">
-                <div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:18px solid #EDE5D0;margin-left:4px;"></div>
-              </div>
-            </div>
-          </div>
-          <span class="card-label">Beau &nbsp;Â·&nbsp; Gray &nbsp;Â·&nbsp; MJ Polk</span>
-          <h3 class="card-title">First Light, Opera Rose, and Grace's Date With Destiny</h3>
-          <p class="card-body">The Guild closes out the First Light feature, introduces Opera Rose, and takes a couple of left turns on the way.</p>
-          <p class="card-note" style="margin-top:0.5rem;">Watch on Substack â†’</p>
-        </a>
+  <div class="work-section">
+    <p class="section-label">Conversations</p>
+    <div class="section-rule"></div>
+    <p class="section-desc">The Guild in dialogue with writers, musicians, and people worth talking to.</p>
+    <div class="convos-list">
 
-        <!-- Two prior stacked -->
-        <div style="display:flex;flex-direction:column;gap:1rem;">
+      <a href="https://thesouthernwritersguild.substack.com/p/a-conversation-from-the-crossroads" target="_blank" rel="noopener" class="convo-card">
+        <div class="convo-thumb"><span>VIDEO</span></div>
+        <div class="convo-body">
+          <p class="convo-date">Jan 27, 2026</p>
+          <p class="convo-title">A Conversation From the Crossroads</p>
+          <p class="convo-desc">Bob Beatty on the Allman Brothers, Southern soul, and the music that built the South.</p>
+          <span class="text-link">Watch →</span>
+        </div>
+      </a>
 
-          <a href="https://thesouthernwritersguild.substack.com/p/porch-talkn-with-harriet-corvine"
-             target="_blank" rel="noopener" class="card card--dim" style="display:block;text-decoration:none;">
-            <div style="position:relative;margin-bottom:0.75rem;">
-              <img src="https://substackcdn.com/image/fetch/w_400,c_limit,f_auto,q_auto:good/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F4e8685b8-c517-423f-bf47-c05070b7b07f_2830x1891.png"
-                   alt="Porch Talkn with Harriet Corvine"
-                   style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:rgba(184,92,56,0.85);display:flex;align-items:center;justify-content:center;">
-                  <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:13px solid #EDE5D0;margin-left:3px;"></div>
-                </div>
-              </div>
-            </div>
-            <span class="card-label">Apr 14, 2026 &nbsp;Â·&nbsp; All three + Harriet Corvine</span>
-            <h3 class="card-title card-title--sm">Porch Talkn with Harriet Corvine</h3>
-            <p class="card-note">1:01:53 &nbsp;Â·&nbsp; Watch on Substack â†’</p>
-          </a>
+      <a href="https://thesouthernwritersguild.substack.com/p/porch-talkn-with-harriet-corvine" target="_blank" rel="noopener" class="convo-card">
+        <div class="convo-thumb">
+          <img src="https://substackcdn.com/image/fetch/w_400,c_limit,f_auto,q_auto:good/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F4e8685b8-c517-423f-bf47-c05070b7b07f_2830x1891.png" alt="Porch Talkn with Harriet Corvine">
+        </div>
+        <div class="convo-body">
+          <p class="convo-date">Apr 14, 2026</p>
+          <p class="convo-title">Porch Talkn with Harriet Corvine</p>
+          <p class="convo-desc">Writers, musicians, the South in motion. A conversation worth having twice.</p>
+          <span class="text-link">Watch →</span>
+        </div>
+      </a>
 
-          <a href="https://thesouthernwritersguild.substack.com/p/grandads-grown-men-on-scooters-and"
-             target="_blank" rel="noopener" class="card card--dim" style="display:block;text-decoration:none;">
-            <div style="position:relative;margin-bottom:0.75rem;">
-              <img src="https://substackcdn.com/image/fetch/w_400,c_limit,f_auto,q_auto:good/https%3A%2F%2Fsubstack-video.s3.amazonaws.com%2Fvideo_upload%2Fpost%2F192084274%2Feacbe682-f66e-436e-b84b-8683b09e74ff%2Ftranscoded-1774486300.png"
-                   alt="Granddads, Grown Men on Scooters, and Lumineering"
-                   style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:rgba(184,92,56,0.85);display:flex;align-items:center;justify-content:center;">
-                  <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:13px solid #EDE5D0;margin-left:3px;"></div>
-                </div>
-              </div>
-            </div>
-            <span class="card-label">Mar 26, 2026 &nbsp;Â·&nbsp; Beau &nbsp;Â·&nbsp; Gray &nbsp;Â·&nbsp; MJ Polk</span>
-            <h3 class="card-title card-title--sm">Granddads, Grown Men on Scooters, and Lumineering</h3>
-            <p class="card-note">Watch on Substack â†’</p>
-          </a>
-
-          <div style="text-align:right;">
-            <a href="/the-work/videos/" class="btn btn--ghost" style="font-size:0.6rem;">All videos â†’</a>
-          </div>
-
+      <div class="convo-card dim">
+        <div class="convo-thumb"><span>SOON</span></div>
+        <div class="convo-body">
+          <p class="convo-date">Coming Soon</p>
+          <p class="convo-title">Next conversation</p>
+          <p class="convo-desc">More to follow.</p>
         </div>
       </div>
+
     </div>
-  </section>
+  </div>
 
-  <!-- MUSIC -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Music</span>
-        <span class="card-label" style="color:var(--text-faint);margin:0;">A throughline, not a category</span>
+  <hr class="work-divider">
+
+  <div class="work-section">
+    <p class="section-label">The Listening Booth</p>
+    <div class="section-rule"></div>
+    <p class="section-desc">A throughline, not a category. Pull up a chair.</p>
+    <div class="booth-grid">
+
+      <div class="booth-card">
+        <p class="booth-owner">Gray's Archive</p>
+        <p class="booth-title">Turtle Meat Mixtapes</p>
+        <p class="booth-desc">Every good recipe, every road trip, every bad day laid out on cold tile deserves a soundtrack.</p>
+        <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener" class="text-link">Visit →</a>
       </div>
-      <div class="grid grid--2">
 
-        <div class="card">
-          <span class="card-label">Gray's archive</span>
-          <h3 class="card-title card-title--sm">Turtle Meat Mixtapes</h3>
-          <p class="card-body">
-            Every good recipe, every road trip, and every bad day laid out on cold tile
-            deserves a soundtrack. Gray's music publication â€” the songs behind the stories.
-          </p>
-          <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener"
-             class="btn btn--ghost" style="margin-top:1rem;">Visit Turtle Meat â†’</a>
-        </div>
-
-        <div class="card">
-          <span class="card-label">Beau Pritchett IV</span>
-          <h3 class="card-title card-title--sm">Beau's Lab</h3>
-          <p class="card-body">
-            Beau writes originals. When a song connects to a story on the Porch,
-            it lives here â€” the music that runs alongside the words.
-          </p>
-          <div style="margin-top:1rem;">
-            <div class="sk-section" style="min-height:80px;font-size:0.7rem;">
-              [ Song links â€” added as stories are published ]<br>
-              Format: song title Â· related story Â· link
-            </div>
-          </div>
-        </div>
-
+      <div class="booth-card">
+        <p class="booth-owner">Beau Pritchett IV</p>
+        <p class="booth-title">Beau's Lab</p>
+        <p class="booth-desc">Beau writes originals. When a song connects to a story on the Porch, it lives here.</p>
+        <span class="text-link" style="opacity:0.4;">Coming →</span>
       </div>
+
     </div>
-  </section>
-
-  <!-- BOOKS CATALOG -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Books</span>
-        <a href="/the-work/books/" class="section-see-all">Full catalog â†’</a>
-      </div>
-      <div class="grid grid--3">
-
-        <div class="card">
-          <div style="margin-bottom:0.75rem;">
-            <img src="../assets/images/cover-opera-rose.png" alt="Opera Rose by Gray" style="width:60%;height:auto;display:block;">
-          </div>
-          <span class="card-label">Gray</span>
-          <h3 class="card-title card-title--sm">Opera Rose</h3>
-          <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
-            <a href="#" class="btn btn--primary" style="font-size:0.58rem;">Buy print</a>
-            <a href="https://www.amazon.com/Opera-Rose-Other-Devotions-Becoming-ebook/dp/B0GZJV9TCN/" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.58rem;">Ebook â†’</a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sk-img sk-img--book" style="margin-bottom:0.75rem;"><img src="../assets/images/cover-first-light.jpg" alt="Book cover" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <span class="card-label">Rick West</span>
-          <h3 class="card-title card-title--sm">First Light</h3>
-          <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
-            <a href="https://www.amazon.com/First-Light-Rick-West-ebook/dp/B0GTR2NJRP/" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.58rem;">Buy on Amazon â†’</a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sk-img sk-img--book" style="margin-bottom:0.75rem;"><img src="../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
-          <span class="card-label">Hank Cotton</span>
-          <h3 class="card-title card-title--sm">The Ugly Duckling</h3>
-          <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
-            <a href="https://www.amazon.com/Ugly-Duckling-Hank-Cotton/dp/B0GPMRL9BK/" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.58rem;">Buy on Amazon â†’</a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
+  </div>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-text">Â© 2026 Southern Writers Guild</span>
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
       <span class="footer-text">southernwritersguild.com</span>
     </div>
   </footer>
 
   <script src="../js/nav.js"></script>
-  <script type="module">
-    import { fetchFeaturedFiction, renderFeaturedFiction, renderFeaturedArchive, showLoading, showError } from '../js/sanity.js'
-  
-    const grid = document.getElementById('featured-fiction-grid')
-    const archiveEl = document.getElementById('featured-fiction-archive')
-    showLoading(grid)
-  
-    fetchFeaturedFiction()
-      .then(items => {
-        if (!items || !items.length) { showError(grid, 'Content unavailable.'); return }
-        grid.innerHTML = renderFeaturedFiction(items)
-        archiveEl.innerHTML = renderFeaturedArchive(items)
-      })
-      .catch(() => showError(grid, 'Content unavailable.'))
-
-const convGrid = document.getElementById('conversations-grid')
-showLoading(convGrid)
-fetchConversations()
-  .then(items => {
-    if (!items || !items.length) {
-      convGrid.innerHTML = `
-        <div class="card card--dim" style="border-style:dashed;">
-          <span class="card-label">Coming soon</span>
-          <h2 class="card-title" style="color:var(--text-muted);">First conversation</h2>
-          <p class="card-body">Writers, musicians, the South in motion.</p>
-        </div>`
-      return
-    }
-    convGrid.innerHTML = items.map(v => renderVideoCard(v, 'small')).join('')
-  })
-  .catch(() => showError(convGrid, 'Content unavailable.'))
-</script>  
+</body>
+</html>
