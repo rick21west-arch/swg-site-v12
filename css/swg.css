@@ -1,5 +1,5 @@
 /* ============================================================
-   Southern Writers Guild — Design System
+   Southern Writers Guild â€” Design System
    swg.css
    ============================================================ */
 
@@ -119,11 +119,16 @@ ul, ol { list-style: none; }
 .nav-links a:hover { color: var(--text); }
 .nav-links a.active { color: var(--text); }
 
-.nav-links .nav-join a {
-  color: var(--text-muted);
+.nav-join a {
+  border: 1px solid rgba(200,112,58,0.4);
+  padding: 7px 16px;
+  color: #8a7e72 !important;
+  background: transparent !important;
 }
 
-.nav-links .nav-join a:hover { color: var(--text); }
+.nav-join a:hover {
+  color: #ede5d8 !important;
+}
 /* ============================================================
    Layout
    ============================================================ */
@@ -621,7 +626,7 @@ ul, ol { list-style: none; }
   letter-spacing: 0.03em;
 }
 
-.tier-feature::before { content: '✓  '; color: var(--accent); }
+.tier-feature::before { content: 'âœ“  '; color: var(--accent); }
 
 /* ============================================================
    Footer

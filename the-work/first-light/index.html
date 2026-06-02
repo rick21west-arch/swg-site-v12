@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>First Light — Southern Writers Guild</title>
+  <title>First Light â€” Southern Writers Guild</title>
   <link rel="stylesheet" href="../../css/swg.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
       <li><a href="/the-work/" class="active">The Work</a></li>
       <li><a href="/the-house/">The House</a></li>
       <li><a href="/writers/">Writers</a></li>
-      <li><a href="/shop/">The Shop</a></li>
+      
       <li class="nav-join"><a href="/join/">Join</a></li>
     </ul>
   </div>
@@ -25,7 +25,7 @@
 
 <section class="section">
   <div class="container">
-    <a href="/the-work/" class="btn btn--ghost" style="font-size:0.6rem;display:inline-block;margin-bottom:var(--sp-md);">← The Work</a>
+    <a href="/the-work/" class="btn btn--ghost" style="font-size:0.6rem;display:inline-block;margin-bottom:var(--sp-md);">â† The Work</a>
     <div id="book-content">
       <div style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.1em;padding:3rem 0;text-align:center;">Loading...</div>
     </div>
@@ -34,7 +34,7 @@
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <span class="footer-text">© 2026 Southern Writers Guild</span>
+    <span class="footer-text">Â© 2026 Southern Writers Guild</span>
     <span class="footer-text">southernwritersguild.com</span>
   </div>
 </footer>
@@ -52,15 +52,15 @@
         <div style="display:grid;grid-template-columns:280px 1fr;gap:var(--sp-lg);align-items:start;">
           ${book.coverUrl ? `<img src="${book.coverUrl}" alt="${book.title}" style="width:100%;height:auto;display:block;">` : '<div style="width:280px;height:420px;background:var(--bg-3);"></div>'}
           <div>
-            <span class="section-eyebrow">${book.author || ''} &nbsp;·&nbsp; Fiction</span>
+            <span class="section-eyebrow">${book.author || ''} &nbsp;Â·&nbsp; Fiction</span>
             <h1 class="section-title">${book.title}</h1>
             ${book.note ? `<p class="card-note" style="margin-bottom:var(--sp-sm);">${book.note}</p>` : ''}
             ${book.featuredMonth ? `<p class="card-note" style="margin-bottom:var(--sp-sm);">Featured: ${book.featuredMonth}</p>` : ''}
             ${book.description ? `<p class="card-body" style="margin-top:var(--sp-sm);font-size:1rem;line-height:1.75;">${book.description}</p>` : ''}
             <div style="display:flex;gap:1rem;margin-top:var(--sp-md);flex-wrap:wrap;">
               ${book.substackUrl ? `<a href="${book.substackUrl}" target="_blank" rel="noopener" class="btn btn--primary">Read it</a>` : ''}
-              ${book.ebookUrl ? `<a href="${book.ebookUrl}" target="_blank" rel="noopener" class="btn btn--ghost">Buy on Amazon →</a>` : ''}
-              ${book.printUrl ? `<a href="${book.printUrl}" target="_blank" rel="noopener" class="btn btn--ghost">Buy print →</a>` : ''}
+              ${book.ebookUrl ? `<a href="${book.ebookUrl}" target="_blank" rel="noopener" class="btn btn--ghost">Buy on Amazon â†’</a>` : ''}
+              ${book.printUrl ? `<a href="${book.printUrl}" target="_blank" rel="noopener" class="btn btn--ghost">Buy print â†’</a>` : ''}
             </div>
           </div>
         </div>`
