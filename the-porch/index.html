@@ -3,12 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Porch â€” Southern Writers Guild</title>
+  <title>The Porch — Southern Writers Guild</title>
   <meta name="description" content="No agenda. No algorithm. A porch, rotating company, and whatever the South hands them today.">
   <link rel="stylesheet" href="../css/swg.css">
+  <style>
+    .porch-header {
+      padding: 48px 60px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .porch-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: #5a5048;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .porch-tagline {
+      font-family: var(--serif, 'Cormorant Garamond', Georgia, serif);
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 300;
+      color: #6a6056;
+      line-height: 1.5;
+    }
+    .cooler-link {
+      font-size: 10px;
+      color: #c8703a;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      white-space: nowrap;
+      margin-left: 24px;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .cooler-link:hover { opacity: 1; }
+    .porch-divider { border: none; border-top: 1px solid rgba(200,150,80,0.12); margin: 0; }
+    .porch-grid-wrap { padding: 44px 60px 0; }
+    #porch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    #porch-grid > :first-child {
+      grid-column: span 2;
+    }
+    .porch-footer {
+      padding: 40px 60px 56px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: end;
+    }
+    .jp-quote {
+      font-family: var(--serif, 'Cormorant Garamond', Georgia, serif);
+      font-size: 13px;
+      font-style: italic;
+      font-weight: 300;
+      color: #5a5048;
+      line-height: 1.7;
+      margin: 0;
+    }
+    .archive-link {
+      font-size: 10px;
+      color: #c8703a;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .archive-link:hover { color: #d4824e; }
+    @media (max-width: 768px) {
+      .porch-header { padding: 36px 24px 12px; flex-direction: column; align-items: flex-start; gap: 16px; }
+      .cooler-link { margin-left: 0; }
+      .porch-grid-wrap { padding: 32px 24px 0; }
+      #porch-grid { grid-template-columns: 1fr; }
+      #porch-grid > :first-child { grid-column: span 1; }
+      .porch-footer { padding: 32px 24px 40px; grid-template-columns: 1fr; gap: 20px; }
+    }
+  </style>
 </head>
 <body>
-
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo-link">
@@ -20,97 +98,54 @@
         <li><a href="/the-work/">The Work</a></li>
         <li><a href="/the-house/">The House</a></li>
         <li><a href="/writers/">Writers</a></li>
-        
         <li class="nav-join"><a href="/join/">Join</a></li>
       </ul>
     </div>
   </nav>
 
-  <section class="hero" style="text-align:center;padding-bottom:var(--sp-md);">
-    <div class="container--narrow">
-      <img src="../assets/images/swg-logo.jpg" alt="Southern Writers Guild"
-           style="height:72px;width:auto;margin:0 auto var(--sp-sm);border-radius:6px;display:block;">
-      <h1 class="section-title" style="font-size:3rem;">The Porch</h1>
-      <p class="hero-sub" style="margin:0.75rem auto 0;text-align:center;">
-        No agenda. No algorithm. A porch, rotating company, and whatever the South hands them today.
-      </p>
+  <div class="porch-header">
+    <div>
+      <p class="porch-label">The Porch</p>
+      <p class="porch-tagline">No agenda. No algorithm. Whatever the South hands them today.</p>
     </div>
-  </section>
+    <a href="/the-porch/start-here/" class="cooler-link">The Cooler explains everything →</a>
+  </div>
 
-  <div class="The Door">
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;">
-      <div>
-        <span class="start-here-text" style="display:block;margin-bottom:0.2rem;"><strong>New in these parts?</strong></span>
-        <span class="start-here-text" style="font-family:var(--font-serif);font-style:italic;">Start with the Cooler â€” it explains everything.</span>
-      </div>
-      <a href="/the-porch/start-here/" class="btn btn--primary" style="white-space:nowrap;flex-shrink:0;">The Door</a>
+  <hr class="porch-divider">
+
+  <div class="porch-grid-wrap">
+    <div id="porch-grid">
+      <!-- Populated by Sanity -->
     </div>
   </div>
 
-  <div class="filter-tabs">
-    <button class="filter-tab active" onclick="filterStories('all', this)">Latest</button>
-    <button class="filter-tab" onclick="filterStories('Hank', this)">By Hank</button>
-    <button class="filter-tab" onclick="filterStories('Beau', this)">By Beau</button>
-    <button class="filter-tab" onclick="filterStories('Gray', this)">By Gray</button>
+  <div class="porch-footer">
+    <p class="jp-quote">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
+    <a href="/the-porch/archive/" class="archive-link">Every story from the Porch →</a>
   </div>
-
-  <section class="section">
-    <div class="container">
-      <div id="porch-grid" class="grid grid--3">
-        <!-- Populated by Sanity -->
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--tight" style="background:var(--bg-2);text-align:center;">
-    <div class="container">
-      <p class="card-body" style="margin-bottom:1rem;">Every story from the Porch, most recent first.</p>
-      <a href="/the-porch/archive/" class="btn btn--primary">Browse the full archive â†’</a>
-    </div>
-  </section>
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-text">Â© 2026 Southern Writers Guild</span>
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
       <span class="footer-text">southernwritersguild.com</span>
     </div>
   </footer>
 
   <script type="module">
     import { fetchPorchStories, renderPorchCard, showLoading, showError } from '../js/sanity.js'
-
     const grid = document.getElementById('porch-grid')
-    let allStories = []
-
     showLoading(grid)
-
-    fetchPorchStories(9)
+    fetchPorchStories(6)
       .then(stories => {
-        allStories = stories
-        renderGrid(stories)
+        if (!stories || !stories.length) {
+          showError(grid, 'No stories found.')
+          return
+        }
+        grid.innerHTML = stories.map(renderPorchCard).join('')
       })
-      .catch(() => showError(grid, 'Stories unavailable â€” visit us on Substack.'))
-
-    function renderGrid(stories) {
-      if (!stories || !stories.length) {
-        showError(grid, 'No stories found.')
-        return
-      }
-      grid.innerHTML = stories.map(renderPorchCard).join('')
-    }
-
-    window.filterStories = function(term, btn) {
-      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      if (term === 'all') {
-        renderGrid(allStories)
-      } else {
-        renderGrid(allStories.filter(s => s.authors && s.authors.includes(term)))
-      }
-    }
+      .catch(() => showError(grid, 'Stories unavailable — visit us on Substack.'))
   </script>
 
-  <nav
-<script src="/js/nav.js"></script>
+  <script src="/js/nav.js"></script>
 </body>
 </html>
