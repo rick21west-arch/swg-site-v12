@@ -4,138 +4,119 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Southern Writers Guild</title>
-  <meta name="description" content="A deliberate assembly of stubborn scribes who stake our claim on this tangled South.">
-  <link rel="stylesheet" href="css/swg.css">
+  <meta name="description" content="A writer cannot not write, always compelled to wrestle chaos into art.">
+  <link rel="stylesheet" href="/css/swg.css">
   <style>
-    /* â”€â”€ Email capture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .email-capture {
-      text-align: center;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: var(--sp-lg) 0;
-    }
-    .email-capture .capture-label {
-      display: block;
-      font-family: var(--font-ui);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: var(--sp-sm);
-    }
-    .email-capture h3 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.4rem, 3vw, 1.9rem);
-      font-weight: 400;
-      color: var(--text);
-      margin: 0 0 0.35rem;
-      line-height: 1.25;
-    }
-    .email-capture .capture-sub {
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      margin: 0 0 var(--sp-md);
-    }
-    .email-form {
+    .home-hero {
       display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 96px 40px 80px;
+      max-width: 660px;
+      margin: 0 auto;
     }
-    .email-form input[type="email"] {
-      background: var(--bg-3, rgba(255,255,255,0.05));
-      border: 1px solid rgba(237,229,208,0.2);
-      color: var(--text);
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      padding: 0.6rem 1rem;
+    .home-headline {
+      font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 300;
+      line-height: 1.22;
+      color: #ede5d8;
+      margin-bottom: 22px;
+      letter-spacing: -0.01em;
+    }
+    .home-sub {
+      font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      font-weight: 300;
+      color: #8a7e72;
+      margin-bottom: 52px;
+      line-height: 1.6;
+    }
+    .home-email-form {
+      display: flex;
+      width: 100%;
+      max-width: 440px;
+      border: 1px solid rgba(200,150,80,0.25);
       border-radius: 2px;
-      min-width: 220px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .home-email-form input {
+      flex: 1;
+      padding: 15px 18px;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      color: #ede5d8;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 300;
       outline: none;
-      transition: border-color 0.2s;
+      min-width: 0;
     }
-    .email-form input[type="email"]::placeholder {
-      color: var(--text-dim);
+    .home-email-form input::placeholder { color: #6a6056; }
+    .home-email-form button {
+      padding: 15px 22px;
+      background: #c8703a;
+      border: none;
+      color: #fff;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
     }
-    .email-form input[type="email"]:focus {
-      border-color: var(--accent);
+    .home-email-form button:hover { background: #d4824e; }
+    .home-micro {
+      font-size: 11px;
+      color: #4a4038;
+      letter-spacing: 0.04em;
+      font-weight: 300;
     }
-
-    /* â”€â”€ Writers strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .writers-grid {
+    .home-divider { border: none; border-top: 1px solid rgba(200,150,80,0.12); margin: 0; }
+    .home-porch-section {
+      padding: 56px 60px 72px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .home-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 32px;
+    }
+    .home-section-label {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: #8a7e72;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .home-section-link {
+      font-size: 10px;
+      color: #c8703a;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .home-section-link:hover { color: #d4824e; }
+    #home-porch-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
+      gap: 24px;
     }
-    .writer-card {
-      text-align: center;
-    }
-    .writer-card img {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: center top;
-      display: block;
-      margin: 0 auto var(--sp-sm);
-      border: 1px solid rgba(237,229,208,0.15);
-    }
-    .writer-card .writer-name {
-      font-family: var(--font-serif);
-      font-size: 1.05rem;
-      font-weight: 400;
-      color: var(--text);
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    .writer-card .writer-persona {
-      font-family: var(--font-ui);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    .writer-card .writer-line {
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
-
-    /* â”€â”€ JOIN band â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    .join-band {
-      text-align: center;
-      padding: var(--sp-xl) 0;
-    }
-    .join-band h3 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.6rem, 4vw, 2.4rem);
-      font-weight: 400;
-      color: var(--text);
-      margin: 0 0 0.5rem;
-      line-height: 1.2;
-    }
-    .join-band p {
-      font-family: var(--font-ui);
-      font-size: 0.88rem;
-      color: var(--text-dim);
-      max-width: 420px;
-      margin: 0 auto var(--sp-md);
-      line-height: 1.65;
-    }
-
-    @media (max-width: 640px) {
-      .writers-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-      .email-form { flex-direction: column; align-items: center; }
-      .email-form input[type="email"] { min-width: 0; width: 100%; max-width: 320px; }
+    @media (max-width: 768px) {
+      .home-hero { padding: 64px 24px 56px; }
+      .home-porch-section { padding: 40px 24px 56px; }
+      #home-porch-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="/" class="nav-logo-link"><img src="/assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo"></a>
@@ -145,220 +126,52 @@
         <li><a href="/the-work/">The Work</a></li>
         <li><a href="/the-house/">The House</a></li>
         <li><a href="/writers/">Writers</a></li>
-        
         <li class="nav-join"><a href="/join/">Join</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 1 â€” HERO
-       CTA changed: JOIN deferred, START HERE leads
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
-
-        <div>
-          <img src="/assets/images/swg-logo.jpg" alt="Southern Writers Guild"
-               style="height:180px;width:auto;margin-bottom:var(--sp-md);border-radius:4px;">
-          <h1 class="hero-headline">
-            A writer cannot not write, always compelled to wrestle chaos into art.
-          </h1>
-          <p class="hero-sub">
-            Not every story is about the South, but the South is in every story.<br>Southern is a state of mind.<br>Southernness is an attitude.<br>To be Southern is to live inside a kaleidoscope.<br>The South is a permanent, undulating argument with itself.
-          </p>
-          <div class="hero-ctas">
-            <a href="/the-porch/start-here/" class="btn btn--primary">The Door</a>
-            <a href="/the-work/" class="btn btn--ghost">Read Our Work</a>
-          </div>
-        </div>
-
-        <div>
-          <img src="/assets/images/hero-bg.png"
-               alt="A farm and tractor in the foreground, a gleaming Southern city skyline rising at golden hour behind it"
-               style="width:100%;border-radius:4px;display:block;aspect-ratio:4/3;object-fit:cover;">
-        </div>
-
-      </div>
-    </div>
+  <section class="home-hero">
+    <h1 class="home-headline">A writer cannot not write, always compelled to wrestle chaos into art.</h1>
+    <p class="home-sub">Not every story is about the South, but the South is in every story.</p>
+    <form class="home-email-form" action="#" method="post">
+      <input type="email" name="email" placeholder="your@email.com" required>
+      <button type="submit">Follow the Porch</button>
+    </form>
+    <p class="home-micro">New stories, when they're ready. No noise. No schedule.</p>
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 2 â€” LATEST FROM THE PORCH
-       Moved up from Section 3. First proof of voice.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Latest from the Porch</span>
-        <a href="/the-porch/" class="section-see-all">See all â†’</a>
-      </div>
-      <div class="grid grid--3">
+  <hr class="home-divider">
 
-        <a href="https://thesouthernwritersguild.substack.com/p/sarah-macdougals-mushroom-pie" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="https://substackcdn.com/image/fetch/w_800,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Ffdae70d9-2162-48a4-b54c-039b1a847e4f_1402x1122.png"
-               alt="Sarah MacDougal's Mushroom Pie" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Beau + Gray &nbsp;Â·&nbsp; Apr 27</span>
-          <h3 class="card-title card-title--sm">Sarah MacDougal's Mushroom Pie</h3>
-          <p class="card-body" style="font-size:0.9rem;">The Trio goes to FloydFest. Jean-Paul emits observational signal.</p>
-        </a>
-
-        <a href="https://thesouthernwritersguild.substack.com/p/the-little-shops-that-were" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="assets/images/thumb-little-shops.jpg"
-               alt="The Little Shops That Were" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center top;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">All three &nbsp;Â·&nbsp; Mar 16</span>
-          <h3 class="card-title card-title--sm">The Little Shops That Were</h3>
-          <p class="card-body" style="font-size:0.9rem;">Gators in a Cape Coral convenience store. Bootleggers behind the Quality Inn.</p>
-        </a>
-
-        <a href="https://thesouthernwritersguild.substack.com/p/best-in-show" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
-          <img src="https://substackcdn.com/image/fetch/w_800,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Feb964193-43c3-422d-80f8-4961f6f2cf56_1536x1024.png"
-               alt="Best in Show" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">All three &nbsp;Â·&nbsp; Mar 9</span>
-          <h3 class="card-title card-title--sm">Best in Show</h3>
-          <p class="card-body" style="font-size:0.9rem;">Airlie Gardens, Wilmington. A flower show. A peacock. Zero surprises.</p>
-        </a>
-
-      </div>
+  <div class="home-porch-section">
+    <div class="home-section-header">
+      <span class="home-section-label">Latest from the Porch</span>
+      <a href="/the-porch/" class="home-section-link">See all →</a>
     </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 3 â€” EMAIL CAPTURE
-       New. Low-friction follow. The owned relationship.
-       âš  Wire form action to your list provider (Mailchimp,
-         ConvertKit, etc.) before going live.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section section--tight" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="email-capture">
-        <span class="capture-label">Stay in the loop</span>
-        <h3>New stories, when they're ready.</h3>
-        <p class="capture-sub">No noise. No schedule. Just the work, straight to you.</p>
-        <form class="email-form" action="#" method="post">
-          <input type="email" name="email" placeholder="your@email.com" required>
-          <button type="submit" class="btn btn--primary">Subscribe</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 4 â€” FEATURED FICTION
-       Moved down from Section 2. Earns its place now.
-       Opera Rose copy: PROVISIONAL â€” replace when Gray
-       provides her own description.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">Featured this month</span>
-        <a href="/the-work/#archive" class="section-see-all">All features â†’</a>
-      </div>
-      <div id="home-featured-grid"></div>
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 5 â€” THE WRITERS (inline, abbreviated)
-       New block. Full bios live at /writers/.
-       Three names. One sentence each. The ensemble argument.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section section--tight" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-header-title">The Writers</span>
-        <a href="/writers/" class="section-see-all">Meet them â†’</a>
-      </div>
-      <div class="writers-grid">
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-mj-polk.jpg" alt="MJ Polk">
-          <span class="writer-name">MJ Polk</span>
-          <span class="writer-persona">Hank Cotton</span>
-          <p class="writer-line">Gritty realism, developed over years of hard work and quick study. Hard-boiled reality delivered in plain English.</p>
-        </div>
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-rick-west.jpg" alt="Rick West">
-          <span class="writer-name">Rick West</span>
-          <span class="writer-persona">Beau Pritchett IV</span>
-          <p class="writer-line">Atmospheric psychological fiction, a strong sense of place, laconic.</p>
-        </div>
-
-        <div class="writer-card">
-          <img src="/assets/images/photo-gray.jpg" alt="Gray">
-          <span class="writer-name">Gray</span>
-          <span class="writer-persona">Grace Lynn</span>
-          <p class="writer-line">Lyrical confessional precision â€” Southern goth with softer edges, and stories that are sometimes fiction but always true.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 6 â€” INTERVIEW
-       Stays. Establishes range and the music throughline.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section section--tight">
-    <div class="container">
-      <div class="card card--band">
-        <span class="card-label">Interview &nbsp;Â·&nbsp; Music &amp; Culture</span>
-        <h3 class="card-title">Bob Beatty on the Allman Brothers and the Changing South</h3>
-        <p class="card-body">
-          A deep dive into <em>Play All Night</em> â€” and into the South that shaped the band,
-          and the band that shaped the South.
-        </p>
-        <a href="/the-work/interviews/beatty/" class="btn btn--ghost" style="margin-top:1rem;">Read the interview â†’</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- JEAN-PAUL STRIP -->
-  <div class="jp-strip">
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-      <p class="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." â€” Jean-Paul</p>
-      <a href="/writers/#jean-paul" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;">Who is Jean-Paul?</a>
+    <div id="home-porch-grid">
+      <!-- Populated by Sanity -->
     </div>
   </div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 7 â€” JOIN (final CTA)
-       Conclusion, not opener. By now they've earned it.
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="section" style="background:var(--bg-2);">
-    <div class="container">
-      <div class="join-band">
-        <h3>Join the Guild.</h3>
-        <p>You've spent some time here. You know what this is. If it's yours, come in.</p>
-        <a href="/join/" class="btn btn--primary">Join the Guild â†’</a>
-      </div>
-    </div>
-  </section>
-
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-text">Â© 2026 Southern Writers Guild</span>
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
       <span class="footer-text">southernwritersguild.com</span>
     </div>
   </footer>
 
-  
   <script type="module">
-    import { fetchFeaturedFiction, renderFeaturedFiction, showLoading, showError } from '/js/sanity.js'
-  
-    const grid = document.getElementById('home-featured-grid')
+    import { fetchPorchStories, renderPorchCard, showLoading, showError } from '/js/sanity.js'
+    const grid = document.getElementById('home-porch-grid')
     showLoading(grid)
-  
-    fetchFeaturedFiction()
-      .then(items => {
-        if (!items || !items.length) { showError(grid, 'Content unavailable.'); return }
-        grid.innerHTML = renderFeaturedFiction(items)
+    fetchPorchStories(3)
+      .then(stories => {
+        if (!stories || !stories.length) { showError(grid, 'Content unavailable.'); return }
+        grid.innerHTML = stories.map(renderPorchCard).join('')
       })
       .catch(() => showError(grid, 'Content unavailable.'))
   </script>
-<script src="/js/nav.js"></script>
+
+  <script src="/js/nav.js"></script>
 </body>
 </html>
