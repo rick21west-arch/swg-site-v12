@@ -11,52 +11,80 @@
     .writers-eyebrow { font-size: 9px; letter-spacing: 0.22em; color: #5a5048; text-transform: uppercase; margin-bottom: 14px; }
     .writers-headline { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: clamp(2rem, 5vw, 3rem); font-weight: 300; color: #ede5d8; line-height: 1.25; }
     .writers-headline em { color: #c8703a; font-style: italic; }
-    .writer-section { border-top: 1px solid rgba(200,150,80,0.12); }
-    .char-photo-wrap { overflow: hidden; }
+
+    .writer-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(200,150,80,0.12);
+      border-bottom: 1px solid rgba(200,150,80,0.12);
+      min-height: 480px;
+    }
+
+    .char-col { overflow: hidden; }
+    .char-photo-wrap { width: 100%; height: 100%; min-height: 480px; overflow: hidden; }
     .char-photo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
-    .char-info { padding: 20px 28px 28px; }
+
+    .image-left .char-col { border-right: 1px solid rgba(200,150,80,0.12); }
+    .image-right .char-col { order: 2; border-left: 1px solid rgba(200,150,80,0.12); }
+    .image-right .writer-col { order: 1; }
+
+    .writer-text {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
     .role-label { font-size: 8px; letter-spacing: 0.2em; color: #5a5048; text-transform: uppercase; margin-bottom: 8px; }
     .char-name { font-family: var(--serif, Georgia, serif); font-size: 1.6rem; font-weight: 400; color: #ede5d8; line-height: 1.2; margin-bottom: 8px; }
-    .char-descriptor { font-family: var(--serif, Georgia, serif); font-size: 0.82rem; font-style: italic; color: #5a5048; line-height: 1.55; }
-    .writer-side { padding: 36px 28px 32px; display: flex; flex-direction: column; }
-    .writer-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(200,150,80,0.15); margin-bottom: 12px; flex-shrink: 0; }
+    .char-descriptor { font-family: var(--serif, Georgia, serif); font-size: 0.85rem; font-style: italic; color: #5a5048; line-height: 1.55; }
+    .identity-rule { width: 24px; height: 1px; background: #c8703a; opacity: 0.4; margin: 20px 0; }
+    .writer-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(200,150,80,0.15); margin-bottom: 12px; }
     .writer-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
     .writer-name { font-family: var(--serif, Georgia, serif); font-size: 1rem; font-weight: 400; color: #c8a878; margin-bottom: 10px; }
-    .identity-rule { width: 24px; height: 1px; background: #c8703a; opacity: 0.4; margin: 14px 0; }
-    .writer-bio { font-size: 0.78rem; color: #8a7e72; line-height: 1.7; font-weight: 300; margin-bottom: 18px; flex: 1; }
+    .writer-bio { font-size: 0.78rem; color: #8a7e72; line-height: 1.7; font-weight: 300; margin-bottom: 18px; }
     .writer-link { font-size: 9px; letter-spacing: 0.12em; color: #c8703a; text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
     .writer-link:hover { color: #d4824e; }
-    .section-hank { display: grid; grid-template-columns: 3fr 2fr; border-bottom: 1px solid rgba(200,150,80,0.12); }
-    .section-hank .char-side { border-right: 1px solid rgba(200,150,80,0.12); }
-    .section-hank .char-photo-wrap { height: 400px; }
-    .section-beau { border-bottom: 1px solid rgba(200,150,80,0.12); }
-    .section-beau .char-photo-wrap { height: 380px; }
-    .section-beau .beau-center { max-width: 480px; margin: 0 auto; text-align: center; padding: 36px 24px 40px; }
-    .section-beau .identity-rule { margin: 14px auto; }
-    .section-beau .writer-avatar { margin: 0 auto 12px; }
-    .section-grace { display: grid; grid-template-columns: 2fr 3fr; border-bottom: 1px solid rgba(200,150,80,0.12); }
-    .section-grace .writer-side { border-right: 1px solid rgba(200,150,80,0.12); }
-    .section-grace .char-photo-wrap { height: 400px; }
-    .section-trio { border-top: 1px solid rgba(200,150,80,0.12); border-bottom: 1px solid rgba(200,150,80,0.12); display: grid; grid-template-columns: 1fr 1fr; }
+
+    .section-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(200,150,80,0.12);
+      border-bottom: 1px solid rgba(200,150,80,0.12);
+      min-height: 420px;
+    }
     .trio-photo { overflow: hidden; border-right: 1px solid rgba(200,150,80,0.12); }
-    .trio-photo img { width: 100%; height: 380px; object-fit: cover; display: block; }
-    .trio-text { padding: 36px; display: flex; flex-direction: column; justify-content: center; }
+    .trio-photo img { width: 100%; height: 100%; min-height: 420px; object-fit: cover; object-position: center center; display: block; }
+    .trio-text { padding: 48px 40px; display: flex; flex-direction: column; justify-content: center; }
     .trio-eyebrow { font-size: 8px; letter-spacing: 0.2em; color: #5a5048; text-transform: uppercase; margin-bottom: 12px; }
-    .trio-headline { font-family: var(--serif, Georgia, serif); font-size: 1.4rem; font-weight: 400; color: #ede5d8; margin-bottom: 10px; line-height: 1.3; }
-    .section-jp { padding: 36px 60px 48px; display: grid; grid-template-columns: 96px 1fr; gap: 28px; align-items: start; }
-    .jp-photo { aspect-ratio: 1/1; border: 1px solid rgba(200,150,80,0.12); border-radius: 2px; overflow: hidden; }
-    .jp-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .trio-headline { font-family: var(--serif, Georgia, serif); font-size: 1.5rem; font-weight: 400; color: #ede5d8; margin-bottom: 10px; line-height: 1.3; }
+
+    .section-jp {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      border-top: 1px solid rgba(200,150,80,0.12);
+      align-items: center;
+    }
+    .jp-text { padding: 40px 48px 48px; }
+    .jp-photo-col { padding: 32px; display: flex; justify-content: center; align-items: center; }
+    .jp-photo-wrap { width: 100%; overflow: hidden; border: 1px solid rgba(200,150,80,0.12); border-radius: 2px; }
+    .jp-photo-wrap img { width: 100%; aspect-ratio: 1/1; object-fit: cover; object-position: center top; display: block; }
     .jp-eyebrow { font-size: 8px; letter-spacing: 0.2em; color: #5a5048; text-transform: uppercase; margin-bottom: 8px; }
     .jp-name { font-family: var(--serif, Georgia, serif); font-size: 1.2rem; font-weight: 400; color: #ede5d8; margin-bottom: 8px; }
-    @media (max-width: 680px) {
+
+    @media (max-width: 768px) {
       .writers-header { padding: 40px 24px 32px; }
-      .section-hank { grid-template-columns: 1fr; }
-      .section-hank .char-side { border-right: none; border-bottom: 1px solid rgba(200,150,80,0.12); }
-      .section-grace { grid-template-columns: 1fr; }
-      .section-grace .writer-side { border-right: none; border-bottom: 1px solid rgba(200,150,80,0.12); order: -1; }
-      .section-trio { grid-template-columns: 1fr; }
+      .writer-section, .section-trio { grid-template-columns: 1fr; min-height: auto; }
+      .image-right .char-col { order: 1; border-left: none; border-bottom: 1px solid rgba(200,150,80,0.12); }
+      .image-right .writer-col { order: 2; }
+      .image-left .char-col { border-right: none; border-bottom: 1px solid rgba(200,150,80,0.12); }
+      .char-photo-wrap, .trio-photo img { min-height: 300px; height: 300px; }
+      .writer-text, .trio-text { padding: 32px 24px; }
       .trio-photo { border-right: none; border-bottom: 1px solid rgba(200,150,80,0.12); }
-      .section-jp { padding: 32px 24px 40px; }
+      .section-jp { grid-template-columns: 1fr; }
+      .jp-text { padding: 32px 24px 24px; }
+      .jp-photo-col { padding: 0 24px 32px; justify-content: flex-start; }
+      .jp-photo-wrap { max-width: 160px; }
     }
   </style>
 </head>
@@ -77,78 +105,76 @@
 
   <div class="writers-header">
     <p class="writers-eyebrow">The Founders</p>
-    <h1 class="writers-headline">
-      Three writers.<br>
-      Three registers.<br>
-      <em>One place.</em>
-    </h1>
+    <h1 class="writers-headline">Three writers.<br>Three registers.<br><em>One place.</em></h1>
   </div>
 
-  <div class="writer-section section-hank">
-    <div class="char-side">
+  <!-- HANK / MJ — image LEFT -->
+  <div class="writer-section image-left">
+    <div class="char-col">
       <div class="char-photo-wrap">
         <img src="../assets/images/char-hank-cotton.jpg" alt="Hank Cotton">
       </div>
-      <div class="char-info">
+    </div>
+    <div class="writer-col">
+      <div class="writer-text">
         <p class="role-label">The Character</p>
         <h2 class="char-name">Hank Cotton</h2>
         <p class="char-descriptor">Hotshot driver. Gritty realist. Hard-boiled truth delivered in plain English.</p>
+        <div class="identity-rule"></div>
+        <p class="role-label">The Writer</p>
+        <div class="writer-avatar"><img src="../assets/images/photo-mj-polk.jpg" alt="MJ Polk"></div>
+        <h3 class="writer-name">MJ Polk</h3>
+        <p class="writer-bio">I'm Hank's handler. Not exactly sure why he trusts me with his stories, but he does. And I've agreed to pass them on to all of you. While Hank tramps around the USA playing Hotshot Hero — writing his memoir in shady diners and truck stops — I'm here in Southern Georgia, studying Philosophy and working on my craft.</p>
+        <a href="https://thesouthernwritersguild.substack.com/s/hank-cotton" target="_blank" rel="noopener" class="writer-link">Hank Cotton's archive →</a>
       </div>
-    </div>
-    <div class="writer-side">
-      <p class="role-label">The Writer</p>
-      <div class="writer-avatar">
-        <img src="../assets/images/photo-mj-polk.jpg" alt="MJ Polk">
-      </div>
-      <h3 class="writer-name">MJ Polk</h3>
-      <div class="identity-rule"></div>
-      <p class="writer-bio">I'm Hank's handler. Not exactly sure why he trusts me with his stories, but he does. And I've agreed to pass them on to all of you. While Hank tramps around the USA playing Hotshot Hero — writing his memoir in shady diners and truck stops — I'm here in Southern Georgia, studying Philosophy and working on my craft.</p>
-      <a href="https://thesouthernwritersguild.substack.com/s/hank-cotton" target="_blank" rel="noopener" class="writer-link">Hank Cotton's archive →</a>
     </div>
   </div>
 
-  <div class="writer-section section-beau">
-    <div class="char-photo-wrap">
-      <img src="../assets/images/char-beau.jpg" alt="Beau Pritchett IV">
-    </div>
-    <div class="beau-center">
-      <p class="role-label">The Character</p>
-      <h2 class="char-name">Beau Pritchett IV</h2>
-      <p class="char-descriptor">Regional nuisance. Minor legend. Ersatz poet who seized a guitar by the neck when he was a kid.</p>
-      <div class="identity-rule"></div>
-      <p class="role-label">The Writer</p>
-      <div class="writer-avatar">
-        <img src="../assets/images/photo-rick-west.jpg" alt="Rick West">
+  <!-- BEAU / RICK — image RIGHT -->
+  <div class="writer-section image-right">
+    <div class="writer-col">
+      <div class="writer-text">
+        <p class="role-label">The Character</p>
+        <h2 class="char-name">Beau Pritchett IV</h2>
+        <p class="char-descriptor">Regional nuisance. Minor legend. Ersatz poet who seized a guitar by the neck when he was a kid.</p>
+        <div class="identity-rule"></div>
+        <p class="role-label">The Writer</p>
+        <div class="writer-avatar"><img src="../assets/images/photo-rick-west.jpg" alt="Rick West"></div>
+        <h3 class="writer-name">Rick West</h3>
+        <p class="writer-bio">Rick West — the public-facing version, anyway — comes from the southeastern United States. The humid stretch of land where stories sweat before they speak. He wanders now. Portugal, Istanbul. Albania. Even Florida. Other coordinates still blinking on the map. He takes notes, asks bad questions, drinks whatever's poured, and passes the signal along. Author of <em>First Light</em>.</p>
+        <a href="https://www.rick-west.com" target="_blank" rel="noopener" class="writer-link">rick-west.com →</a>
       </div>
-      <h3 class="writer-name">Rick West</h3>
-      <p class="writer-bio">Rick West — the public-facing version, anyway — comes from the southeastern United States. The humid stretch of land where stories sweat before they speak. He wanders now. Portugal, Istanbul. Albania. Even Florida. Other coordinates still blinking on the map. He takes notes, asks bad questions, drinks whatever's poured, and passes the signal along. Author of <em>First Light</em>.</p>
-      <a href="https://www.rick-west.com" target="_blank" rel="noopener" class="writer-link">rick-west.com →</a>
+    </div>
+    <div class="char-col">
+      <div class="char-photo-wrap">
+        <img src="../assets/images/char-beau.jpg" alt="Beau Pritchett IV">
+      </div>
     </div>
   </div>
 
-  <div class="writer-section section-grace">
-    <div class="writer-side">
-      <p class="role-label">The Writer</p>
-      <div class="writer-avatar">
-        <img src="../assets/images/photo-gray.jpg" alt="Gray">
-      </div>
-      <h3 class="writer-name">Gray</h3>
-      <div class="identity-rule"></div>
-      <p class="writer-bio">My stories are sometimes fiction, always true. I'm not the Gray or Grace in these stories. But we've walked a lot of the same roads. Heard a lot of the same songs. Cried over a lot of the same things. For a long time, I lived mostly in my head. These days, I write it out. Author of the <em>Opera Rose</em> trilogy.</p>
-      <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener" class="writer-link">Turtle Meat Mixtapes →</a>
-    </div>
-    <div>
+  <!-- GRAY / GRACE — image LEFT -->
+  <div class="writer-section image-left">
+    <div class="char-col">
       <div class="char-photo-wrap">
         <img src="../assets/images/char-grace.jpg" alt="Grace Lynn">
       </div>
-      <div class="char-info">
+    </div>
+    <div class="writer-col">
+      <div class="writer-text">
         <p class="role-label">The Character</p>
         <h2 class="char-name">Grace · Grace Lynn</h2>
         <p class="char-descriptor">Lyrical. Confessional. Southern goth with softer edges — stories that are sometimes fiction but always true.</p>
+        <div class="identity-rule"></div>
+        <p class="role-label">The Writer</p>
+        <div class="writer-avatar"><img src="../assets/images/photo-gray.jpg" alt="Gray"></div>
+        <h3 class="writer-name">Gray</h3>
+        <p class="writer-bio">My stories are sometimes fiction, always true. I'm not the Gray or Grace in these stories. But we've walked a lot of the same roads. Heard a lot of the same songs. Cried over a lot of the same things. For a long time, I lived mostly in my head. These days, I write it out. Author of the <em>Opera Rose</em> trilogy.</p>
+        <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener" class="writer-link">Turtle Meat Mixtapes →</a>
       </div>
     </div>
   </div>
 
+  <!-- THE TRIO -->
   <div class="section-trio">
     <div class="trio-photo">
       <img src="../assets/images/char-trio.jpg" alt="Hank, Grace, and Beau on the Porch steps">
@@ -162,16 +188,19 @@
     </div>
   </div>
 
-  <div class="writer-section section-jp">
-    <div class="jp-photo">
-      <img src="../assets/images/char-jean-paul.jpg" alt="Jean-Paul">
-    </div>
-    <div>
+  <!-- JEAN-PAUL — text left, small image right -->
+  <div class="section-jp">
+    <div class="jp-text">
       <p class="jp-eyebrow">Also Present</p>
       <h3 class="jp-name">Jean-Paul</h3>
       <div class="identity-rule"></div>
       <p class="writer-bio" style="max-width:520px;">Strangely sentient. Taxidermied. One eye cracked, one glowing blue-green since Pensacola — nobody's talking about it. He answers to French curses and banana pudding. He was there before the rest of them knew they were starting something. He already knows what's in the cooler. He emits low-level observational signal. The humans continue regardless.</p>
       <a href="/the-porch/start-here/" class="writer-link">Read his origin →</a>
+    </div>
+    <div class="jp-photo-col">
+      <div class="jp-photo-wrap">
+        <img src="../assets/images/char-jean-paul.jpg" alt="Jean-Paul">
+      </div>
     </div>
   </div>
 
