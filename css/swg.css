@@ -10,14 +10,14 @@
    ============================================================ */
 
 :root {
-  --bg:              #0C0B09;
-  --bg-2:            #131210;
-  --bg-3:            #1a1814;
-  --text:            #EDE5D0;
+  --bg:              #3e352c;
+  --bg-2:            #453b31;
+  --bg-3:            #4c4136;
+  --text:            #f2ece1;
   --text-muted:      rgba(237,229,208,0.55);
   --text-faint:      rgba(237,229,208,0.28);
-  --accent:          #B85C38;
-  --accent-light:    #C96A42;
+  --accent:          #d68449;
+  --accent-light:    #e0955c;
   --border:          rgba(237,229,208,0.11);
   --border-strong:   rgba(237,229,208,0.24);
 
