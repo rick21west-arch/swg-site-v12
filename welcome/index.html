@@ -280,9 +280,7 @@
   const successState = document.getElementById('successState');
 
   // ---------------------------------------------------------------
-  // PLACEHOLDER SUBMIT TARGET
-  // Replace the fetch() call below with the real Kit API request
-  // once Kit is confirmed. This currently does NOT send anywhere.
+  // Kit API submit target
   // ---------------------------------------------------------------
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -293,17 +291,18 @@
     statusMsg.classList.remove('success');
 
     try {
-      // TODO: replace with real Kit API call, e.g.:
-      // await fetch('https://api.kit.com/v4/forms/FORM_ID/subscribers', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ api_key: 'PUBLIC_KEY', email: email })
-      // });
-
-      await new Promise(res => setTimeout(res, 600)); // placeholder delay
+      const res = await fetch('https://api.kit.com/v4/forms/9740544/subscribers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Kit-Api-Key': 'lcRThPTsUVywO8sJfc_3JQ'
+        },
+        body: JSON.stringify({ email_address: email })
+      });
+      if (!res.ok) throw new Error('Request failed');
 
       formState.classList.add('hidden');
-      successState.classList.add('visible');
+        successState.classList.add('visible');
     } catch (err) {
       statusMsg.textContent = "Something didn't work. Try again in a moment.";
     }
