@@ -291,13 +291,12 @@
     statusMsg.classList.remove('success');
 
     try {
-      const res = await fetch('https://api.kit.com/v4/forms/9740544/subscribers', {
+      const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Kit-Api-Key': 'lcRThPTsUVywO8sJfc_3JQ'
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email_address: email })
+        body: JSON.stringify({ email: email })
       });
       if (!res.ok) throw new Error('Request failed');
 
