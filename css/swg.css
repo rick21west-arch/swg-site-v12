@@ -31,6 +31,8 @@
 
   --accent:          #df8d52;
   --accent-light:    #e79f68;
+  /* warm gold — writer names, pull quotes, attributed voice. 5.33:1 */
+  --accent-warm:     #c8a878;
 
   /* Text on coloured fills — e.g. button labels sitting on --accent */
   --on-accent:         #2a2018;
