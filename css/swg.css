@@ -14,11 +14,27 @@
   --bg:              #3e352c;
   --bg-2:            #453b31;
   --bg-3:            #4c4136;
+
+  /* Recessed surfaces — cards, panels, and input fields sit darker than the page background */
+  --surface-sunken:    #332c24;
+  --surface-sunken-2:  #2a241d;
+
+  /*
+     --text          body copy, headings — 10.2:1
+     --text-muted    secondary text, bylines, captions, most small copy — 4.57:1
+     --text-faint    de-emphasised labels 14px or larger only — 3.04:1, fails below 14px
+     --on-accent     text on accent-coloured fills — 6.12:1
+  */
   --text:            #f2ece1;
   --text-muted:      rgba(237,229,208,0.60);
   --text-faint:      rgba(237,229,208,0.42);
+
   --accent:          #df8d52;
   --accent-light:    #e79f68;
+
+  /* Text on coloured fills — e.g. button labels sitting on --accent */
+  --on-accent:         #2a2018;
+
   --border:          rgba(237,229,208,0.11);
   --border-strong:   rgba(237,229,208,0.24);
 
@@ -341,11 +357,11 @@ ul, ol { list-style: none; }
 .btn--primary {
   padding: 0.7rem 1.8rem;
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent);
   border: 0.5px solid transparent;
 }
 
-.btn--primary:hover { background: var(--accent-light); color: var(--text); }
+.btn--primary:hover { background: var(--accent-light); color: var(--on-accent); }
 
 .btn--ghost {
   color: var(--text-muted);
