@@ -21,7 +21,7 @@
       font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 300;
       line-height: 1.22;
-      color: #ede5d8;
+      color: var(--text);
       margin-bottom: 22px;
       letter-spacing: -0.01em;
     }
@@ -30,7 +30,7 @@
       font-size: 1.05rem;
       font-style: italic;
       font-weight: 300;
-      color: #8a7e72;
+      color: var(--text-muted);
       margin-bottom: 52px;
       line-height: 1.6;
     }
@@ -38,7 +38,7 @@
       display: flex;
       width: 100%;
       max-width: 440px;
-      border: 1px solid rgba(200,150,80,0.25);
+      border: 1px solid var(--border-strong);
       border-radius: 2px;
       overflow: hidden;
       margin-bottom: 14px;
@@ -46,21 +46,21 @@
     .home-email-form input {
       flex: 1;
       padding: 15px 18px;
-      background: rgba(0,0,0,0.3);
+      background: var(--surface-sunken-2);
       border: none;
-      color: #ede5d8;
+      color: var(--text);
       font-family: inherit;
       font-size: 14px;
       font-weight: 300;
       outline: none;
       min-width: 0;
     }
-    .home-email-form input::placeholder { color: #6a6056; }
+    .home-email-form input::placeholder { color: var(--text-muted); }
     .home-email-form button {
       padding: 15px 22px;
-      background: #c8703a;
+      background: var(--accent);
       border: none;
-      color: #fff;
+      color: var(--on-accent);
       font-family: inherit;
       font-size: 10px;
       font-weight: 500;
@@ -70,14 +70,14 @@
       white-space: nowrap;
       transition: background 0.2s;
     }
-    .home-email-form button:hover { background: #d4824e; }
+    .home-email-form button:hover { background: var(--accent-light); }
     .home-micro {
       font-size: 11px;
-      color: #4a4038;
+      color: var(--text-muted);
       letter-spacing: 0.04em;
       font-weight: 300;
     }
-    .home-divider { border: none; border-top: 1px solid rgba(200,150,80,0.12); margin: 0; }
+    .home-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
     .home-porch-section {
       padding: 56px 60px 72px;
       max-width: 1200px;
@@ -92,18 +92,18 @@
     .home-section-label {
       font-size: 9px;
       letter-spacing: 0.22em;
-      color: #8a7e72;
+      color: var(--text-muted);
       font-weight: 500;
       text-transform: uppercase;
     }
     .home-section-link {
       font-size: 10px;
-      color: #c8703a;
+      color: var(--accent);
       letter-spacing: 0.12em;
       text-decoration: none;
       transition: color 0.2s;
     }
-    .home-section-link:hover { color: #d4824e; }
+    .home-section-link:hover { color: var(--accent-light); }
     #home-porch-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);

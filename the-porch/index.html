@@ -16,7 +16,7 @@
     .porch-label {
       font-size: 9px;
       letter-spacing: 0.22em;
-      color: #5a5048;
+      color: var(--text-muted);
       text-transform: uppercase;
       margin-bottom: 10px;
     }
@@ -25,12 +25,12 @@
       font-size: 15px;
       font-style: italic;
       font-weight: 300;
-      color: #6a6056;
+      color: var(--text-muted);
       line-height: 1.5;
     }
     .cooler-link {
       font-size: 10px;
-      color: #c8703a;
+      color: var(--accent);
       letter-spacing: 0.08em;
       text-decoration: none;
       white-space: nowrap;
@@ -40,7 +40,7 @@
       flex-shrink: 0;
     }
     .cooler-link:hover { opacity: 1; }
-    .porch-divider { border: none; border-top: 1px solid rgba(200,150,80,0.12); margin: 0; }
+    .porch-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
     .porch-grid-wrap { padding: 44px 60px 0; }
     #porch-grid {
       display: grid;
@@ -62,20 +62,20 @@
       font-size: 13px;
       font-style: italic;
       font-weight: 300;
-      color: #5a5048;
+      color: var(--text-muted);
       line-height: 1.7;
       margin: 0;
     }
     .archive-link {
       font-size: 10px;
-      color: #c8703a;
+      color: var(--accent);
       letter-spacing: 0.12em;
       text-decoration: none;
       text-transform: uppercase;
       transition: color 0.2s;
       white-space: nowrap;
     }
-    .archive-link:hover { color: #d4824e; }
+    .archive-link:hover { color: var(--accent-light); }
     @media (max-width: 768px) {
       .porch-header { padding: 36px 24px 12px; flex-direction: column; align-items: flex-start; gap: 16px; }
       .cooler-link { margin-left: 0; }
