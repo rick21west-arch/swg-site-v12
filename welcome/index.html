@@ -158,7 +158,8 @@
   }
 
   button:focus-visible,
-  input:focus-visible {
+  input:focus-visible,
+  .porch-link:focus-visible {
     outline: 2px solid var(--copper);
     outline-offset: 2px;
   }
@@ -191,6 +192,29 @@
     color: var(--copper);
   }
 
+  .porch-link {
+    display: inline-block;
+    margin-top: 24px;
+    background: transparent;
+    border: 1px solid var(--copper);
+    color: var(--copper);
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 26px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .porch-link:hover {
+    background: var(--copper);
+    color: var(--bg);
+  }
+
   .jp-footer {
     position: fixed;
     bottom: 18px;
@@ -203,10 +227,12 @@
   }
 
   .jp-footer img {
-    height: 64px;
+    height: 88px;
     width: auto;
-    opacity: 0.85;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    opacity: 0.55;
+    filter: saturate(0.75) drop-shadow(0 6px 18px rgba(0,0,0,0.55));
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 22%);
+    mask-image: linear-gradient(to top, transparent 0%, black 22%);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -222,7 +248,7 @@
     }
     @keyframes settle {
       from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 0.85; transform: translateY(0); }
+      to { opacity: 0.55; transform: translateY(0); }
     }
   }
 </style>
@@ -266,7 +292,8 @@
     </div>
 
     <div class="success-state" id="successState">
-      <p class="success-line">You're on the porch now.</p>
+      <p class="success-line">Taking you to the Porch&hellip;</p>
+      <a href="/the-porch/" class="porch-link">Go now</a>
     </div>
   </div>
   </div>
@@ -302,6 +329,9 @@
 
       formState.classList.add('hidden');
         successState.classList.add('visible');
+        setTimeout(function () {
+          window.location.href = '/the-porch/';
+        }, 600);
     } catch (err) {
       statusMsg.textContent = "Something didn't work. Try again in a moment.";
     }
