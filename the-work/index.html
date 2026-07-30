@@ -8,20 +8,20 @@
   <link rel="stylesheet" href="../css/swg.css">
   <style>
     .work-header { padding: 52px 60px 44px; }
-    .work-eyebrow { font-size: 13px; letter-spacing: 0.22em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
+    .work-eyebrow { font-size: 14px; letter-spacing: 0.22em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
     .work-tagline { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 15px; font-style: italic; font-weight: 400; color: var(--text-muted); line-height: 1.5; }
     .work-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
     .work-section { padding: 52px 60px 56px; }
-    .section-label { font-size: 13px; letter-spacing: 0.22em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0; }
+    .section-label { font-size: 14px; letter-spacing: 0.22em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0; }
     .section-rule { width: 28px; height: 1px; background: var(--accent); opacity: 0.55; margin-top: 9px; }
-    .section-desc { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 13px; font-style: italic; font-weight: 400; color: var(--text-muted); margin: 12px 0 28px; line-height: 1.5; }
+    .section-desc { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 14px; font-style: italic; font-weight: 400; color: var(--text-muted); margin: 12px 0 28px; line-height: 1.5; }
     .books-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 28px; }
     .book-cover { aspect-ratio: 2/3; background: var(--surface-sunken-2); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
     .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .book-author { font-size: 13px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+    .book-author { font-size: 14px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
     .book-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1.1rem; font-weight: 400; color: var(--text); margin-bottom: 8px; line-height: 1.25; }
-    .book-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; font-weight: 400; }
-    .text-link { font-size: 13px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+    .book-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; font-weight: 400; }
+    .text-link { font-size: 14px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
     .text-link:hover { color: var(--accent-light); }
     .convos-list { display: flex; flex-direction: column; gap: 14px; }
     .convo-card { background: var(--surface-sunken); border: 1px solid var(--border); display: grid; grid-template-columns: 200px 1fr; overflow: hidden; text-decoration: none; transition: border-color 0.25s; }
@@ -29,17 +29,17 @@
     .convo-card.dim { opacity: 0.45; pointer-events: none; }
     .convo-thumb { overflow: hidden; background: var(--surface-sunken-2); display: flex; align-items: center; justify-content: center; }
     .convo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .convo-thumb span { font-size: 13px; color: rgba(255,255,255,0.1); letter-spacing: 0.12em; }
+    .convo-thumb span { font-size: 14px; color: var(--text-faint); letter-spacing: 0.12em; }
     .convo-body { padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; }
-    .convo-date { font-size: 13px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .convo-date { font-size: 14px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
     .convo-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
-    .convo-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; font-weight: 400; }
+    .convo-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; font-weight: 400; }
     .booth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .booth-card { background: var(--surface-sunken); border: 1px solid var(--border); padding: 22px 24px 26px; transition: border-color 0.25s; }
     .booth-card:hover { border-color: var(--border-strong); }
-    .booth-owner { font-size: 13px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .booth-owner { font-size: 14px; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
     .booth-title { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 10px; }
-    .booth-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-weight: 400; }
+    .booth-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-weight: 400; }
     @media (max-width: 768px) {
       .work-header { padding: 36px 24px 28px; }
       .work-section { padding: 36px 24px 40px; }
