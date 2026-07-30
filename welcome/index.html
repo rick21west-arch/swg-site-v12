@@ -192,12 +192,6 @@
     color: var(--copper);
   }
 
-  .redirect-note {
-    margin-top: 10px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
   .porch-link {
     display: inline-block;
     margin-top: 24px;
@@ -233,10 +227,12 @@
   }
 
   .jp-footer img {
-    height: 64px;
+    height: 88px;
     width: auto;
-    opacity: 0.85;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    opacity: 0.55;
+    filter: saturate(0.75) drop-shadow(0 6px 18px rgba(0,0,0,0.55));
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 22%);
+    mask-image: linear-gradient(to top, transparent 0%, black 22%);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -252,7 +248,7 @@
     }
     @keyframes settle {
       from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 0.85; transform: translateY(0); }
+      to { opacity: 0.55; transform: translateY(0); }
     }
   }
 </style>
@@ -296,9 +292,8 @@
     </div>
 
     <div class="success-state" id="successState">
-      <p class="success-line">You're on the porch now.</p>
-      <p class="redirect-note">Taking you there&hellip;</p>
-      <a href="/the-porch/" class="porch-link">Come on in</a>
+      <p class="success-line">Taking you to the Porch&hellip;</p>
+      <a href="/the-porch/" class="porch-link">Go now</a>
     </div>
   </div>
   </div>
@@ -336,7 +331,7 @@
         successState.classList.add('visible');
         setTimeout(function () {
           window.location.href = '/the-porch/';
-        }, 2000);
+        }, 600);
     } catch (err) {
       statusMsg.textContent = "Something didn't work. Try again in a moment.";
     }
