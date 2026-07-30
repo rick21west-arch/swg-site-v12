@@ -158,7 +158,8 @@
   }
 
   button:focus-visible,
-  input:focus-visible {
+  input:focus-visible,
+  .porch-link:focus-visible {
     outline: 2px solid var(--copper);
     outline-offset: 2px;
   }
@@ -189,6 +190,35 @@
     font-style: italic;
     font-size: 22px;
     color: var(--copper);
+  }
+
+  .redirect-note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .porch-link {
+    display: inline-block;
+    margin-top: 24px;
+    background: transparent;
+    border: 1px solid var(--copper);
+    color: var(--copper);
+    font-family: 'Karla', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 26px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .porch-link:hover {
+    background: var(--copper);
+    color: var(--bg);
   }
 
   .jp-footer {
@@ -267,6 +297,8 @@
 
     <div class="success-state" id="successState">
       <p class="success-line">You're on the porch now.</p>
+      <p class="redirect-note">Taking you there&hellip;</p>
+      <a href="/the-porch/" class="porch-link">Come on in</a>
     </div>
   </div>
   </div>
@@ -302,6 +334,9 @@
 
       formState.classList.add('hidden');
         successState.classList.add('visible');
+        setTimeout(function () {
+          window.location.href = '/the-porch/';
+        }, 2000);
     } catch (err) {
       statusMsg.textContent = "Something didn't work. Try again in a moment.";
     }
