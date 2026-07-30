@@ -1,0 +1,102 @@
+# Southern Writers Guild — working instructions
+
+## Who you're working with
+
+Rick West — co-founder, project owner. Former C-level executive. Not a programmer, and should never be asked to read, interpret, or debug code.
+
+**Communication rules — requirements, not preferences:**
+
+- Diagnose before instructing. State what you have verified and what you are assuming.
+- Never send him hunting through a UI. Work out the exact path first, or do it yourself.
+- No jargon. "A record," "endpoint," "environment variable," "serverless function" mean nothing to him. Plain language or don't mention it.
+- One step at a time. Wait for confirmation before the next.
+- Don't say "the whole explanation" / "that's everything." Nothing is ever the whole of something.
+- If he flags a possible cause, check it. Do not dismiss it. This has already cost him an entire afternoon.
+
+## Absolute rule
+
+One of the three founders goes by **Gray**, **Grace**, or **Grace Lynn** only. Her legal name must never appear anywhere — code, comments, commit messages, CMS entries, file names, conversation. No exceptions.
+
+Other founders: Rick West (writes as Beau Pritchett IV), MJ Polk (writes as Hank Cotton). Jean-Paul is the Guild's mascot, a taxidermied peacock, played completely straight.
+
+## Repo location trap
+
+Working repo: `C:\Users\Rick\Desktop\EZ\websites\swg-site-v12\swg-site`
+
+A decoy folder exists at `...\swg-site-v12\swg-site-v12` with no git repository in it. If git says "not a git repository," you are in the wrong folder. Do not ask Rick to hunt for it.
+
+## Deploy workflow
+
+Static site, no build step. Vercel watches GitHub and deploys automatically.
+
+- Push to `main` → live on southernwritersguild.com in ~30 seconds.
+- Push to any other branch → public preview URL.
+- Anything visual goes to a branch first for Rick and Grace to review. Do not merge to `main` without being told.
+
+## Design system
+
+Tokens at the top of `css/swg.css`. Cormorant Garamond (display) + system sans (UI). Do not introduce new fonts or a new palette.
+
+**Known defect — fix pending approval.** Background was lightened from `#0C0B09` to `#3e352c` without adjusting text opacity. Measured WCAG contrast:
+
+| token | ratio | status |
+|---|---|---|
+| `--text` | 10.20:1 | fine |
+| `--text-muted` | 4.09:1 | fails body text (needs 4.5:1) |
+| `--text-faint` | 2.13:1 | fails badly |
+| `--accent` | 4.15:1 | fails body text |
+
+This is an opacity problem, not a palette problem. Raise alpha values, darken the accent slightly. Keep the warm character. The brief is "readable and navigable," not "redesign."
+
+## Typography decisions (locked)
+
+As of the `typography-pass` branch:
+
+- Body text now uses EB Garamond (`--font-body`) instead of Cormorant Garamond. Cormorant Garamond (`--font-serif`) stays on headings — h1–h4 and every display/hero/title class are set explicitly so they don't inherit the new body face.
+- Body copy stays 1.1rem; line-height changed from 1.75 to 1.7.
+- Running body copy (the `.prose` sections used on the manifesto, guidelines, and Porch "start here" pages) is capped at `max-width: 66ch` for a readable line length. Not applied to nav, cards, grids, or the hero.
+
+Contrast fix for the four tokens, measured against the `--bg: #3e352c` background:
+
+| token | old value | new value | old ratio | new ratio |
+|---|---|---|---|---|
+| `--text-muted` | rgba(237,229,208,0.55) | rgba(237,229,208,0.60) | 4.09:1 | 4.57:1 |
+| `--text-faint` | rgba(237,229,208,0.28) | rgba(237,229,208,0.42) | 2.13:1 | 3.04:1 |
+| `--accent` | #d68449 | #df8d52 | 4.15:1 | 4.61:1 |
+| `--accent-light` | #e0955c | #e79f68 | not previously measured | 5.46:1 |
+
+`--text-muted` and `--accent` now pass WCAG AA for body text (4.5:1). `--text-faint` improved from 2.13:1 to 3.04:1 but still falls short of the 4.5:1 body-text threshold — it only clears the 3:1 minimum that applies to large text. `--text-faint` is used for small caption-style text (footer, card notes, filter tabs), so this is an improvement, not a full fix, and should be revisited.
+
+Reason for the change: the background was lightened from `#0C0B09` to `#3e352c` in an earlier pass without adjusting these token values, leaving text hard to read. This raises opacity/darkens the accent to compensate, keeping the same warm palette — "readable and navigable," not a redesign.
+
+## Kit (email platform)
+
+Welcome page form posts to `/api/subscribe`, a serverless function holding the API key server-side. Visitor never sees Kit branding.
+
+Kit requires two calls in sequence — create the subscriber, then add to form. Calling only the second returns 404. Implemented correctly in `api/subscribe.js` as of commit `59ed81b`.
+
+**Unverified:** whether `KIT_API_KEY` in Vercel is the current working key. Several were generated; at least one was stale. A 401 means this is the cause. Form id hardcoded as `9740544`, but `GET /v4/forms` returned ids `52` and `53` — discrepancy never resolved. Check this before assuming the code is wrong.
+
+Never commit an API key.
+
+## Substack
+
+Still live, ~243 subscribers, nearly all imported by the founders from prior audiences. Substack's own discovery tools produced 32 subscribers in the publication's lifetime. Direction: Substack becomes free-only, paid content moves to the Guild site.
+
+## Current objectives
+
+1. **Readability and polish** — the contrast fix above, plus body copy sizing and line length. Same aesthetic. Deadline mid-August.
+2. **The Kitchen Table** — new paid section, added to navigation. Design and shell first; the paywall is a separate, larger project and should not be rushed to meet the deadline.
+3. **Porch access via email** — signup grants Porch entry. The mechanism for recognising a returning visitor is undecided. Do not implement one without an explicit decision.
+
+Nav currently reads: THE PORCH · THE WORK · THE HOUSE · WRITERS · JOIN. Every item is evocative rather than descriptive; a first-time visitor can't tell what any of them contain. Adding a sixth is a real navigability risk. Raise it before adding.
+
+## Content management
+
+Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, conversations, and House contact addresses are still hardcoded and need moving into Sanity. When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
+
+## Hard limits
+
+- Never handle passwords, payment details, or credentials on Rick's behalf.
+- Read the actual documentation for a third-party service before writing code against it.
+- If something fails twice the same way, stop and diagnose. Do not try a third variation.

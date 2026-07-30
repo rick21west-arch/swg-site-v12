@@ -4,6 +4,7 @@
    ============================================================ */
 
 @import url('https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond/index.css');
+@import url('https://cdn.jsdelivr.net/npm/@fontsource/eb-garamond/index.css');
 
 /* ============================================================
    Design Tokens
@@ -14,14 +15,15 @@
   --bg-2:            #453b31;
   --bg-3:            #4c4136;
   --text:            #f2ece1;
-  --text-muted:      rgba(237,229,208,0.55);
-  --text-faint:      rgba(237,229,208,0.28);
-  --accent:          #d68449;
-  --accent-light:    #e0955c;
+  --text-muted:      rgba(237,229,208,0.60);
+  --text-faint:      rgba(237,229,208,0.42);
+  --accent:          #df8d52;
+  --accent-light:    #e79f68;
   --border:          rgba(237,229,208,0.11);
   --border-strong:   rgba(237,229,208,0.24);
 
   --font-serif:      'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body:       'EB Garamond', Georgia, 'Times New Roman', serif;
   --font-ui:         -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   --nav-h:           56px;
@@ -46,12 +48,14 @@ html { font-size: 16px; scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: 1.1rem;
-  line-height: 1.75;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
+
+h1, h2, h3, h4 { font-family: var(--font-serif); }
 
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
@@ -461,6 +465,10 @@ ul, ol { list-style: none; }
 /* ============================================================
    Content typography (for real prose sections)
    ============================================================ */
+
+.prose {
+  max-width: 66ch;
+}
 
 .prose h1, .prose h2, .prose h3 {
   font-family: var(--font-serif);
