@@ -46,7 +46,14 @@
        `*[_type == "porchStory"] | order(publishedAt desc)`
      )
    }
-    
+
+   export async function fetchPorchStoryBySlug(slug) {
+     const safe = String(slug).replace(/"/g, '\\"')
+     return sanityFetch(
+       `*[_type == "porchStory" && slug.current == "${safe}"][0]`
+     )
+   }
+
    /* ── Featured fiction ──────────────────────────────────────── */
     
    export async function fetchFeaturedFiction() {
@@ -166,8 +173,13 @@
        : `<div style="aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
             <span style="font-family:var(--font-serif);font-style:italic;color:var(--text-faint);font-size:0.95rem;text-align:center;padding:1rem;">${esc(story.excerpt || story.title)}</span>
           </div>`
+     // Stories with a slug now have their own page on this site. Older stories
+     // without one still fall back to the original Substack post.
+     const hasSlug = Boolean(story.slug && story.slug.current)
+     const href = hasSlug ? `/the-porch/${story.slug.current}/` : story.substackUrl
+     const external = hasSlug ? '' : 'target="_blank" rel="noopener"'
      return `
-       <a href="${esc(story.substackUrl)}" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;">
+       <a href="${esc(href)}" ${external} class="card" style="display:block;text-decoration:none;">
          ${img}
          <span class="card-label">${esc(formatDate(story.publishedAt))} &nbsp;·&nbsp; ${esc(story.authors || '')}</span>
          <h2 class="card-title card-title--sm">${esc(story.title)}</h2>
@@ -219,6 +231,74 @@
      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
    }
     
+   /* ── Portable Text → HTML ──────────────────────────────────── */
+   /* Minimal renderer for Sanity's rich-text format. No build step on
+      this site, so this is hand-written rather than a package import.
+      Handles paragraphs, headings, blockquotes, bullet/numbered lists,
+      bold, italic, and links — the set the Studio's Story Text field
+      offers. */
+
+   export function renderPortableText(blocks) {
+     if (!Array.isArray(blocks) || !blocks.length) return ''
+
+     const out = []
+     let listBuffer = []
+     let listTag = null
+
+     function flushList() {
+       if (listBuffer.length) {
+         out.push(`<${listTag}>${listBuffer.join('')}</${listTag}>`)
+         listBuffer = []
+         listTag = null
+       }
+     }
+
+     function renderSpans(block) {
+       const markDefs = block.markDefs || []
+       return (block.children || []).map(span => {
+         let text = esc(span.text || '')
+         ;(span.marks || []).forEach(mark => {
+           const def = markDefs.find(m => m._key === mark)
+           if (def && def._type === 'link' && def.href) {
+             text = `<a href="${esc(def.href)}" target="_blank" rel="noopener">${text}</a>`
+           } else if (mark === 'strong') {
+             text = `<strong>${text}</strong>`
+           } else if (mark === 'em') {
+             text = `<em>${text}</em>`
+           }
+         })
+         return text
+       }).join('')
+     }
+
+     blocks.forEach(block => {
+       if (block._type !== 'block') { flushList(); return }
+
+       const isListItem = block.listItem === 'bullet' || block.listItem === 'number'
+       if (isListItem) {
+         const tag = block.listItem === 'number' ? 'ol' : 'ul'
+         if (listTag && listTag !== tag) flushList()
+         listTag = tag
+         listBuffer.push(`<li>${renderSpans(block)}</li>`)
+         return
+       }
+       flushList()
+
+       const inner = renderSpans(block)
+       if (!inner.trim()) { out.push('<p>&nbsp;</p>'); return }
+
+       const style = block.style || 'normal'
+       if (style === 'h2') out.push(`<h2>${inner}</h2>`)
+       else if (style === 'h3') out.push(`<h3>${inner}</h3>`)
+       else if (style === 'h4') out.push(`<h4>${inner}</h4>`)
+       else if (style === 'blockquote') out.push(`<blockquote>${inner}</blockquote>`)
+       else out.push(`<p>${inner}</p>`)
+     })
+
+     flushList()
+     return out.join('\n')
+   }
+
    export function showLoading(el, msg = 'Loading...') {
      el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.1em;">${msg}</div>`
    }

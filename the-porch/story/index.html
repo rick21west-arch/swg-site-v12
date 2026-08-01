@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Porch — Southern Writers Guild</title>
+  <link rel="stylesheet" href="/css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="/assets/images/swg-logo.jpg" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/" class="active">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-sm);">
+    <div class="container" style="max-width:var(--content-w);">
+      <span class="hero-eyebrow">The Porch</span>
+      <h1 id="story-title" class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.6rem);">Loading…</h1>
+      <p id="story-meta" class="hero-sub" style="font-family:var(--font-ui);font-size:0.8rem;letter-spacing:0.04em;"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:var(--content-w);">
+      <div id="story-thumb"></div>
+      <div id="story-body" class="prose"></div>
+      <div id="story-fallback"></div>
+      <p style="margin-top:var(--sp-lg);">
+        <a href="/the-porch/" style="font-size:14px;color:var(--accent);letter-spacing:0.12em;text-decoration:none;text-transform:uppercase;">← Back to the Porch</a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchPorchStoryBySlug, renderPortableText, thumbSrc } from '/js/sanity.js'
+
+    const titleEl = document.getElementById('story-title')
+    const metaEl = document.getElementById('story-meta')
+    const thumbEl = document.getElementById('story-thumb')
+    const bodyEl = document.getElementById('story-body')
+    const fallbackEl = document.getElementById('story-fallback')
+
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const slug = parts[parts.length - 1]
+
+    function esc(str) {
+      const d = document.createElement('div')
+      d.textContent = str || ''
+      return d.innerHTML
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr + 'T12:00:00Z')
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    }
+
+    function notFound() {
+      titleEl.textContent = 'Story not found'
+      metaEl.textContent = ''
+      bodyEl.innerHTML = '<p>We couldn’t find that story. It may have moved.</p>'
+    }
+
+    if (!slug) {
+      notFound()
+    } else {
+      fetchPorchStoryBySlug(slug)
+        .then(story => {
+          if (!story) { notFound(); return }
+
+          document.title = `${story.title} — The Porch — Southern Writers Guild`
+          titleEl.textContent = story.title
+          metaEl.textContent = [formatDate(story.publishedAt), story.authors].filter(Boolean).join('  ·  ')
+
+          const thumb = thumbSrc(story, 1200)
+          if (thumb) {
+            thumbEl.innerHTML = `<img src="${esc(thumb)}" alt="${esc(story.title)}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
+          }
+
+          if (story.body && story.body.length) {
+            bodyEl.innerHTML = renderPortableText(story.body)
+          } else if (story.excerpt) {
+            bodyEl.innerHTML = `<p>${esc(story.excerpt)}</p>`
+          }
+
+          if (story.substackUrl) {
+            fallbackEl.innerHTML = `<p style="margin-top:var(--sp-md);"><a href="${esc(story.substackUrl)}" target="_blank" rel="noopener" class="btn btn--ghost">Read on Substack →</a></p>`
+          }
+        })
+        .catch(() => {
+          titleEl.textContent = 'Story unavailable'
+          metaEl.textContent = ''
+          bodyEl.innerHTML = '<p>Something went wrong loading this story.</p>'
+        })
+    }
+  </script>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>
