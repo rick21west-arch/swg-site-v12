@@ -37,7 +37,7 @@
     
    export async function fetchPorchStories(limit = 9) {
      return sanityFetch(
-       `*[_type == "porchStory"] | order(publishedAt desc) [0...${limit}]`
+       `*[_type == "porchStory" && featured == true] | order(publishedAt desc) [0...${limit}]`
      )
    }
     
