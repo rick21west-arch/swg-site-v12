@@ -47,9 +47,6 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
-    #porch-grid > :first-child {
-      grid-column: span 2;
-    }
     .porch-footer {
       padding: 40px 60px 56px;
       display: grid;
@@ -81,7 +78,6 @@
       .cooler-link { margin-left: 0; }
       .porch-grid-wrap { padding: 32px 24px 0; }
       #porch-grid { grid-template-columns: 1fr; }
-      #porch-grid > :first-child { grid-column: span 1; }
       .porch-footer { padding: 32px 24px 40px; grid-template-columns: 1fr; gap: 20px; }
     }
   </style>
@@ -135,7 +131,7 @@
     import { fetchPorchStories, renderPorchCard, showLoading, showError } from '../js/sanity.js'
     const grid = document.getElementById('porch-grid')
     showLoading(grid)
-    fetchPorchStories(6)
+    fetchPorchStories(9)
       .then(stories => {
         if (!stories || !stories.length) {
           showError(grid, 'No stories found.')
