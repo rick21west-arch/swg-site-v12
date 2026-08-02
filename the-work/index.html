@@ -16,6 +16,8 @@
     .section-rule { width: 28px; height: 1px; background: var(--accent); opacity: 0.55; margin-top: 9px; }
     .section-desc { font-family: var(--serif, 'Cormorant Garamond', Georgia, serif); font-size: 14px; font-style: italic; font-weight: 400; color: var(--text-muted); margin: 12px 0 28px; line-height: 1.5; }
     .section-header-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    #books-grid { max-width: 70%; margin-left: auto; margin-right: auto; }
+    @media (max-width: 768px) { #books-grid { max-width: 100%; } }
     .text-link { font-size: 14px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
     .text-link:hover { color: var(--accent-light); }
     .music-grid { display: flex; flex-wrap: wrap; gap: 18px; }
