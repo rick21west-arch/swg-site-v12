@@ -133,8 +133,8 @@
    export function renderEventCard(event) {
      const thumb = thumbSrc(event, 800)
      const img = thumb
-       ? `<img src="${esc(thumb)}" alt="${esc(event.title)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;margin-bottom:0.75rem;">`
-       : `<div style="aspect-ratio:4/5;background:var(--bg-3);margin-bottom:0.75rem;"></div>`
+       ? `<img src="${esc(thumb)}" alt="${esc(event.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">`
+       : `<div style="aspect-ratio:16/9;background:var(--bg-3);margin-bottom:0.75rem;"></div>`
      const hasSlug = Boolean(event.slug && event.slug.current)
      const href = hasSlug ? `/events/${event.slug.current}/` : '#'
      return `
