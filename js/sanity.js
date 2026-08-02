@@ -62,25 +62,20 @@
      )
    }
 
-   /* ── Music (ambient tracks hosted on YouTube) ────────────────── */
-
-   function youtubeId(url) {
-     if (!url) return null
-     const m = String(url).match(/(?:youtu\.be\/|[?&]v=|\/embed\/)([a-zA-Z0-9_-]{6,})/)
-     return m ? m[1] : null
-   }
+   /* ── Music (ambient tracks, hosted on YouTube) ───────────────── */
+   /* Lives on the shared guildVideo type, filtered to type == "music".
+      substackUrl holds the YouTube link despite the field's old name. */
 
    export async function fetchMusicVideos() {
      return sanityFetch(
-       `*[_type == "musicVideo"] | order(_createdAt desc) {title, youtubeUrl}`
+       `*[_type == "guildVideo" && type == "music"] | order(publishedAt desc) {title, thumbnail, substackUrl}`
      )
    }
 
    export function renderMusicThumb(video) {
-     const id = youtubeId(video.youtubeUrl)
-     const thumb = id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
+     const thumb = thumbSrc(video, 300)
      return `
-       <a href="${esc(video.youtubeUrl)}" target="_blank" rel="noopener" class="music-thumb">
+       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="music-thumb">
          ${thumb
            ? `<img src="${esc(thumb)}" alt="${esc(video.title)}">`
            : `<div class="music-thumb-fallback"></div>`}
