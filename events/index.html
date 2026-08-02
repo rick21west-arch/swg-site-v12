@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Porch — Southern Writers Guild</title>
-  <meta name="description" content="No agenda. No algorithm. A porch, rotating company, and whatever the South hands them today.">
+  <title>Events — Southern Writers Guild</title>
+  <meta name="description" content="Readings, fairs, and gatherings from the Southern Writers Guild.">
   <link rel="stylesheet" href="../css/swg.css">
   <style>
-    .porch-header {
+    .events-header {
       padding: 48px 60px 16px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
     }
-    .porch-label {
+    .events-label {
       font-size: 14px;
       letter-spacing: 0.22em;
       color: var(--text-muted);
       text-transform: uppercase;
       margin-bottom: 10px;
     }
-    .porch-tagline {
+    .events-tagline {
       font-family: var(--serif, 'Cormorant Garamond', Georgia, serif);
       font-size: 15px;
       font-style: italic;
@@ -28,28 +28,17 @@
       color: var(--text-muted);
       line-height: 1.5;
     }
-    .porch-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-    .porch-grid-wrap { padding: 44px 60px 0; }
-    #porch-grid {
+    .events-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .events-grid-wrap { padding: 44px 60px 0; }
+    #events-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
     }
-    .porch-footer {
+    .events-footer {
       padding: 40px 60px 56px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 40px;
-      align-items: end;
-    }
-    .jp-quote {
-      font-family: var(--serif, 'Cormorant Garamond', Georgia, serif);
-      font-size: 14px;
-      font-style: italic;
-      font-weight: 400;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin: 0;
+      display: flex;
+      justify-content: flex-end;
     }
     .archive-link {
       font-size: 14px;
@@ -62,10 +51,10 @@
     }
     .archive-link:hover { color: var(--accent-light); }
     @media (max-width: 768px) {
-      .porch-header { padding: 36px 24px 12px; flex-direction: column; align-items: flex-start; gap: 16px; }
-      .porch-grid-wrap { padding: 32px 24px 0; }
-      #porch-grid { grid-template-columns: 1fr; }
-      .porch-footer { padding: 32px 24px 40px; grid-template-columns: 1fr; gap: 20px; }
+      .events-header { padding: 36px 24px 12px; flex-direction: column; align-items: flex-start; gap: 16px; }
+      .events-grid-wrap { padding: 32px 24px 0; }
+      #events-grid { grid-template-columns: 1fr; }
+      .events-footer { padding: 32px 24px 40px; }
     }
   </style>
 </head>
@@ -77,9 +66,9 @@
       </a>
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
       <ul class="nav-links">
-        <li><a href="/the-porch/" class="active">The Porch</a></li>
+        <li><a href="/the-porch/">The Porch</a></li>
         <li><a href="/the-work/">The Work</a></li>
-        <li><a href="/events/">Events</a></li>
+        <li><a href="/events/" class="active">Events</a></li>
         <li><a href="/the-house/">The House</a></li>
         <li><a href="/writers/">Writers</a></li>
         <li class="nav-join"><a href="/join/">Join</a></li>
@@ -87,24 +76,23 @@
     </div>
   </nav>
 
-  <div class="porch-header">
+  <div class="events-header">
     <div>
-      <p class="porch-label">The Porch</p>
-      <p class="porch-tagline">A little bit of YeeHaw. A lot of Rebel Yell. And a touch of Grace.</p>
+      <p class="events-label">Events</p>
+      <p class="events-tagline">Where the Guild shows up in person.</p>
     </div>
   </div>
 
-  <hr class="porch-divider">
+  <hr class="events-divider">
 
-  <div class="porch-grid-wrap">
-    <div id="porch-grid">
+  <div class="events-grid-wrap">
+    <div id="events-grid">
       <!-- Populated by Sanity -->
     </div>
   </div>
 
-  <div class="porch-footer">
-    <p class="jp-quote">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
-    <a href="/the-porch/archive/" class="archive-link">Every story from the Porch →</a>
+  <div class="events-footer">
+    <a href="/events/archive/" class="archive-link">Every event →</a>
   </div>
 
   <footer class="site-footer">
@@ -115,20 +103,20 @@
   </footer>
 
   <script type="module">
-    import { fetchPorchStories, renderPorchCard, showLoading, showError } from '../js/sanity.js'
-    const grid = document.getElementById('porch-grid')
+    import { fetchEvents, renderEventCard, showLoading, showError } from '../js/sanity.js'
+    const grid = document.getElementById('events-grid')
     showLoading(grid)
-    fetchPorchStories(9)
-      .then(stories => {
-        if (!stories || !stories.length) {
-          showError(grid, 'No stories found.')
+    fetchEvents(9)
+      .then(events => {
+        if (!events || !events.length) {
+          showError(grid, 'No events on the calendar right now — check back soon.')
           return
         }
-        grid.innerHTML = stories.map(renderPorchCard).join('')
+        grid.innerHTML = events.map(renderEventCard).join('')
       })
-      .catch(() => showError(grid, 'Stories unavailable — visit us on Substack.'))
+      .catch(() => showError(grid, 'Events unavailable.'))
   </script>
 
-  <script src="/js/nav.js"></script>
+  <script src="../js/nav.js"></script>
 </body>
 </html>

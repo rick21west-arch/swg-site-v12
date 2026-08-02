@@ -107,6 +107,51 @@
        </a>`
    }
 
+   /* ── Events ─────────────────────────────────────────────────── */
+   /* Forward-looking, so sorted soonest-first rather than newest-first
+      like everything else on the site. */
+
+   export async function fetchEvents(limit = 9) {
+     return sanityFetch(
+       `*[_type == "event" && (featured == true || !defined(featured))] | order(eventDate asc) [0...${limit}]`
+     )
+   }
+
+   export async function fetchAllEvents() {
+     return sanityFetch(
+       `*[_type == "event"] | order(eventDate asc)`
+     )
+   }
+
+   export async function fetchEventBySlug(slug) {
+     const safe = String(slug).replace(/"/g, '\\"')
+     return sanityFetch(
+       `*[_type == "event" && slug.current == "${safe}"][0]`
+     )
+   }
+
+   export function renderEventCard(event) {
+     const thumb = thumbSrc(event, 800)
+     const img = thumb
+       ? `<img src="${esc(thumb)}" alt="${esc(event.title)}" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;margin-bottom:0.75rem;">`
+       : `<div style="aspect-ratio:4/5;background:var(--bg-3);margin-bottom:0.75rem;"></div>`
+     const hasSlug = Boolean(event.slug && event.slug.current)
+     const href = hasSlug ? `/events/${event.slug.current}/` : '#'
+     return `
+       <a href="${esc(href)}" class="card" style="display:block;text-decoration:none;">
+         ${img}
+         <span class="card-label">${esc(formatEventDate(event.eventDate))}${event.venue ? ` &nbsp;·&nbsp; ${esc(event.venue)}` : ''}</span>
+         <h2 class="card-title card-title--sm">${esc(event.title)}</h2>
+         ${event.subtitle ? `<p class="card-body" style="font-size:0.9rem;">${esc(event.subtitle)}</p>` : ''}
+       </a>`
+   }
+
+   function formatEventDate(dateStr) {
+     if (!dateStr) return ''
+     const d = new Date(dateStr + 'T12:00:00Z')
+     return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+   }
+
    /* ── Featured fiction ──────────────────────────────────────── */
     
    export async function fetchFeaturedFiction() {

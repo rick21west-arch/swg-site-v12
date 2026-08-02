@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interviews — Southern Writers Guild</title>
+  <title>All Events — Southern Writers Guild</title>
   <link rel="stylesheet" href="../../css/swg.css">
 </head>
 <body>
@@ -16,11 +16,10 @@
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
       <ul class="nav-links">
         <li><a href="/the-porch/">The Porch</a></li>
-        <li><a href="/the-work/" class="active">The Work</a></li>
-        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/events/" class="active">Events</a></li>
         <li><a href="/the-house/">The House</a></li>
         <li><a href="/writers/">Writers</a></li>
-
         <li class="nav-join"><a href="/join/">Join</a></li>
       </ul>
     </div>
@@ -28,15 +27,15 @@
 
   <section class="hero" style="padding-bottom:var(--sp-md);">
     <div class="container">
-      <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Interviews</span>
-      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Every interview.</h1>
-      <p class="hero-sub">The Guild in dialogue, recorded and hosted on our YouTube channel. <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
+      <span class="hero-eyebrow">Events</span>
+      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Every event.</h1>
+      <p class="hero-sub">Past and upcoming, soonest first. <a href="/events/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to Events</a></p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="grid grid--3" id="interviews-archive-grid"></div>
+      <div class="grid grid--3" id="events-archive-grid"></div>
     </div>
   </section>
 
@@ -48,15 +47,15 @@
   </footer>
 
   <script type="module">
-    import { fetchAllInterviews, renderVideoCard, showLoading, showError } from '../../js/sanity.js'
-    const grid = document.getElementById('interviews-archive-grid')
+    import { fetchAllEvents, renderEventCard, showLoading, showError } from '../../js/sanity.js'
+    const grid = document.getElementById('events-archive-grid')
     showLoading(grid)
-    fetchAllInterviews()
-      .then(interviews => {
-        if (!interviews || !interviews.length) { showError(grid, 'Interviews unavailable.'); return }
-        grid.innerHTML = interviews.map(v => renderVideoCard(v, 'large')).join('')
+    fetchAllEvents()
+      .then(events => {
+        if (!events || !events.length) { showError(grid, 'No events found.'); return }
+        grid.innerHTML = events.map(renderEventCard).join('')
       })
-      .catch(() => showError(grid, 'Interviews unavailable.'))
+      .catch(() => showError(grid, 'Archive unavailable.'))
   </script>
 
   <script src="../../js/nav.js"></script>

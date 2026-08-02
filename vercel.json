@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/the-porch/:slug", "destination": "/the-porch/story/index.html" },
-    { "source": "/the-porch/:slug/", "destination": "/the-porch/story/index.html" }
+    { "source": "/the-porch/:slug/", "destination": "/the-porch/story/index.html" },
+    { "source": "/events/:slug", "destination": "/events/event/index.html" },
+    { "source": "/events/:slug/", "destination": "/events/event/index.html" }
   ]
 }

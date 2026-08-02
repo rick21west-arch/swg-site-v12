@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event — Southern Writers Guild</title>
+  <link rel="stylesheet" href="/css/swg.css">
+  <style>
+    .event-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: var(--sp-md) 0; }
+    .event-gallery img { width: 100%; height: auto; display: block; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="/assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/events/" class="active">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-sm);">
+    <div class="container" style="max-width:var(--content-w);">
+      <span class="hero-eyebrow">Events</span>
+      <h1 id="event-title" class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.6rem);">Loading…</h1>
+      <p id="event-meta" class="hero-sub" style="font-family:var(--font-ui);font-size:0.8rem;letter-spacing:0.04em;"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:var(--content-w);">
+      <div id="event-thumb"></div>
+      <div id="event-tickets"></div>
+      <div id="event-body" class="prose"></div>
+      <div id="event-gallery" class="event-gallery"></div>
+      <p style="margin-top:var(--sp-lg);">
+        <a href="/events/" style="font-size:14px;color:var(--accent);letter-spacing:0.12em;text-decoration:none;text-transform:uppercase;">← Back to Events</a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchEventBySlug, renderPortableText, thumbSrc } from '/js/sanity.js'
+
+    const titleEl = document.getElementById('event-title')
+    const metaEl = document.getElementById('event-meta')
+    const thumbEl = document.getElementById('event-thumb')
+    const ticketsEl = document.getElementById('event-tickets')
+    const bodyEl = document.getElementById('event-body')
+    const galleryEl = document.getElementById('event-gallery')
+
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const slug = parts[parts.length - 1]
+
+    function esc(str) {
+      const d = document.createElement('div')
+      d.textContent = str || ''
+      return d.innerHTML
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr + 'T12:00:00Z')
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    }
+
+    function notFound() {
+      titleEl.textContent = 'Event not found'
+      metaEl.textContent = ''
+      bodyEl.innerHTML = '<p>We couldn’t find that event. It may have moved.</p>'
+    }
+
+    if (!slug) {
+      notFound()
+    } else {
+      fetchEventBySlug(slug)
+        .then(event => {
+          if (!event) { notFound(); return }
+
+          document.title = `${event.title} — Events — Southern Writers Guild`
+          titleEl.textContent = event.title
+          metaEl.textContent = [formatDate(event.eventDate), event.timeRange, event.venue].filter(Boolean).join('  ·  ')
+
+          const thumb = thumbSrc(event, 1200)
+          if (thumb) {
+            thumbEl.innerHTML = `<img src="${esc(thumb)}" alt="${esc(event.title)}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
+          }
+
+          if (event.subtitle) {
+            bodyEl.innerHTML += `<p style="font-family:var(--font-serif);font-style:italic;font-size:1.1rem;">${esc(event.subtitle)}</p>`
+          }
+
+          const ticketBits = []
+          if (event.priceInfo) ticketBits.push(`<p>${esc(event.priceInfo)}</p>`)
+          if (event.ticketUrl) ticketBits.push(`<a href="${esc(event.ticketUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="margin-top:0.5rem;">Get tickets →</a>`)
+          if (ticketBits.length) ticketsEl.innerHTML = ticketBits.join('')
+
+          if (event.body && event.body.length) {
+            bodyEl.innerHTML += renderPortableText(event.body)
+          }
+
+          if (Array.isArray(event.gallery) && event.gallery.length) {
+            galleryEl.innerHTML = event.gallery.map((img, i) => {
+              const src = thumbSrc({ thumbnail: img }, 900)
+              return src ? `<img src="${esc(src)}" alt="${esc(event.title)} — image ${i + 1}">` : ''
+            }).join('')
+          }
+        })
+        .catch(() => {
+          titleEl.textContent = 'Event unavailable'
+          metaEl.textContent = ''
+          bodyEl.innerHTML = '<p>Something went wrong loading this event.</p>'
+        })
+    }
+  </script>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>
