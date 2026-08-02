@@ -79,18 +79,9 @@
     }
     .home-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
     .scratches-section {
-      padding: 64px 40px 88px;
+      padding: 88px 40px 88px;
       max-width: 1100px;
       margin: 0 auto;
-    }
-    .scratches-label {
-      text-align: center;
-      font-size: 14px;
-      letter-spacing: 0.22em;
-      color: var(--text-muted);
-      font-weight: 500;
-      text-transform: uppercase;
-      margin: 0 0 44px;
     }
     .scratches {
       display: flex;
@@ -99,10 +90,10 @@
       gap: 12px 6px;
     }
     .scratch {
-      background-color: #e8ddc7;
-      background-image:
-        repeating-linear-gradient(90deg, rgba(62,53,44,0.05) 0px, rgba(62,53,44,0.05) 1px, transparent 1px, transparent 3px),
-        repeating-linear-gradient(0deg, rgba(62,53,44,0.04) 0px, rgba(62,53,44,0.04) 1px, transparent 1px, transparent 3px);
+      background-color: #ece2ce;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.9' numOctaves='2' stitchTiles='stitch' result='t'/%3E%3CfeColorMatrix in='t' type='matrix' values='0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.1  0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        linear-gradient(115deg, rgba(255,255,255,0.35) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.06) 100%);
+      background-blend-mode: soft-light, normal;
       color: #332c24;
       width: 250px;
       padding: 24px 22px 28px;
@@ -170,7 +161,6 @@
   <hr class="home-divider">
 
   <div class="scratches-section">
-    <p class="scratches-label">Scratches</p>
     <div class="scratches">
       <div class="scratch">Yanking is for amateurs and dentists.</div>
       <div class="scratch">Peace of mind is a premium product.</div>
