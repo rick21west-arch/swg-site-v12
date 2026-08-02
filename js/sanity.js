@@ -54,6 +54,40 @@
      )
    }
 
+   /* ── Essays (curated Porch pieces, surfaced on The Work) ─────── */
+
+   export async function fetchEssays(limit = 9) {
+     return sanityFetch(
+       `*[_type == "porchStory" && essayFeatured == true] | order(publishedAt desc) [0...${limit}]`
+     )
+   }
+
+   /* ── Music (ambient tracks hosted on YouTube) ────────────────── */
+
+   function youtubeId(url) {
+     if (!url) return null
+     const m = String(url).match(/(?:youtu\.be\/|[?&]v=|\/embed\/)([a-zA-Z0-9_-]{6,})/)
+     return m ? m[1] : null
+   }
+
+   export async function fetchMusicVideos() {
+     return sanityFetch(
+       `*[_type == "musicVideo"] | order(_createdAt desc) {title, youtubeUrl}`
+     )
+   }
+
+   export function renderMusicThumb(video) {
+     const id = youtubeId(video.youtubeUrl)
+     const thumb = id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null
+     return `
+       <a href="${esc(video.youtubeUrl)}" target="_blank" rel="noopener" class="music-thumb">
+         ${thumb
+           ? `<img src="${esc(thumb)}" alt="${esc(video.title)}">`
+           : `<div class="music-thumb-fallback"></div>`}
+         <span class="music-thumb-title">${esc(video.title)}</span>
+       </a>`
+   }
+
    /* ── Featured fiction ──────────────────────────────────────── */
     
    export async function fetchFeaturedFiction() {
@@ -187,18 +221,29 @@
        </a>`
    }
     
+   export async function fetchFeaturedBooks(limit = 9) {
+     return sanityFetch(
+       `*[_type == "featuredFiction" && (featured == true || !defined(featured))] | order(_createdAt desc) [0...${limit}] {
+         title, author, description, status, featuredMonth,
+         substackUrl, printUrl, ebookUrl, note,
+         "coverUrl": coverImage.asset->url
+       }`
+     )
+   }
+
    export function renderBookCard(book) {
-     const link = book.ebookUrl || book.printUrl || book.substackUrl
-     const label = (book.ebookUrl || book.printUrl) ? 'Amazon →' : 'Read →'
      return `
-       <div>
-         <div class="book-cover">
-           ${book.coverUrl ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}">` : ''}
+       <div class="card">
+         ${book.coverUrl
+           ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">`
+           : `<div style="aspect-ratio:2/3;background:var(--bg-3);margin-bottom:0.75rem;"></div>`}
+         <span class="card-label">${esc(book.author || '')}</span>
+         <h2 class="card-title">${esc(book.title)}</h2>
+         ${book.note ? `<p class="card-body" style="font-size:0.9rem;">${esc(book.note)}</p>` : ''}
+         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+           ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
+           ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
          </div>
-         <p class="book-author">${esc(book.author || '')}</p>
-         <p class="book-title">${esc(book.title)}</p>
-         ${book.description ? `<p class="book-desc">${esc(book.description)}</p>` : ''}
-         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="text-link">${label}</a>` : ''}
        </div>`
    }
 

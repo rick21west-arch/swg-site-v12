@@ -35,46 +35,7 @@
 
   <section class="section">
     <div class="container">
-      <div class="grid grid--3">
-
-        <div class="card">
-          <img src="../../assets/images/cover-grace.jpg" alt="Opera Rose" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Gray</span>
-          <h2 class="card-title">Opera Rose</h2>
-          <p class="card-body" style="font-size:0.9rem;">Trilogy &nbsp;·&nbsp; 2026</p>
-          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-            <a href="#" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>
-            <a href="#" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <img src="../../assets/images/cover-first-light.jpg" alt="First Light" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Rick West</span>
-          <h2 class="card-title">First Light</h2>
-          <p class="card-body" style="font-size:0.9rem;">Novel &nbsp;·&nbsp; 2026</p>
-          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-            <a href="#" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>
-            <a href="#" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <img src="../../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Hank Cotton</span>
-          <h2 class="card-title">The Ugly Duckling</h2>
-          <p class="card-body" style="font-size:0.9rem;">Novella &nbsp;·&nbsp; 2026</p>
-          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-            <a href="#" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>
-            <a href="#" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>
-          </div>
-        </div>
-
-        <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
-          <p class="card-body" style="text-align:center;font-size:0.9rem;font-style:italic;">Catalog expands<br>with the house.</p>
-        </div>
-
-      </div>
+      <div class="grid grid--3" id="books-archive-grid"></div>
     </div>
   </section>
 
@@ -84,6 +45,18 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchFeaturedFiction, renderBookCard, showLoading, showError } from '../../js/sanity.js'
+    const grid = document.getElementById('books-archive-grid')
+    showLoading(grid)
+    fetchFeaturedFiction()
+      .then(books => {
+        if (!books || !books.length) { showError(grid, 'Catalog unavailable.'); return }
+        grid.innerHTML = books.map(renderBookCard).join('')
+      })
+      .catch(() => showError(grid, 'Catalog unavailable.'))
+  </script>
 
   <script src="../../js/nav.js"></script>
 </body>
