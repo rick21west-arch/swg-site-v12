@@ -38,9 +38,9 @@
       <div class="filter-tabs" style="padding:0 0 1rem;border-bottom:0.5px solid var(--border);margin-bottom:1.5rem;">
         <button class="filter-tab active" onclick="filterStories('all', this)">All</button>
         <button class="filter-tab" onclick="filterStories('Hank', this)">By Hank</button>
-        <button class="filter-tab" onclick="filterStories('Beau', this)">By Beau</button>
         <button class="filter-tab" onclick="filterStories('Gray', this)">By Gray</button>
-        <button class="filter-tab" onclick="filterStories('three', this)">All three</button>
+        <button class="filter-tab" onclick="filterStories('MJ Polk', this)">By MJ Polk</button>
+        <button class="filter-tab" onclick="filterStories('primalbeet', this)">By primalbeet</button>
       </div>
       <div id="archive-grid" class="grid grid--3"></div>
     </div>
@@ -78,8 +78,15 @@
       document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
       if (term === 'all') return renderGrid(allStories)
-      if (term === 'three') return renderGrid(allStories.filter(s => s.authors && s.authors.toLowerCase().includes('three')))
-      renderGrid(allStories.filter(s => s.authors && s.authors.includes(term)))
+      // Gray, MJ Polk, and primalbeet also catch stories credited to "all three"
+      // (the three human co-founders — Hank is a separate pen name, not part of that trio).
+      const catchAllThree = ['Gray', 'MJ Polk', 'primalbeet'].includes(term)
+      renderGrid(allStories.filter(s => {
+        if (!s.authors) return false
+        if (s.authors.includes(term)) return true
+        if (catchAllThree && s.authors.toLowerCase().includes('all three')) return true
+        return false
+      }))
     }
   </script>
 
