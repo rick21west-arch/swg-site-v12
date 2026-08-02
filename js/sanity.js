@@ -86,14 +86,24 @@
      )
    }
 
-   export function renderMusicThumb(video) {
+   /* ── Just the Three of Us (guildVideo, type == "guild") ───────── */
+   /* The founders talking to each other, no outside guest. Home page
+      shows only the most recent few; the rest lives on YouTube. */
+
+   export async function fetchGuildTalks(limit = 2) {
+     return sanityFetch(
+       `*[_type == "guildVideo" && type == "guild"] | order(publishedAt desc) [0...${limit}] {title, thumbnail, substackUrl}`
+     )
+   }
+
+   export function renderSmallThumb(video) {
      const thumb = thumbSrc(video, 300)
      return `
-       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="music-thumb">
+       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="small-thumb">
          ${thumb
            ? `<img src="${esc(thumb)}" alt="${esc(video.title)}">`
-           : `<div class="music-thumb-fallback"></div>`}
-         <span class="music-thumb-title">${esc(video.title)}</span>
+           : `<div class="small-thumb-fallback"></div>`}
+         <span class="small-thumb-title">${esc(video.title)}</span>
        </a>`
    }
 
