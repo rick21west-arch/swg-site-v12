@@ -62,6 +62,20 @@
      )
    }
 
+   /* ── Interviews (guildVideo, type == "conversation") ─────────── */
+
+   export async function fetchInterviews(limit = 9) {
+     return sanityFetch(
+       `*[_type == "guildVideo" && type == "conversation" && (featured == true || !defined(featured))] | order(publishedAt desc) [0...${limit}] {title, description, participants, publishedAt, duration, thumbnail, substackUrl}`
+     )
+   }
+
+   export async function fetchAllInterviews() {
+     return sanityFetch(
+       `*[_type == "guildVideo" && type == "conversation"] | order(publishedAt desc) {title, description, participants, publishedAt, duration, thumbnail, substackUrl}`
+     )
+   }
+
    /* ── Music (ambient tracks, hosted on YouTube) ───────────────── */
    /* Lives on the shared guildVideo type, filtered to type == "music".
       substackUrl holds the YouTube link despite the field's old name. */
@@ -265,7 +279,7 @@
          <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
          <h2 class="${titleClass}">${esc(video.title)}</h2>
          ${video.description ? `<p class="card-body">${esc(video.description)}</p>` : ''}
-         <p class="card-note" style="margin-top:0.5rem;">${video.duration ? video.duration + ' &nbsp;·&nbsp; ' : ''}Watch on Substack →</p>
+         <p class="card-note" style="margin-top:0.5rem;">${video.duration ? video.duration + ' &nbsp;·&nbsp; ' : ''}Watch →</p>
        </a>`
    }
     

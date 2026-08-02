@@ -79,10 +79,14 @@
   <hr class="work-divider">
 
   <div class="work-section">
-    <p class="section-label">Interviews</p>
+    <div class="section-header-row">
+      <p class="section-label">Interviews</p>
+      <a href="/the-work/interviews/" class="text-link">See all interviews →</a>
+    </div>
     <div class="section-rule"></div>
     <p class="section-desc">The Guild in dialogue with writers, musicians, and people worth talking to — recorded and hosted on our YouTube channel.</p>
-    <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--primary">Watch on YouTube →</a>
+    <div class="grid grid--3" id="interviews-grid" style="margin-top:28px;"></div>
+    <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">Everything on our YouTube channel →</a>
   </div>
 
   <hr class="work-divider" id="music-divider">
@@ -102,7 +106,7 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchMusicVideos, renderMusicThumb, showLoading, showError } from '../js/sanity.js'
+    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchInterviews, renderVideoCard, fetchMusicVideos, renderMusicThumb, showLoading, showError } from '../js/sanity.js'
 
     const booksGrid = document.getElementById('books-grid')
     showLoading(booksGrid)
@@ -124,6 +128,18 @@
         essaysGrid.innerHTML = essays.map(renderPorchCard).join('')
       })
       .catch(() => showError(essaysGrid, 'Essays unavailable.'))
+
+    const interviewsGrid = document.getElementById('interviews-grid')
+    showLoading(interviewsGrid)
+    fetchInterviews(9)
+      .then(interviews => {
+        if (!interviews || !interviews.length) {
+          interviewsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
+          return
+        }
+        interviewsGrid.innerHTML = interviews.map(v => renderVideoCard(v, 'large')).join('')
+      })
+      .catch(() => showError(interviewsGrid, 'Interviews unavailable.'))
 
     const musicGrid = document.getElementById('music-grid')
     function hideMusicSection() {
