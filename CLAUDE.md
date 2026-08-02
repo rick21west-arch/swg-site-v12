@@ -85,11 +85,13 @@ Still live, ~243 subscribers, nearly all imported by the founders from prior aud
 
 ## Current objectives
 
-1. **Readability and polish** — the contrast fix above, plus body copy sizing and line length. Same aesthetic. Deadline mid-August.
-2. **The Kitchen Table** — new paid section, added to navigation. Design and shell first; the paywall is a separate, larger project and should not be rushed to meet the deadline.
-3. **Porch access via email** — signup grants Porch entry. The mechanism for recognising a returning visitor is undecided. Do not implement one without an explicit decision.
+1. **Readability and polish** — the contrast fix above, plus body copy sizing and line length. Same aesthetic. Deadline mid-August. *(Status unconfirmed as of 2026-08-02 — see the "Typography decisions (locked)" section above, which documents this work as done on the `typography-pass` branch. Whether that branch is merged to `main` was not verified this session.)*
+2. **The Kitchen Table** — new paid section, added to navigation. Design and shell first; the paywall is a separate, larger project and should not be rushed to meet the deadline. *(Status unconfirmed as of 2026-08-02.)*
+3. **Porch access via email** — signup grants Porch entry. The mechanism for recognising a returning visitor is undecided. Do not implement one without an explicit decision. *(Status unconfirmed as of 2026-08-02.)*
+4. **The House, Writers, and Join pages** — next up as of 2026-08-02. Not yet scoped.
+5. **Store concept** — a discussion, not yet a decision, as of 2026-08-02. Do not assume this is the same thing as the existing `/shop/` page unless told so explicitly.
 
-Nav currently reads: THE PORCH · THE WORK · THE HOUSE · WRITERS · JOIN. Every item is evocative rather than descriptive; a first-time visitor can't tell what any of them contain. Adding a sixth is a real navigability risk. Raise it before adding.
+Nav currently reads: THE PORCH · THE WORK · EVENTS · THE HOUSE · WRITERS · JOIN. Events was added 2026-08-02. Every item is evocative rather than descriptive; a first-time visitor can't tell what any of them contain. Adding a seventh is a real navigability risk. Raise it before adding.
 
 ## Content management
 
