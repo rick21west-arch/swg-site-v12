@@ -187,6 +187,21 @@
        </a>`
    }
     
+   export function renderBookCard(book) {
+     const link = book.ebookUrl || book.printUrl || book.substackUrl
+     const label = (book.ebookUrl || book.printUrl) ? 'Amazon →' : 'Read →'
+     return `
+       <div>
+         <div class="book-cover">
+           ${book.coverUrl ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}">` : ''}
+         </div>
+         <p class="book-author">${esc(book.author || '')}</p>
+         <p class="book-title">${esc(book.title)}</p>
+         ${book.description ? `<p class="book-desc">${esc(book.description)}</p>` : ''}
+         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="text-link">${label}</a>` : ''}
+       </div>`
+   }
+
    export function renderVideoCard(video, size = 'large') {
      const thumb = thumbSrc(video)
      const btnSize = size === 'large' ? 56 : 38

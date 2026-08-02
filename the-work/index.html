@@ -74,39 +74,7 @@
   <div class="work-section">
     <p class="section-label">The Books</p>
     <div class="section-rule"></div>
-    <div class="books-grid">
-
-      <div>
-        <div class="book-cover">
-          <img src="../assets/images/cover-opera-rose.png" alt="Opera Rose by Gray">
-        </div>
-        <p class="book-author">Gray</p>
-        <p class="book-title">Opera Rose</p>
-        <p class="book-desc">A trilogy about what we bury in the South's soft ground — and what refuses to stay there.</p>
-        <a href="https://www.amazon.com/Opera-Rose-Other-Devotions-Becoming-ebook/dp/B0GZJV9TCN/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
-      </div>
-
-      <div>
-        <div class="book-cover">
-          <img src="../assets/images/cover-first-light.jpg" alt="First Light by Rick West">
-        </div>
-        <p class="book-author">Rick West</p>
-        <p class="book-title">First Light</p>
-        <p class="book-desc">A man comes back to the place he once escaped, chasing a feeling he can't quite name.</p>
-        <a href="https://www.amazon.com/First-Light-Rick-West-ebook/dp/B0GTR2NJRP/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
-      </div>
-
-      <div>
-        <div class="book-cover">
-          <img src="../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling by Hank Cotton">
-        </div>
-        <p class="book-author">Hank Cotton</p>
-        <p class="book-title">The Ugly Duckling</p>
-        <p class="book-desc">A hotshot truck driver who doesn't know he's picked up an unlikely passenger.</p>
-        <a href="https://www.amazon.com/Ugly-Duckling-Hank-Cotton/dp/B0GPMRL9BK/" target="_blank" rel="noopener" class="text-link">Amazon →</a>
-      </div>
-
-    </div>
+    <div class="books-grid" id="books-grid"></div>
   </div>
 
   <hr class="work-divider">
@@ -182,6 +150,18 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchFeaturedFiction, renderBookCard, showLoading, showError } from '../js/sanity.js'
+    const grid = document.getElementById('books-grid')
+    showLoading(grid)
+    fetchFeaturedFiction()
+      .then(books => {
+        if (!books || !books.length) { showError(grid, 'Books unavailable.'); return }
+        grid.innerHTML = books.map(renderBookCard).join('')
+      })
+      .catch(() => showError(grid, 'Books unavailable.'))
+  </script>
 
   <script src="../js/nav.js"></script>
 </body>
