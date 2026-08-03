@@ -185,6 +185,44 @@
       line-height: 1.7;
       margin-bottom: 30px;
     }
+    .oath-email-form {
+      display: flex;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border: 1px solid var(--border-strong);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .oath-email-form input {
+      flex: 1;
+      padding: 14px 16px;
+      background: var(--surface-sunken);
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      min-width: 0;
+    }
+    .oath-email-form input::placeholder { color: var(--text-muted); }
+    .oath-email-form button {
+      padding: 0 20px;
+      background: var(--accent);
+      border: none;
+      color: var(--on-accent);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .oath-email-form button:hover { background: var(--accent-light); }
+    .oath-form-status {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      min-height: 18px;
+    }
+    .oath-form-status.success { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -260,6 +298,11 @@
 
   <div class="oath-section">
     <p class="oath-quote">"What if she double-dog dared you?" Nin asked her, snubbing out her cigarette.</p>
+    <form class="oath-email-form" id="oathEmailForm">
+      <input type="email" name="email" id="oathEmailInput" placeholder="your@email.com" required>
+      <button type="submit" aria-label="Submit">&#8594;</button>
+    </form>
+    <p class="oath-form-status" id="oathFormStatus"></p>
   </div>
 
   <footer class="site-footer">
@@ -268,6 +311,38 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('oathEmailForm');
+      var input = document.getElementById('oathEmailInput');
+      var status = document.getElementById('oathFormStatus');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = input.value.trim();
+        if (!email) return;
+
+        status.textContent = 'Joining...';
+        status.classList.remove('success');
+
+        fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error('Request failed');
+            status.textContent = "You're in. Welcome to the Porch.";
+            status.classList.add('success');
+            form.reset();
+          })
+          .catch(function () {
+            status.textContent = "Something didn't work. Try again in a moment.";
+          });
+      });
+    })();
+  </script>
 
   <script src="../js/nav.js"></script>
 </body>
