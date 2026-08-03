@@ -7,11 +7,25 @@
   <meta name="description" content="Bring your unfinished sentences. We'll sharpen them together.">
   <link rel="stylesheet" href="../css/swg.css">
   <style>
-    .join-header {
-      text-align: center;
-      padding: 72px 40px 56px;
-      max-width: 560px;
+    .join-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      max-width: 900px;
       margin: 0 auto;
+      padding: 72px 40px 56px;
+    }
+    .join-header {
+      text-align: left;
+      max-width: 480px;
+    }
+    .join-badge { flex-shrink: 0; }
+    .join-badge-img { width: 220px; height: 220px; display: block; }
+    @media (max-width: 680px) {
+      .join-header-row { flex-direction: column; padding: 48px 24px 32px; gap: 28px; text-align: center; }
+      .join-header { text-align: center; max-width: 100%; }
+      .join-badge-img { width: 160px; height: 160px; }
     }
     .join-eyebrow {
       font-size: 14px;
@@ -204,10 +218,15 @@
     </div>
   </nav>
 
-  <div class="join-header">
-    <p class="join-eyebrow">Join the Guild</p>
-    <h1 class="join-headline">Bring your unfinished sentences.</h1>
-    <p class="join-sub">We'll sharpen them together, under whatever light we can steal from the kaleidoscope.</p>
+  <div class="join-header-row">
+    <div class="join-header">
+      <p class="join-eyebrow">We Are On Substack and YouTube</p>
+      <h1 class="join-headline">We want you to join. As a reader. As a writer. Whatever moves you.</h1>
+      <p class="join-sub">You have been cited for being delightful.</p>
+    </div>
+    <div class="join-badge">
+      <img src="../assets/images/join-you-are-delightful.jpg" alt="Vintage circular sign reading 'You are delightful'" class="join-badge-img">
+    </div>
   </div>
 
   <hr class="join-divider">
