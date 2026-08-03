@@ -66,6 +66,13 @@
       transition: background 0.2s;
     }
     .home-email-form button:hover { background: var(--accent-light); }
+    .home-form-status {
+      font-size: 13px;
+      color: var(--text-muted);
+      min-height: 18px;
+      margin: 0 0 8px;
+    }
+    .home-form-status.success { color: var(--accent); }
     .home-micro {
       font-size: 14px;
       color: var(--text-muted);
@@ -171,10 +178,11 @@
   <section class="home-hero">
     <h1 class="home-headline">turning loss into language, fury into form, chaos into art</h1>
     <p class="home-sub">Not every story is about the South, but the South is in every story.</p>
-    <form class="home-email-form" action="#" method="post">
-      <input type="email" name="email" placeholder="your@email.com" required>
+    <form class="home-email-form" id="homeEmailForm" method="post">
+      <input type="email" name="email" id="homeEmailInput" placeholder="your@email.com" required>
       <button type="submit" aria-label="Submit">&#8594;</button>
     </form>
+    <p class="home-form-status" id="homeFormStatus"></p>
     <a class="home-micro-link" href="/the-porch/" aria-label="Get your emotional support prawns here — go to the Porch">
       <p class="home-micro">Get your emotional support prawns here.</p>
       <svg class="cooler-icon" width="60" height="54" viewBox="0 0 100 90" aria-hidden="true">
@@ -210,6 +218,38 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('homeEmailForm');
+      var input = document.getElementById('homeEmailInput');
+      var status = document.getElementById('homeFormStatus');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = input.value.trim();
+        if (!email) return;
+
+        status.textContent = 'Joining...';
+        status.classList.remove('success');
+
+        fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error('Request failed');
+            status.textContent = "You're in. Welcome to the Porch.";
+            status.classList.add('success');
+            form.reset();
+          })
+          .catch(function () {
+            status.textContent = "Something didn't work. Try again in a moment.";
+          });
+      });
+    })();
+  </script>
 
   <script src="/js/nav.js"></script>
 </body>
