@@ -528,32 +528,6 @@ ul, ol { list-style: none; }
 }
 
 /* ============================================================
-   Start Here bar
-   ============================================================ */
-
-.start-here {
-  background: var(--bg-2);
-  border-bottom: 0.5px solid var(--border);
-  padding: 1rem var(--sp-md);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.start-here-text {
-  font-family: var(--font-ui);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-}
-
-.start-here-text strong {
-  color: var(--text);
-  font-weight: 500;
-}
-
-/* ============================================================
    Filter tabs
    ============================================================ */
 
