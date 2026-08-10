@@ -362,6 +362,34 @@
       bold, italic, and links — the set the Studio's Story Text field
       offers. */
 
+   /* Turns a YouTube or Vimeo link into an embedded player. Falls back to a
+      plain "Watch the video" link if the URL doesn't match either pattern. */
+   function renderVideoBlock(block) {
+     const url = block.url || ''
+     const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/)
+     const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/)
+
+     let embedSrc = null
+     if (yt) embedSrc = `https://www.youtube.com/embed/${yt[1]}`
+     else if (vimeo) embedSrc = `https://player.vimeo.com/video/${vimeo[1]}`
+
+     if (!embedSrc) {
+       return url
+         ? `<p><a href="${esc(url)}" target="_blank" rel="noopener">Watch the video →</a></p>`
+         : ''
+     }
+
+     const caption = block.caption
+       ? `<p style="font-family:var(--font-ui);font-size:0.8rem;color:var(--text-faint);margin-top:0.5rem;">${esc(block.caption)}</p>`
+       : ''
+
+     return `
+       <div style="position:relative;width:100%;aspect-ratio:16/9;margin:1.5rem 0;background:var(--bg-3);">
+         <iframe src="${esc(embedSrc)}" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+       </div>
+       ${caption}`
+   }
+
    export function renderPortableText(blocks) {
      if (!Array.isArray(blocks) || !blocks.length) return ''
 
@@ -396,6 +424,11 @@
      }
 
      blocks.forEach(block => {
+       if (block._type === 'videoEmbed') {
+         flushList()
+         out.push(renderVideoBlock(block))
+         return
+       }
        if (block._type !== 'block') { flushList(); return }
 
        const isListItem = block.listItem === 'bullet' || block.listItem === 'number'
