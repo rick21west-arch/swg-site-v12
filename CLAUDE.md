@@ -97,6 +97,36 @@ Nav currently reads: THE PORCH · THE WORK · EVENTS · THE HOUSE · WRITERS · 
 
 Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, conversations, and House contact addresses are still hardcoded and need moving into Sanity. When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
 
+## Going Pro — infrastructure ownership (governs sequencing below)
+
+From a separate, lengthy planning conversation with Rick ("Going Pro Infrastructure Planning"), summarized and added to project knowledge 2026-08-10. The workstation and visual editing both live inside this larger plan — this section is the context that was missing when they were first discussed in this file.
+
+**The governing decision:** Southern Writers Guild is being run as a real company, not three founders sharing a hobby. Every asset that matters — domain, code, documents, mailbox, tools — is meant to end up owned by the LLC, not any individual person.
+
+**Step 0, no exceptions:** Nothing in the infrastructure plan gets executed for real — including pieces that don't technically require it — until the LLC and a working business bank account actually exist. As of the planning session, both were "in process," described as "this week" with no confirmed date beyond that. **Confirm Step 0 is actually done before starting real build work on the workstation or infrastructure migration** — the build-step decision logged below (Vite, etc.) is a settled technical choice for *when* this work starts, not a signal that it starts now.
+
+**Confirmed facts from that session:**
+- `jp@southernwritersguild.com` is active with its own independent login, separate from Polk's main IONOS account.
+- The IONOS plan includes five mailbox slots, already paid for. One is used (`jp@`); four are free — enough for `rick@`, a `polk@`, and a `grace@`-style address without new cost.
+- The Kit account is registered in the Guild's name already, not personal.
+- Rick's C drive holds only the website build for SWG — no financial or admin records mixed in.
+- IONOS holds only the domain and `jp@`. No entanglement with Polk's other business, per Rick (not independently verified beyond his statement).
+- Southern Writers Guild LLC is in formation in Georgia.
+
+**Architecture decisions locked in that session:**
+- **Role-based access, not person-based.** Roles: Admin, Technical Operator, Content Operator, Communications Operator, Growth Operator. All three founders currently hold every role — the role system is scaffolding for future hires, not a restriction among the founders.
+- **Two workstations, one credential system.** A **Creator Workstation** (Docs, Sheets, Canva, Kit, Sanity, `jp@` mail) for day-to-day content work — built for the non-technical partners, not Rick's primary use case. A separate **Tech Console** (GitHub, Vercel, Cloudflare, Sanity Studio, uptime status) for deploys and infrastructure. All three founders can reach both; the split is relevance, not permission.
+- **No Google Workspace.** Superseded by using the free IONOS mailbox addresses as sign-ins for free individual Google accounts — full Drive/Docs/Sheets, and the same login works for "Sign in with Google" on GitHub, Vercel, Sanity, and Canva. Zero monthly cost. Known gap: free consumer Google accounts don't have org-owned Shared Drives, so documents are centralized by convention, not truly org-owned.
+- **Shared credential vault: Proton Pass**, free tier, chosen because it supports exactly 3 people on one shared vault at no cost (Bitwarden's free tier only covers 2; KeePassXC is free with no cap but has no individual accountability). Used specifically for the tools whose cheap tiers don't support three real separate logins — Kit and Vercel.
+- **Claude/Cowork cannot use the shared-vault pattern.** This is an Anthropic terms-of-service rule, not a cost tradeoff like Kit or Vercel — sharing one person's Claude login is not permitted. If more than one founder needs real Claude/Cowork access, the path is a Claude Team plan (individual seats) or separate individual accounts, not a shared login. Do not set up or suggest shared Claude credentials among the founders.
+- **Canva stays individual**, deliberately — no Team plan. Sharing happens via a Drive folder convention for exported assets, since Canva is treated as a workshop, not the asset of record.
+
+**Reference documents that exist but aren't in hand yet:** `SWG_Infrastructure_Independence_Plan.md` ("Rick's Vision for Going Pro," the canonical 13-step plan) and `SWG_Workstation_Concept_Preview.html` (a working clickable HTML mockup of the Creator/Tech workstation, built in the site's real design system, fake data — a sales/concept tool shown to Polk and Grace, not a functional system). If this initiative is picked up for real, get both files rather than working from memory or screenshots.
+
+**Resolved, not open:** that planning session ended mid-troubleshooting on a Sanity Studio bug — stories displaying correctly but with no editable input in the Studio editor. That was independently diagnosed and fixed in a later session (this file's git history): the schema simply never declared fields that already held live data. No longer an open thread.
+
+**Do not ask Rick about founder governance or decision-making mechanics between the three of them** — stated explicitly as out of scope for a technical assistant.
+
 ## Long-term initiative: visual editing (not a mid-August item)
 
 This is the actual destination behind the site rebuild — not a punch-list item, its own tracked initiative. Everything built this session (video embeds, inline images, dividers, image sizing, the homepage toggle) was laying groundwork this will eventually sit on top of, whether that was said out loud at the time or not.
