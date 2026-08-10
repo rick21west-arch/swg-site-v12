@@ -200,6 +200,17 @@
 
   <hr class="home-divider">
 
+  <section class="section">
+    <div class="container">
+      <div class="section-header" style="margin-bottom:1.25rem;">
+        <span class="section-header-title">Right Now</span>
+      </div>
+      <div class="grid grid--2" id="highlights-grid"></div>
+    </div>
+  </section>
+
+  <hr class="home-divider">
+
   <div class="scratches-section">
     <div class="scratches">
       <div class="scratch">Yanking is for amateurs and dentists.</div>
@@ -252,5 +263,21 @@
   </script>
 
   <script src="/js/nav.js"></script>
+
+  <script type="module">
+    import { fetchHomepageHighlights, renderHighlightCard, showLoading, showError } from '/js/sanity.js'
+
+    const highlightsGrid = document.getElementById('highlights-grid')
+    showLoading(highlightsGrid)
+    fetchHomepageHighlights(2)
+      .then(items => {
+        if (!items || !items.length) {
+          highlightsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
+          return
+        }
+        highlightsGrid.innerHTML = items.map(renderHighlightCard).join('')
+      })
+      .catch(() => showError(highlightsGrid, 'Unable to load right now.'))
+  </script>
 </body>
 </html>
