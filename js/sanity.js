@@ -24,6 +24,20 @@
      }
      return doc.thumbnailUrl || null
    }
+
+   /* Where to center a cropped thumbnail. Sanity stores an editor-set hotspot
+      (x/y as 0–1 fractions of the image) when the "hotspot" option is on for
+      an image field. object-fit:cover normally crops dead-center, which can
+      cut off the actual subject of a photo — this reads the hotspot, if one
+      was set in Studio, and points the crop there instead. Falls back to a
+      plain center crop when no hotspot exists. */
+   export function thumbPosition(doc) {
+     const hs = doc.thumbnail?.hotspot
+     if (hs && typeof hs.x === 'number' && typeof hs.y === 'number') {
+       return `${(hs.x * 100).toFixed(1)}% ${(hs.y * 100).toFixed(1)}%`
+     }
+     return '50% 50%'
+   }
     
    /* Generic fetch helper */
    export async function sanityFetch(query) {
@@ -278,8 +292,9 @@
     
    export function renderPorchCard(story) {
      const thumb = thumbSrc(story)
+     const pos = thumbPosition(story)
      const img = thumb
-       ? `<img src="${thumb}" alt="${esc(story.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">`
+       ? `<img src="${thumb}" alt="${esc(story.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:${pos};display:block;margin-bottom:0.75rem;">`
        : `<div style="aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
             <span style="font-family:var(--font-serif);font-style:italic;color:var(--text-faint);font-size:0.95rem;text-align:center;padding:1rem;">${esc(story.excerpt || story.title)}</span>
           </div>`
@@ -402,7 +417,10 @@
        ${caption}`
    }
 
-   /* Turns an inline image block into an <img>, with an optional caption. */
+   /* Turns an inline image block into an <img>, with an optional caption.
+      Width is controlled by the editor's "Image size" choice in Studio. */
+   const IMAGE_SIZE_WIDTH = { small: '320px', medium: '600px', large: '900px', full: '100%' }
+
    function renderImageBlock(block) {
      const ref = block.asset && block.asset._ref
      if (!ref) return ''
@@ -413,11 +431,17 @@
      const caption = block.caption
        ? `<p style="font-family:var(--font-ui, inherit);font-size:0.8rem;color:var(--text-faint);margin-top:0.5rem;text-align:center;">${esc(block.caption)}</p>`
        : ''
+     const maxWidth = IMAGE_SIZE_WIDTH[block.size] || IMAGE_SIZE_WIDTH.full
      return `
-       <figure style="margin:1.5rem 0;">
+       <figure style="margin:1.5rem auto;max-width:${maxWidth};">
          <img src="${esc(src)}" alt="${esc(block.caption || '')}" style="width:100%;height:auto;display:block;">
          ${caption}
        </figure>`
+   }
+
+   /* Renders a manual section break inside a story. */
+   function renderDividerBlock() {
+     return '<hr style="border:none;border-top:1px solid var(--border);margin:2.5rem 0;">'
    }
 
    export function renderPortableText(blocks) {
@@ -462,6 +486,11 @@
        if (block._type === 'image') {
          flushList()
          out.push(renderImageBlock(block))
+         return
+       }
+       if (block._type === 'divider') {
+         flushList()
+         out.push(renderDividerBlock())
          return
        }
        if (block._type !== 'block') { flushList(); return }
