@@ -80,15 +80,9 @@
       document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
       if (term === 'all') return renderGrid(allStories)
-      // Gray, MJ Polk, and primalbeet also catch stories credited to "all three"
-      // (the three human co-founders — Hank and Beau are separate pen names, not part of that trio).
-      const catchAllThree = ['Gray', 'MJ Polk', 'primalbeet'].includes(term)
-      renderGrid(allStories.filter(s => {
-        if (!s.authors) return false
-        if (s.authors.includes(term)) return true
-        if (catchAllThree && s.authors.toLowerCase().includes('all three')) return true
-        return false
-      }))
+      // No more generic "all three" catch-all — every story names its actual writers,
+      // so a plain substring match against the authors field is enough.
+      renderGrid(allStories.filter(s => s.authors && s.authors.includes(term)))
     }
   </script>
 
