@@ -58,9 +58,9 @@
     .tiers-wrap {
       padding: 52px 60px 56px;
       display: grid;
-      grid-template-columns: 2fr 3fr;
+      grid-template-columns: 1fr;
       gap: 20px;
-      max-width: 960px;
+      max-width: 480px;
       margin: 0 auto;
     }
     @media (max-width: 680px) {
@@ -243,7 +243,6 @@
 
   <div class="join-header-row">
     <div class="join-header">
-      <p class="join-eyebrow">We Are On Substack and YouTube</p>
       <h1 class="join-headline">We want you to join. As a reader. As a writer. Whatever moves you.</h1>
       <p class="join-sub">You have been cited for being delightful.</p>
     </div>
@@ -256,40 +255,24 @@
 
   <div class="tiers-wrap">
 
-    <div class="tier-box">
-      <div class="tier-top">
-        <p class="tier-eyebrow">Free Reader</p>
-      </div>
-      <div class="tier-rule"></div>
-      <p class="tier-desc">Follow along. No card. No commitment. Just the work, straight to you.</p>
-      <ul class="tier-list">
-        <li>All Porch stories</li>
-        <li>Featured fiction excerpts</li>
-        <li>Conversations and music</li>
-        <li>New work to your inbox</li>
-      </ul>
-      <a href="https://thesouthernwritersguild.substack.com/subscribe" target="_blank" rel="noopener" class="tier-cta-text">Follow along →</a>
-      <span class="tier-via">Via Substack · No card required</span>
-    </div>
-
     <div class="tier-box tier-box--featured">
       <div class="tier-top">
         <p class="tier-eyebrow">Guild Member</p>
         <div class="tier-price-wrap">
-          <p class="tier-price-main">$75 <span>/ year</span></p>
-          <p class="tier-price-alt">or $8 / month</p>
+          <p class="tier-price-main">$96 <span>/ year</span></p>
         </div>
       </div>
       <div class="tier-rule"></div>
-      <p class="tier-desc">Everything the Guild makes. And the satisfaction of keeping it going.</p>
+      <p class="tier-desc">Everything the Guild makes, straight to you — and the satisfaction of keeping it going.</p>
       <ul class="tier-list">
-        <li>Everything in free</li>
+        <li>All Porch stories</li>
         <li>Full fiction archive</li>
         <li>Early access to new work</li>
+        <li>Conversations and music</li>
         <li>Support the writers directly</li>
       </ul>
-      <a href="https://thesouthernwritersguild.substack.com/subscribe" target="_blank" rel="noopener" class="tier-cta-btn">Become a member →</a>
-      <span class="tier-via">Via Substack · Cancel anytime</span>
+      <a href="#oathEmailForm" class="tier-cta-btn">Join — $96/year →</a>
+      <span class="tier-via">Memberships open very soon — leave your email below</span>
     </div>
 
   </div>
@@ -298,12 +281,17 @@
 
   <div class="oath-section">
     <p class="oath-quote">"What if she double-dog dared you?" Nin asked her, snubbing out her cigarette.</p>
+    <p style="font-family:var(--font-ui, inherit);font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;">Paid memberships open very soon — leave your email and we'll write the moment the doors do.</p>
     <form class="oath-email-form" id="oathEmailForm">
       <input type="email" name="email" id="oathEmailInput" placeholder="your@email.com" required>
       <button type="submit" aria-label="Submit">&#8594;</button>
     </form>
     <p class="oath-form-status" id="oathFormStatus"></p>
   </div>
+
+  <p style="text-align:center;font-size:13px;color:var(--text-muted);opacity:0.7;margin:0 0 28px;">
+    Still on <a href="https://thesouthernwritersguild.substack.com" target="_blank" rel="noopener" style="color:var(--text-muted);text-decoration:underline;">Substack</a> and <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" style="color:var(--text-muted);text-decoration:underline;">YouTube</a> too.
+  </p>
 
   <footer class="site-footer">
     <div class="footer-inner">
