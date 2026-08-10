@@ -293,8 +293,14 @@
    export function renderPorchCard(story) {
      const thumb = thumbSrc(story)
      const pos = thumbPosition(story)
+     // Thumbnails vary — some are wide photos, some are tall poster-style
+     // covers (like a magazine cover). Cropping to a fixed landscape box
+     // cuts the top/bottom off tall images, so the whole image is shown
+     // inside the box instead of cropped to fill it.
      const img = thumb
-       ? `<img src="${thumb}" alt="${esc(story.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:${pos};display:block;margin-bottom:0.75rem;">`
+       ? `<div style="aspect-ratio:16/9;background:var(--bg-3);margin-bottom:0.75rem;overflow:hidden;">
+            <img src="${thumb}" alt="${esc(story.title)}" style="width:100%;height:100%;object-fit:contain;object-position:${pos};display:block;">
+          </div>`
        : `<div style="aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
             <span style="font-family:var(--font-serif);font-style:italic;color:var(--text-faint);font-size:0.95rem;text-align:center;padding:1rem;">${esc(story.excerpt || story.title)}</span>
           </div>`
