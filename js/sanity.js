@@ -153,29 +153,15 @@
    }
 
    /* ── Homepage Highlights ───────────────────────────────────── */
-   /* Sanity-managed, toggle-controlled blocks on the homepage. Editors
-      flip "Show on homepage" on/off in Studio — no code or deploy needed
-      to change what's featured. */
+   /* Sanity-managed, toggle-controlled. Editors flip "Show on homepage"
+      on/off on any Porch Story in Studio — no code or deploy needed to
+      change what's featured. Uses renderPorchCard below, same as
+      everywhere else Porch stories are shown. */
 
-   export async function fetchHomepageHighlights(limit = 2) {
+   export async function fetchHomepageStories(limit = 2) {
      return sanityFetch(
-       `*[_type == "homepageHighlight" && featured == true] | order(order asc) [0...${limit}]`
+       `*[_type == "porchStory" && showOnHomepage == true] | order(publishedAt desc) [0...${limit}]`
      )
-   }
-
-   export function renderHighlightCard(item) {
-     const thumb = thumbSrc(item, 800)
-     const img = thumb
-       ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:0.75rem;">`
-       : `<div style="aspect-ratio:16/9;background:var(--bg-3);margin-bottom:0.75rem;"></div>`
-     const isExternal = /^https?:\/\//i.test(item.linkUrl || '') && !/southernwritersguild\.com/i.test(item.linkUrl)
-     return `
-       <a href="${esc(item.linkUrl || '#')}" ${isExternal ? 'target="_blank" rel="noopener"' : ''} class="card card--highlight" style="display:block;text-decoration:none;">
-         ${img}
-         <h2 class="card-title">${esc(item.title)}</h2>
-         ${item.blurb ? `<p class="card-body">${esc(item.blurb)}</p>` : ''}
-         <p class="card-note" style="margin-top:0.5rem;color:var(--accent);">${esc(item.linkLabel || 'Learn more →')}</p>
-       </a>`
    }
 
    /* ── Featured fiction ──────────────────────────────────────── */
