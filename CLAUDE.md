@@ -97,6 +97,24 @@ Nav currently reads: THE PORCH · THE WORK · EVENTS · THE HOUSE · WRITERS · 
 
 Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, conversations, and House contact addresses are still hardcoded and need moving into Sanity. When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
 
+## Long-term initiative: visual editing (not a mid-August item)
+
+This is the actual destination behind the site rebuild — not a punch-list item, its own tracked initiative. Everything built this session (video embeds, inline images, dividers, image sizing, the homepage toggle) was laying groundwork this will eventually sit on top of, whether that was said out loud at the time or not.
+
+**The goal:** an editor clicks a piece of text or an image on the live site and it jumps straight to that exact field in Sanity Studio. Edit there, watch the live preview update as you type. This is a real, supported Sanity feature — "Visual Editing" — not something built from scratch. Confirmed against Sanity's own documentation 2026-08-10.
+
+**Status: not started.** The site currently only ever shows finished, published content — there is no mechanism for privately showing an editor an unpublished draft.
+
+**The process, in order:**
+
+1. **Give the site a way to privately preview drafts.** This means a small serverless function — the same kind of thing that already powers the email signup button (`api/subscribe.js`), living in the same Vercel project, deployed the same way. Not a separate server, not something hosted on Sanity's side. Its job: tell an editor apart from a regular visitor, and quietly show the editor the unpublished version.
+2. **Replace the site's hand-built Sanity fetch with Sanity's real client library.** This is the load-bearing step and the one real open decision: the current fetch layer (`js/sanity.js`) is a simple hand-rolled `fetch()` call with no build step, by deliberate design (see "Deploy workflow" above). Sanity's real toolkit — the thing that invisibly tags every word with "this came from this document, this field" so clicking it means something — is built for a bundled environment. Adopting it very likely means giving the site an actual build step for the first time. That conflicts with the current "no build step" architecture and has not been decided.
+3. **Turn on the click-to-edit overlay** (`@sanity/visual-editing`) — scans the page for those invisible tags and draws a clickable layer over each one.
+4. **Tell Sanity Studio which live URL each document type resolves to** (a Presentation Tool config) — so opening a story in the new preview view loads the real page, not a blank frame.
+5. **Wire up live updates** — so a change made in Studio refreshes the preview without a manual reload.
+
+Steps 1 and 2 are the true prerequisites; nothing past them works without both in place. Step 2 is where the no-build-step decision has to be revisited — flag it back to Rick when this initiative is actually picked up, don't decide it unilaterally.
+
 ## Hard limits
 
 - Never handle passwords, payment details, or credentials on Rick's behalf.
