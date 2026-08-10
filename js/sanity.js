@@ -402,6 +402,24 @@
        ${caption}`
    }
 
+   /* Turns an inline image block into an <img>, with an optional caption. */
+   function renderImageBlock(block) {
+     const ref = block.asset && block.asset._ref
+     if (!ref) return ''
+     const parts = ref.replace('image-', '').split('-')
+     const ext = parts.pop()
+     const id = parts.join('-')
+     const src = `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${id}.${ext}?w=1200&auto=format`
+     const caption = block.caption
+       ? `<p style="font-family:var(--font-ui, inherit);font-size:0.8rem;color:var(--text-faint);margin-top:0.5rem;text-align:center;">${esc(block.caption)}</p>`
+       : ''
+     return `
+       <figure style="margin:1.5rem 0;">
+         <img src="${esc(src)}" alt="${esc(block.caption || '')}" style="width:100%;height:auto;display:block;">
+         ${caption}
+       </figure>`
+   }
+
    export function renderPortableText(blocks) {
      if (!Array.isArray(blocks) || !blocks.length) return ''
 
@@ -439,6 +457,11 @@
        if (block._type === 'videoEmbed') {
          flushList()
          out.push(renderVideoBlock(block))
+         return
+       }
+       if (block._type === 'image') {
+         flushList()
+         out.push(renderImageBlock(block))
          return
        }
        if (block._type !== 'block') { flushList(); return }
