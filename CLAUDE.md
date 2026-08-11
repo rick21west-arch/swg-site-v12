@@ -83,6 +83,31 @@ Never commit an API key.
 
 Still live, ~243 subscribers, nearly all imported by the founders from prior audiences. Substack's own discovery tools produced 32 subscribers in the publication's lifetime. Direction: Substack becomes free-only, paid content moves to the Guild site.
 
+## Jean-Paul's tip jar — Value for Value concept
+
+Rick's strategic notes, provided in full 2026-08-11. Governs how monetization sits alongside the free Porch content and the $96/year dues tier — read this before touching anything related to payments, donations, or merch.
+
+**The core problem:** Value-for-Value (the "No Agenda" podcast model — give the work away free, ask for support directly) only works if the ask is actually visible. No Agenda's host asks constantly, by name, with dollar amounts — the Guild's voice can't do that without breaking character. But a tasteful, quiet ask is functionally invisible, and an invisible ask reads to the audience as "we don't need your money." The design problem is an ask that's standing and unembarrassed without ever sounding like a pledge drive.
+
+**The solution: Jean-Paul is the collection plate.** He's already established as a taxidermied peacock whose hunger is played completely straight. "Feed Jean-Paul" is an in-voice, in-character donation ask the Guild can make at any frequency without it ever reading as begging — it's a running bit with a payment link attached, and regulars enjoy the bit. This sits below and separate from the formal $96/year dues tier: dues are for people who want to join something; feeding Jean-Paul is for people who just want to toss five dollars at something they love without joining anything. Two asks, both fully in-voice, neither one a pledge drive.
+
+**Where the ask lives:** not a site banner — the site's posture stays "we don't need you." It lives in the email newsletter, in a standing line in the same spot in every footer, same dry register every time. Ritual, not campaign — regular readers see it dozens of times a year at zero cost to them, until the time they act on it.
+
+**The full formula is time, talent, and treasure — not just money:**
+- **Talent:** readers writing back — letters to the Porch, readers' own porch-style stories, fan art of Jean-Paul. Costs nothing, deepens the fictional world, and quietly doubles as a farm system for finding the Guild's future writers.
+- **Time:** word of mouth. Given Substack's organic discovery produced exactly 32 subscribers in the publication's lifetime, word of mouth isn't a soft nice-to-have here — it's the actual acquisition channel. V4V means formalizing the ask: if this was worth something, hand it to somebody.
+- **Treasure:** the literal money ask — Jean-Paul's jar and the dues tier.
+
+**Merch ties directly into this, not alongside it.** The bar for merch: artifacts a stranger might want, not logo-on-a-mug branding. Objects from inside the fiction — the Guild treated as an institution that's quietly existed for a century and occasionally lets artifacts out into the world. Jean-Paul as iconography; whatever Hank Cotton's world would plausibly produce. This matters specifically for MJ Polk: it turns his pen name into a real brand with real objects in the world, run by him, sold to strangers — which is the actual memorialization he's chasing. Natural cadence: a story publishes free, its artifact follows about a week later. The writing becomes the marketing calendar, and every merch drop is a newsletter with a reason to exist beyond "new story."
+
+**The flywheel:** free writing brings a reader in. A reader who catches real affection for it has three purely voluntary exits — feed Jean-Paul, pay dues, buy an object — none of them gating anything. Every one of those transactions drops an email address into Kit and the members table, which grows the list, which grows the next drop's audience. None of it requires a paywall, a vendor platform, or a fixed cost.
+
+**Tempered expectations, stated plainly so nobody's dreaming:** V4V conversion for a small, devoted audience typically runs low single digits of people paying anything in a given year. Off ~250 subscribers, that's beer money, and merch will likely start the same. The honest framing, including to the founders themselves: this isn't an income play, it's a proof-of-affection machine where every dollar is a data point, running on infrastructure that costs nothing to sit idle and scales without modification if the audience ever multiplies (a screenplay, a viral story, Polk's own hustle). Cheap to be wrong about, already built if it's right.
+
+**How this is meant to land with each founder, per Rick:** MJ Polk gets a real commercial lane to run hard in on his own terms. Grace's work stays a labor of love that never acquires a revenue target it didn't ask for. Rick himself doesn't need any of it to pay him personally — if it ever takes off, the upside goes to his kids, and otherwise Jean-Paul just eats well that year. The system doesn't depend on any of the three needing it to work, which is stated as the actual point.
+
+**Related, not yet written:** a "paywall counterfactual" — laying out plainly what gating content would cost at this scale, in both data and readers — is meant to go in a separate paper Rick is preparing, framed as a numbers-driven case rather than a deference argument.
+
 ## Current objectives
 
 1. **Readability and polish** — the contrast fix above, plus body copy sizing and line length. Same aesthetic. Deadline mid-August. *(Status unconfirmed as of 2026-08-02 — see the "Typography decisions (locked)" section above, which documents this work as done on the `typography-pass` branch. Whether that branch is merged to `main` was not verified this session.)*
