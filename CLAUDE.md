@@ -135,6 +135,9 @@ The canonical infrastructure plan, provided in full by Rick 2026-08-10 (source d
 - The Kit account is already registered in the Guild's name.
 - Everything on Rick's C drive relative to SWG is the website build — one folder, no financial or admin records mixed in.
 - IONOS holds the domain and the `jp@` mailbox. Nothing else, no entanglement with anyone's other business.
+- The entity is being formed in Georgia. **Unresolved:** Rick has referred to it both as an LLC (consistently, throughout the original plan) and, in one 2026-08-11 message, as "a Georgia corporation." These are different legal structures — worth confirming which one is actually being filed before this doc's repeated "the LLC" language is treated as precise. Not corrected here yet since it wasn't clear which term was the casual one.
+- **Payment processors, decided 2026-08-11:** the Guild will run both, split by channel — Stripe handles online/web payments (the site's dues, Jean-Paul tip jar, etc.), Square handles point-of-sale (in-person, e.g. events like Bands, Booze, and Books). Not an either/or choice.
+- **Business bank under consideration as of 2026-08-11:** Bank of America, Truist, and Synovus — not yet chosen.
 
 **The 13 steps, in order:**
 
