@@ -103,7 +103,7 @@ The canonical infrastructure plan, provided in full by Rick 2026-08-10 (source d
 
 **The governing principle:** every asset that matters — domain, code, documents, mailbox, tools — ends up owned by the LLC, not any individual, with one necessary exception: login credentials are personal, but revocable and role-based rather than tied to one person's availability. Where a tool won't support three separate real logins (Kit, for instance), the fallback is a shared credential in a managed vault.
 
-**Step 0 — gate, no exceptions:** LLC, EIN, and business bank account. In progress as of 2026-08-10. Several steps below are deliberately held on this — not because they're technically blocked, but so the paper trail shows the business owning its own infrastructure from day one, not personal accounts reassigned after the fact. **Confirm Step 0 is actually done before starting real build work** — the build-step technical decision logged below (Vite, etc.) is a settled *how*, not a signal that it starts now.
+**Step 0 — gate:** LLC, EIN, and business bank account. In progress as of 2026-08-10. **Clarified 2026-08-11: this gates what's public or official, not quiet technical prep.** Rick knows the LLC is happening — what's still missing is the bank account's actual details. Setting up accounts, building tools, and moving infrastructure quietly is fine and encouraged right now, so it's all ready to switch on the moment the paperwork clears, rather than starting from zero then. What's genuinely blocked: anything that requires the LLC to legally exist (transferring the domain's registration to it — Step 3 — is the clear example), anything needing real bank account details, and any public announcement or "this is now how we officially do things" rollout. Prep freely; don't announce yet.
 
 **Confirmed facts, already true:**
 - `jp@southernwritersguild.com` is active with its own independent login, separate from Polk's main IONOS account.
@@ -114,7 +114,7 @@ The canonical infrastructure plan, provided in full by Rick 2026-08-10 (source d
 **The 13 steps, in order:**
 
 0. Gate — LLC, EIN, bank account. In progress.
-1. Secure `jp@` access — password into the shared vault so all three can get in independently. Held pending Step 0.
+1. Secure `jp@` access — password into the shared vault so all three can get in independently. No longer held on Step 0 — this is quiet prep, not an announcement.
 2. Move DNS management to Cloudflare, signed up under `jp@southernwritersguild.com` rather than a personal email. All three get access.
 3. Transfer the domain's actual registration to the LLC, inside Cloudflare. A tax/reporting transfer — takes about two weeks, doesn't touch live operations.
 4. Give each founder a real identity, free. IONOS already includes five mailbox slots; `jp@` uses one, each founder takes one of the remaining four (one spare left over) — a real, non-shared address on the domain. Each founder makes their own free Google Account signed in with that address: full Drive/Docs/Sheets/Calendar, and the same identity covers "Sign in with Google" on GitHub, Vercel, Sanity, and Canva. Zero added cost. Known gap: free Google accounts don't have Workspace's org-owned Shared Drives, so documents are centralized by convention, not truly company-owned.
