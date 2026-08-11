@@ -85,7 +85,7 @@ Still live, ~243 subscribers, nearly all imported by the founders from prior aud
 
 ## Jean-Paul's tip jar — Value for Value concept
 
-Rick's strategic notes, provided in full 2026-08-11. Governs how monetization sits alongside the free Porch content and the $96/year dues tier — read this before touching anything related to payments, donations, or merch.
+**Status: early thinking, not a locked decision.** Rick's own notes, written roughly a week before being pasted here 2026-08-11 — his framing, not a finalized plan. Useful for the reasoning and direction, but nothing below should be treated as settled or built against without checking current status first. What's actually confirmed as of 2026-08-11: a Jean-Paul tip jar is definitely happening, and Square is the payment processor currently being discussed/decided — actively in progress as of this note, not yet final. Read what follows for the *why*, not as a locked spec.
 
 **The core problem:** Value-for-Value (the "No Agenda" podcast model — give the work away free, ask for support directly) only works if the ask is actually visible. No Agenda's host asks constantly, by name, with dollar amounts — the Guild's voice can't do that without breaking character. But a tasteful, quiet ask is functionally invisible, and an invisible ask reads to the audience as "we don't need your money." The design problem is an ask that's standing and unembarrassed without ever sounding like a pledge drive.
 
