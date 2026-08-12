@@ -423,6 +423,40 @@
        ${caption}`
    }
 
+   /* Turns a Spotify or SoundCloud link into an embedded player. Falls back to a
+      plain "Listen" link for anything else (Substack podcast pages, YouTube audio, etc.) */
+   function renderAudioBlock(block) {
+     const url = block.url || ''
+     const spotify = url.match(/open\.spotify\.com\/(track|episode|show|album)\/([\w]+)/)
+     const soundcloud = url.match(/soundcloud\.com\/[\w-]+\/[\w-]+/)
+
+     const caption = block.caption
+       ? `<p style="font-family:var(--font-ui);font-size:0.8rem;color:var(--text-faint);margin-top:0.5rem;">${esc(block.caption)}</p>`
+       : ''
+
+     if (spotify) {
+       const embedSrc = `https://open.spotify.com/embed/${spotify[1]}/${spotify[2]}`
+       return `
+         <div style="margin:1.5rem 0;">
+           <iframe src="${esc(embedSrc)}" style="width:100%;height:152px;border:0;border-radius:12px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+         </div>
+         ${caption}`
+     }
+
+     if (soundcloud) {
+       const embedSrc = `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23df8d52&auto_play=false&show_user=true`
+       return `
+         <div style="margin:1.5rem 0;">
+           <iframe src="${esc(embedSrc)}" style="width:100%;height:166px;border:0;" allow="autoplay" loading="lazy"></iframe>
+         </div>
+         ${caption}`
+     }
+
+     return url
+       ? `<p><a href="${esc(url)}" target="_blank" rel="noopener">Listen →</a></p>${caption}`
+       : ''
+   }
+
    /* Turns an inline image block into an <img>, with an optional caption.
       Width is controlled by the editor's "Image size" choice in Studio. */
    const IMAGE_SIZE_WIDTH = { small: '320px', medium: '600px', large: '900px', full: '100%' }
@@ -492,6 +526,11 @@
        if (block._type === 'image') {
          flushList()
          out.push(renderImageBlock(block))
+         return
+       }
+       if (block._type === 'audioEmbed') {
+         flushList()
+         out.push(renderAudioBlock(block))
          return
        }
        if (block._type === 'divider') {
