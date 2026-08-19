@@ -38,7 +38,7 @@ Static site, no build step. Vercel watches GitHub and deploys automatically.
 
 - Push to `main` → live on southernwritersguild.com in ~30 seconds.
 - Push to any other branch → public preview URL.
-- Anything visual goes to a branch first for Rick and Grace to review. Do not merge to `main` without being told.
+- Default is to push straight to `main`. There is no standing branch-first review rule — that was a one-off Rick asked for on a single past occasion, not a policy. Corrected 2026-08-19.
 
 ## Design system
 
