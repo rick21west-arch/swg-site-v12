@@ -6,6 +6,18 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-19 — Session close-out
+
+Cowork (this kind of session) and Claude Code are separate, isolated environments by design, not a bug — Cowork's container has no local credentials, which is why a git push needs a Claude Code handoff rather than happening directly. This repo, read by both, is the real shared channel between them; there's no live link beyond it.
+
+**Checkpoint for any future Claude Code session:** should show folder `swg-site`, branch `main`, before anything gets typed. A different project name showing up there — "rick-west-site" did, this session — is the signal to stop before proceeding.
+
+**Unresolved, worth a real look if it comes up again:** what "rick-west-site" actually is. Confirmed as a genuinely separate project from SWG (its real GitHub remote is `swg-site-v12`, not that name), and there are files named `rick-west*.jsx` inside the `primalbeet` folder — likely Rick's personal site project. Not confirmed: whether anything from a past session's handoff accidentally touched it instead of SWG.
+
+Commit `019a856` (this log's creation, the CLAUDE.md continuity rule, and `the-commitment-behind-the-bird.md`) is confirmed pushed to `swg-site-v12` on GitHub — verified directly via Claude Code, not assumed.
+
+No separate summary document needed for the next thread. Reading this file and `CLAUDE.md` — automatic once this folder is connected — covers it.
+
 ## 2026-08-19
 
 **Continuity process, decided.** This file exists because relying on a Cowork project's cached/uploaded files as memory failed — that cache goes stale (last synced 2026-08-11, missed everything built after). This repo, connected live, is the only source treated as current. Going forward: settled decisions and standing rules go in `CLAUDE.md`; everything else that matters but isn't settled goes here, written without being asked, at natural stopping points in a conversation — not something Rick has to remember to request.
