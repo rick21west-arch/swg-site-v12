@@ -356,8 +356,13 @@
            <div style="width:0;height:0;border-top:${borderTop}px solid transparent;border-bottom:${borderTop}px solid transparent;border-left:${borderSide}px solid #EDE5D0;margin-left:${ml}px;"></div>
          </div>
        </div>`
+     // Thumbnails vary — some are wide stills, some are tall portrait crops
+     // (phone-shot video, vertical posters). Cropping to a fixed landscape
+     // box cuts the top/bottom off tall images, so the whole image is shown
+     // inside the box instead of cropped to fill it — same fix as the Porch
+     // cards use for the same reason.
      const imgHtml = thumb
-       ? `<div style="position:relative;margin-bottom:0.75rem;"><img src="${esc(thumb)}" alt="${esc(video.title)}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">${playBtn}</div>`
+       ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
        : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
      const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
      const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
