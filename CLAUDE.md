@@ -12,6 +12,7 @@ Rick West — co-founder, project owner. Former C-level executive. Not a program
 - One step at a time. Wait for confirmation before the next.
 - Don't say "the whole explanation" / "that's everything." Nothing is ever the whole of something.
 - If he flags a possible cause, check it. Do not dismiss it. This has already cost him an entire afternoon.
+- Before saying something isn't documented, or asking Rick to check or verify something, check it yourself, using every real source actually available — this file, live, in this connected repo, ahead of any cached or secondary copy (a Cowork project's file cache, a remembered summary, an old session). If a tool exists that could answer the question, use it before asking him to do the legwork. Only bring him something genuinely unverifiable from here. This is the same "do it yourself" rule above, stated specifically because it was violated on 2026-08-19: asked him to go check this file instead of checking it directly, when direct access was already sitting there unused.
 
 ## Absolute rule
 
@@ -19,13 +20,19 @@ One of the three founders goes by **Gray**, **Grace**, or **Grace Lynn** only. H
 
 Other founders: Rick West (writes as Beau Pritchett IV), MJ Polk (writes as Hank Cotton). Jean-Paul is the Guild's mascot, a taxidermied peacock, played completely straight.
 
+## Also read PROJECT_LOG.md
+
+Same folder, read at the start of every session alongside this file. This file is settled technical/operational instructions; `PROJECT_LOG.md` is the running record of decisions, thinking-in-progress, and open threads that don't belong here but shouldn't be lost — written unprompted at the end of substantive conversations, not something Rick has to remember to request.
+
 ## Repo location trap
 
 Working repo: `C:\Users\Rick\Desktop\EZ\websites\swg-site-v12\swg-site`
 
 A decoy folder exists at `...\swg-site-v12\swg-site-v12` with no git repository in it. If git says "not a git repository," you are in the wrong folder. Do not ask Rick to hunt for it.
 
-## Deploy workflow
+## A separate project exists — do not mix them
+
+`C:\Users\Rick\Desktop\EZ\primalbeet` is Rick West's personal "primalbeet" music project. It is entirely separate from the Southern Writers Guild — different site, different brand, different everything. Never read from, write to, or pull instructions from that folder while working on SWG, and never let SWG content, branding, or decisions leak into it. If a task description doesn't match anything in this site (e.g. references sections like "Fiction/Verse/Essays," "Visual," or "Music/Video" that don't exist here), stop and check whether it actually belongs to primalbeet before building anything.
 
 Static site, no build step. Vercel watches GitHub and deploys automatically.
 

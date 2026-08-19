@@ -1,0 +1,21 @@
+# SWG Project Log
+
+Running record of decisions, thinking-in-progress, and open threads that don't belong in `CLAUDE.md` (technical/operational instructions) but shouldn't be lost either. Newest entries at the top. Each entry is dated. Anything marked **Open** is not a decision — treat it as where the thinking stood, not as settled ground.
+
+Read this at the start of any SWG session, same as `CLAUDE.md`.
+
+---
+
+## 2026-08-19
+
+**Continuity process, decided.** This file exists because relying on a Cowork project's cached/uploaded files as memory failed — that cache goes stale (last synced 2026-08-11, missed everything built after). This repo, connected live, is the only source treated as current. Going forward: settled decisions and standing rules go in `CLAUDE.md`; everything else that matters but isn't settled goes here, written without being asked, at natural stopping points in a conversation — not something Rick has to remember to request.
+
+**"It's All About the Bird" — reader-facing essay, done.** Final version written by Rick, saved as `the-commitment-behind-the-bird.md` in that session's outputs (not yet in this repo — worth moving in if it's going on the site). Governing metaphor: harbor vs. open sea, sailing a self-built corsair, not a warship, not stolen. The unholy trio (all three founders) as the crew. Thesis: ownership isn't the point, it's the price — what it buys is freedom of shape, since every platform-of-one-shape (Substack, YouTube) forces whatever you make into its own template regardless of fit. Jean-Paul closes the piece on the bow of the ship. Deliberately excludes: the Porch/Kitchen Table split, any specific real-world example (Rick's personal Albania piece was ruled out as off-topic for a Guild piece), and any CTA — the CTA lives elsewhere on the page, in a different format, not in the essay text.
+
+**Audio pages — Open, exploratory only, nothing decided.** Partners asked for a page each (three individuals) plus one group page focused on audio. Rationale for the fourth/group page, resolved during discussion: it's for ensemble "skits" — Garrison Keillor-style pieces performed by all three together, which have no natural home on any individual's page. Structural lean, not decided: one Sanity-driven template (`/listen/[persona]`) rather than four hand-built pages, since each partner will self-serve edit their own entry directly in Sanity — Rick is not the bottleneck, each partner touches Sanity at most twice (their own page, and the group page if voted in). QR codes framed as a handoff, not a doorway — the scan should get someone listening in one tap, not route them through navigation. Real podcast distribution (Apple Podcasts, Spotify) needs a dedicated podcast host for RSS; a page with an embedded player is not the same thing as podcast distribution. Video hosting, if it happens: YouTube (free, but subject to advertiser-friendly content policy and algorithmic reach limits — a real concern given Rick's content doesn't always stay in "approved" territory on his personal work, though the Guild's own material is expected to stay within YouTube's guidelines) versus Cloudflare Stream/Mux (paid, no content-policy layer, full control). Nothing built. Nothing scheduled.
+
+**Grace, factual correction for future reference.** She appears on camera regularly — voice and face are not new exposure. What she actually protects: legal name, street address, city of residence. Don't assume audio/video appearances are a privacy risk for her without cause.
+
+**Vercel tile labeled "Shared login" in the workstation concept preview — flagged, not resolved.** Earlier reasoning had Vercel in the same bucket as GitHub/Sanity/Canva (individual Google sign-in, no vault needed). Worth checking whether that's a real distinction (e.g., not on a Team plan) or the mockup just hasn't caught up to the plan.
+
+---
