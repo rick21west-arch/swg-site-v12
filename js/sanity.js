@@ -429,15 +429,30 @@
    }
 
    /* Turns a Spotify or SoundCloud link into an embedded player. Falls back to a
-      plain "Listen" link for anything else (Substack podcast pages, YouTube audio, etc.) */
+      plain "Listen" link for anything else (Substack podcast pages, YouTube audio, etc.).
+      If an uploaded audio file is present, it takes priority and renders as a
+      native <audio> player instead of any URL embed. */
    function renderAudioBlock(block) {
-     const url = block.url || ''
-     const spotify = url.match(/open\.spotify\.com\/(track|episode|show|album)\/([\w]+)/)
-     const soundcloud = url.match(/soundcloud\.com\/[\w-]+\/[\w-]+/)
-
      const caption = block.caption
        ? `<p style="font-family:var(--font-ui);font-size:0.8rem;color:var(--text-faint);margin-top:0.5rem;">${esc(block.caption)}</p>`
        : ''
+
+     const fileRef = block.file && block.file.asset && block.file.asset._ref
+     if (fileRef) {
+       const parts = fileRef.replace('file-', '').split('-')
+       const ext = parts.pop()
+       const id = parts.join('-')
+       const src = `https://cdn.sanity.io/files/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${id}.${ext}`
+       return `
+         <div style="margin:1.5rem 0;">
+           ${block.caption ? `<p style="font-family:var(--font-ui);font-size:0.8rem;color:var(--text-faint);margin-bottom:0.5rem;">${esc(block.caption)}</p>` : ''}
+           <audio src="${esc(src)}" controls style="width:100%;"></audio>
+         </div>`
+     }
+
+     const url = block.url || ''
+     const spotify = url.match(/open\.spotify\.com\/(track|episode|show|album)\/([\w]+)/)
+     const soundcloud = url.match(/soundcloud\.com\/[\w-]+\/[\w-]+/)
 
      if (spotify) {
        const embedSrc = `https://open.spotify.com/embed/${spotify[1]}/${spotify[2]}`
