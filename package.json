@@ -1,0 +1,11 @@
+{
+  "name": "swg-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Southern Writers Guild — static site with Vercel serverless functions under /api. No frontend build step by design; these dependencies are for server-side /api functions only.",
+  "dependencies": {
+    "@sanity/client": "^8.4.0",
+    "@sanity/preview-url-secret": "^4.1.5"
+  }
+}
