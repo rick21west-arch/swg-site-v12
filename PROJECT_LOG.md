@@ -6,6 +6,12 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-28 (5)
+
+Private preview mode built and tested, scoped to Porch stories only — the test case ahead of extending it elsewhere. `/api/preview` (validates a secret, sets a cookie, redirects to the story), `/api/exit-preview` (clears it), `/api/preview-story` (server-side only, fetches the draft with a privileged token when the cookie checks out). Two new Vercel env vars, both server-side only, same pattern as `KIT_API_KEY`: `SANITY_PREVIEW_SECRET` (the activation secret) and `SANITY_PREVIEW_TOKEN` (a Sanity "viewer" role robot token — read access, drafts included, nothing else). Tested end to end: edited a real story's draft without publishing, confirmed the draft text appeared only in the browser session that had visited `/api/preview` with the right secret, confirmed a cookie-less request (and a request with a forged cookie) got a plain 404 with no hint, confirmed `/api/exit-preview` fully reverted the session to published content.
+
+**Naming note for later:** `SANITY_PREVIEW_TOKEN` is scoped to this narrow feature. If Step 9 (real visual editing, per the Going Pro plan) gets built later using Sanity's official `@sanity/preview-url-secret` pattern, that work will likely want its own token following Sanity's own convention (`SANITY_API_READ_TOKEN`) and a proper Presentation Tool handshake — this token and cookie scheme is a simpler hand-rolled version built for this one test case, not meant to be the permanent mechanism Step 9 builds on. Revisit naming then rather than assuming reuse.
+
 ## 2026-08-28 (4)
 
 Real founder addresses confirmed: beau@ (Rick), hank@ (MJ), gray@ (Grace) — using pen names, not real names, consistent with the Guild's naming convention. Mailboxes exist; Google Accounts for these three still need creating, one-time process each, verified against current Google signup flow. jp@ confirmed as the anchor identity for both the YouTube Brand Account and the shared Guild Drive — one identity, multiple jobs, by design.
