@@ -13,7 +13,9 @@
      return `${base}?query=${encodeURIComponent(query)}`
    }
     
-   /* Resolve thumbnail — prefers Sanity-hosted image, falls back to URL string */
+   /* Resolve thumbnail — prefers a manually uploaded Sanity image, then a manual
+      thumbnailUrl string, then (for YouTube videos with neither) YouTube's own
+      thumbnail, pulled automatically so nobody has to upload one by hand. */
    export function thumbSrc(doc, width = 800) {
      if (doc.thumbnail?.asset?._ref) {
        const ref   = doc.thumbnail.asset._ref
@@ -22,7 +24,10 @@
        const id    = parts.join('-')
        return `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/${id}.${ext}?w=${width}&auto=format`
      }
-     return doc.thumbnailUrl || null
+     if (doc.thumbnailUrl) return doc.thumbnailUrl
+     const yt = (doc.substackUrl || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/)
+     if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`
+     return null
    }
 
    /* Where to center a cropped thumbnail. Sanity stores an editor-set hotspot
