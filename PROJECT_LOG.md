@@ -12,7 +12,7 @@ Step 0 partially cleared: LLC formed and confirmed real; business bank account s
 
 ## 2026-08-28
 
-Step 0 (LLC + bank account) confirmed cleared by Rick. Step 4 (founder email identities) confirmed not yet in place — this is now the live prerequisite before any real Creator Workstation build, since its "your account" tiles are literally these accounts.
+Step 0 (LLC + bank account) confirmed cleared by Rick. Step 4 (founder email identities) confirmed not yet in place — this is now the live prerequisite before any real Creator Workstation build, since its "your account" tiles are literally these accounts. — Correction, same day: this entry overstated Step 0 as fully cleared. See the "2026-08-28 (2)" entry above for the accurate status: LLC formed and confirmed, business bank account still under evaluation, not final.
 
 ---
 
