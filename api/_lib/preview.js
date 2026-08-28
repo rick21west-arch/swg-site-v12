@@ -50,17 +50,41 @@ export function isValidPreviewRequest(req) {
   return timingSafeEqual(value, previewCookieValue(secret));
 }
 
-export function setPreviewCookies(res, secret) {
+// SameSite=None (not Lax) because the Presentation Tool loads the site in a
+// cross-site iframe — a sub-frame load, not a top-level navigation, so Lax
+// cookies are dropped by the browser there even though they worked fine for
+// direct top-level testing. None is a strict superset of when Lax is sent,
+// so this doesn't change behavior for the direct/no-Studio flow.
+// Safari 18.4+ additionally requires the CHIPS "Partitioned" attribute for
+// any cookie set from a cross-site iframe, or it silently drops it — added
+// only when the request actually looks like it came from that iframe, so a
+// normal top-level request is unaffected.
+function isCrossSiteIframeRequest(req) {
+  return (
+    req.headers['sec-fetch-dest'] === 'iframe' &&
+    req.headers['sec-fetch-site'] === 'cross-site'
+  );
+}
+
+export function setPreviewCookies(req, res, secret) {
   const value = previewCookieValue(secret);
+  const partitioned = isCrossSiteIframeRequest(req) ? '; Partitioned' : '';
   res.setHeader('Set-Cookie', [
-    `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${MAX_AGE_SECONDS}`,
-    `${HINT_COOKIE_NAME}=1; Path=/; Secure; SameSite=Lax; Max-Age=${MAX_AGE_SECONDS}`,
+    `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${MAX_AGE_SECONDS}${partitioned}`,
+    `${HINT_COOKIE_NAME}=1; Path=/; Secure; SameSite=None; Max-Age=${MAX_AGE_SECONDS}${partitioned}`,
   ]);
 }
 
-export function clearPreviewCookies(res) {
+export function clearPreviewCookies(req, res) {
+  const partitioned = isCrossSiteIframeRequest(req) ? '; Partitioned' : '';
+  const expired = [
+    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0`,
+    `${HINT_COOKIE_NAME}=; Path=/; Secure; SameSite=None; Max-Age=0`,
+  ];
+  // Clear both the partitioned and unpartitioned variants, since either may
+  // have been set depending on how the session started.
   res.setHeader('Set-Cookie', [
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
-    `${HINT_COOKIE_NAME}=; Path=/; Secure; SameSite=Lax; Max-Age=0`,
+    ...expired,
+    ...(partitioned ? expired.map((c) => `${c}${partitioned}`) : []),
   ]);
 }
