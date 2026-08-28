@@ -281,17 +281,19 @@
   <script src="/js/nav.js"></script>
 
   <script type="module">
-    import { fetchHomepageStories, renderPorchCard, showLoading, showError } from '/js/sanity.js'
+    import { fetchHomepageHighlights, renderPorchCard, renderVideoCard, showLoading, showError } from '/js/sanity.js'
 
     const highlightsGrid = document.getElementById('highlights-grid')
     showLoading(highlightsGrid)
-    fetchHomepageStories(2)
+    fetchHomepageHighlights(3)
       .then(items => {
         if (!items || !items.length) {
           highlightsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
           return
         }
-        highlightsGrid.innerHTML = items.map(renderPorchCard).join('')
+        highlightsGrid.innerHTML = items.map(item =>
+          item._type === 'guildVideo' ? renderVideoCard(item, 'small') : renderPorchCard(item)
+        ).join('')
       })
       .catch(() => showError(highlightsGrid, 'Unable to load right now.'))
   </script>

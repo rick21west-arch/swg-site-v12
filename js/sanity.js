@@ -173,13 +173,15 @@
 
    /* ── Homepage Highlights ───────────────────────────────────── */
    /* Sanity-managed, toggle-controlled. Editors flip "Show on homepage"
-      on/off on any Porch Story in Studio — no code or deploy needed to
-      change what's featured. Uses renderPorchCard below, same as
-      everywhere else Porch stories are shown. */
+      on/off on any Porch Story or Guild Video in Studio — no code or
+      deploy needed to change what's featured. Stories and videos are
+      pulled together, newest first, so either kind can fill any of the
+      slots. Render with renderPorchCard or renderVideoCard depending
+      on each item's _type — see homepage script. */
 
-   export async function fetchHomepageStories(limit = 2) {
+   export async function fetchHomepageHighlights(limit = 3) {
      return sanityFetch(
-       `*[_type == "porchStory" && showOnHomepage == true] | order(publishedAt desc) [0...${limit}]`
+       `*[(_type == "porchStory" || _type == "guildVideo") && showOnHomepage == true] | order(publishedAt desc) [0...${limit}]`
      )
    }
 
