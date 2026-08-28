@@ -185,6 +185,14 @@
      )
    }
 
+   /* ── Site Settings ─────────────────────────────────────────── */
+
+   export async function fetchSiteSettings() {
+     return sanityFetch(
+       `*[_type == "siteSettings"][0]`
+     )
+   }
+
    /* ── Featured fiction ──────────────────────────────────────── */
     
    export async function fetchFeaturedFiction() {
