@@ -34,4 +34,4 @@ These aren't in any file anywhere because they haven't been decided yet, not bec
 
 - **Where does the real workstation live** — its own repo and subdomain (`hq.southernwritersguild.com` was floated once, not committed to), or a section of the existing `swg-site` repo?
 - **What actually handles login** — the tiles say "your account" vs "shared login," but nothing has specified the real authentication mechanism tying a person to which tiles they can see. Google OAuth directly? Something else?
-- **Is Step 0 (LLC + business bank account) actually done yet?** `CLAUDE.md` still says "in progress" as of 2026-08-10/11 — over two weeks old as of this writing. The whole build is gated on this per Rick's own rule. Confirm current status before treating this as buildable.
+- Step 0 confirmed cleared 2026-08-28. Current blocker is Step 4 (individual founder identities) — not yet in place.
