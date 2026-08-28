@@ -16,15 +16,20 @@ function fail(res) {
 
 // Resolve the redirect target. Manual/tested use passes ?slug=; the
 // Presentation Tool instead appends its own ?sanity-preview-pathname=
-// (the location our Studio resolver mapped the selected document to).
-// Both are validated against the same Porch-only shape before use.
+// (the location our Studio resolver mapped the selected document to, or
+// just "/" when the tool opens with no document selected yet). The "/"
+// case has to succeed rather than 404 — the Presentation Tool retries the
+// enable call in a loop if it keeps failing, which otherwise hangs the
+// preview pane before an editor has picked anything to preview. Draft
+// content itself stays Porch-only regardless: /api/preview-story never
+// looks at this path, only at porchStory documents.
 function resolveRedirectPath(req) {
   const slug = req.query && req.query.slug;
   if (typeof slug === 'string' && SLUG_PATTERN.test(slug)) {
     return `/the-porch/${slug}/`;
   }
   const pathname = req.query && req.query['sanity-preview-pathname'];
-  if (typeof pathname === 'string' && PORCH_PATH_PATTERN.test(pathname)) {
+  if (typeof pathname === 'string' && (pathname === '/' || PORCH_PATH_PATTERN.test(pathname))) {
     return pathname;
   }
   return null;
