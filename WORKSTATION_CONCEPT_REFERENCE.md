@@ -34,4 +34,4 @@ These aren't in any file anywhere because they haven't been decided yet, not bec
 
 - **Where does the real workstation live** — its own repo and subdomain (`hq.southernwritersguild.com` was floated once, not committed to), or a section of the existing `swg-site` repo?
 - **What actually handles login** — the tiles say "your account" vs "shared login," but nothing has specified the real authentication mechanism tying a person to which tiles they can see. Google OAuth directly? Something else?
-- Step 0 confirmed cleared 2026-08-28. Current blocker is Step 4 (individual founder identities) — not yet in place.
+- Step 0 as of 2026-08-28: LLC legally formed (confirmed). Bank account not yet finalized. Step 4 (founder email identities) is the current live blocker — addresses are decided but not provisioned, no Google Accounts exist yet.

@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-28 (2)
+
+Step 0 partially cleared: LLC formed and confirmed real; business bank account still under evaluation, not final. This unblocks anything requiring the LLC to legally exist (Step 3 named explicitly in the plan), but not anything requiring finalized bank details. Step 4 confirmed not yet in place — addresses decided, not provisioned in IONOS, no Google Accounts created. Decision made this session: proceed with Step 4 work now rather than wait, since it was already sanctioned as quiet prep independent of Step 0's exact status.
+
 ## 2026-08-28
 
 Step 0 (LLC + bank account) confirmed cleared by Rick. Step 4 (founder email identities) confirmed not yet in place — this is now the live prerequisite before any real Creator Workstation build, since its "your account" tiles are literally these accounts.
