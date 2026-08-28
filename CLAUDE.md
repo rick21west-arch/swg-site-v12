@@ -127,7 +127,11 @@ Nav currently reads: THE PORCH · THE WORK · EVENTS · THE HOUSE · WRITERS · 
 
 ## Content management
 
-Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, conversations, and House contact addresses are still hardcoded and need moving into Sanity. When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
+Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, and conversations are still hardcoded and need moving into Sanity. House contact address and the videos/featured-fiction pages were moved to Sanity 2026-08-28 (Step 8, phases 1-2). When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
+
+### Sanity MCP schema lookup gotcha
+
+When checking live schema via Sanity MCP tools (get_schema), list_workspace_schemas can return a "Studio-deployed" schemaId that is stale/disconnected from what npx sanity@latest schema deploy actually writes to. The record that reflects real CLI deploys is schemaId '_.schemas.default'. Confirmed 2026-08-28 after a stale-record check caused a false alarm over a field that was actually live. Check against '_.schemas.default' first.
 
 ## Going Pro — "Rick's Vision for Going Pro" (governs sequencing below)
 

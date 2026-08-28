@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-28 (3)
+
+Step 8 phases 1-2 complete. Videos and Featured Fiction pages rewired to existing Sanity fetch functions (no new schema). New siteSettings singleton added (contactEmail field), House page's two hardcoded addresses now pull from one Sanity document, hardcoded value kept as fallback if the fetch fails. Side effect: the guildVideo showOnHomepage toggle, which existed in a prior unpushed commit, went live in the same deploy — homepage "Right Now" section now actually includes Guild Videos as designed, closing a gap that had existed silently. Phase 3 (Writers page + subpages — needs a new schema type, paused on a real design decision, not started) and Phase 4 (House mission/beliefs copy, guidelines page — low priority) remain open.
+
 ## 2026-08-28 (2)
 
 Step 0 partially cleared: LLC formed and confirmed real; business bank account still under evaluation, not final. This unblocks anything requiring the LLC to legally exist (Step 3 named explicitly in the plan), but not anything requiring finalized bank details. Step 4 confirmed not yet in place — addresses decided, not provisioned in IONOS, no Google Accounts created. Decision made this session: proceed with Step 4 work now rather than wait, since it was already sanctioned as quiet prep independent of Step 0's exact status.
