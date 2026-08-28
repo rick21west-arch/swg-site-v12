@@ -165,7 +165,7 @@ The canonical infrastructure plan, provided in full by Rick 2026-08-10 (source d
 
 **What it produces:** no single laptop, personal account, or one person's availability stays load-bearing for the business. Access is real, independent, and revocable in one action instead of a scavenger hunt across a dozen logins.
 
-**Reference file not yet in hand:** `SWG_Workstation_Concept_Preview.html` — a working clickable HTML mockup of the Creator/Tech workstation, built in the site's real design system, fake data, shown to Polk and Grace as a concept tool, not a functional system. Get this file if the workstation build is picked up for real, rather than working from screenshots.
+**Reference file still not in hand:** `SWG_Workstation_Concept_Preview.html`, the original clickable mockup, isn't in this repo. What exists instead: `WORKSTATION_CONCEPT_REFERENCE.md` (same folder), a full transcription of its actual content and structure, done directly from screenshots 2026-08-28 — every tile, every label, every access tag. Read that file before starting a real build; it also lists the three things that are genuinely undecided (where the workstation lives, what handles login, and current Step 0 status) rather than just undocumented.
 
 **Resolved, not open:** the planning session this plan came from ended mid-troubleshooting on a Sanity Studio bug — stories displaying correctly but with no editable input in the Studio editor. That was independently diagnosed and fixed in a later session (this file's git history): the schema simply never declared fields that already held live data. No longer an open thread.
 
