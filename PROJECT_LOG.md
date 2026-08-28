@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-28 (8)
+
+Rotated `SANITY_PREVIEW_SECRET` — the old value had been exposed in Studio's build output before the previous session's `@sanity/preview-url-secret` fix, so it was due for rotation on general hygiene grounds (flagged, not acted on, last session). New 256-bit value set in Vercel; the old one no longer works anywhere. Confirmed directly, not assumed, that env var changes don't take effect until a new deployment: right after updating the Vercel value, the live site still accepted the old secret and rejected the new one, then flipped the other way immediately after a fresh `vercel deploy --prod`. The Presentation Tool's own separate mechanism (Sanity's per-session secret, `@sanity/preview-url-secret`) is untouched by this — verified fresh via Vercel's logs (enable→302, preview-story→200) after the rotation, same pattern as before.
+
 ## 2026-08-28 (7)
 
 Replaced the static preview secret baked into Studio's config with Sanity's own `@sanity/preview-url-secret` mechanism — that secret was ending up in Studio's public built JS bundle, which is exactly the pattern Sanity's docs warn against. Studio's `presentationTool` config no longer embeds anything; the Presentation Tool generates its own short-lived, per-session secret internally and `/api/preview` (site repo) validates it against the dataset using the library, reusing the same `SANITY_PREVIEW_TOKEN` already used for draft-fetching (no new token needed — it already has the read access this requires). Added `@sanity/client` and `@sanity/preview-url-secret` as real dependencies — first `package.json` this site repo has ever had, scoped to the `/api` serverless functions only, no effect on the static frontend's no-build-step design. The original manual `?secret=&slug=` path (the fixed server-side `SANITY_PREVIEW_SECRET`) still works unchanged, for direct testing and for sharing a preview link with someone outside Studio.
