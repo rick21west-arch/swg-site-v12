@@ -36,43 +36,7 @@
 
   <section class="section">
     <div class="container">
-      <div class="grid grid--3">
-
-        <div class="card card--highlight">
-          <span class="card-badge">Current</span>
-          <img src="../../assets/images/cover-grace.jpg" alt="Opera Rose" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin:0.75rem 0;">
-          <span class="card-label">Gray &nbsp;·&nbsp; 2026</span>
-          <h2 class="card-title">Opera Rose</h2>
-          <p class="card-body">A trilogy. [ Description — TBD from Gray ]</p>
-          <a href="/the-work/opera-rose/" class="btn btn--primary" style="margin-top:1rem;">Read it</a>
-        </div>
-
-        <div class="card">
-          <img src="../../assets/images/cover-first-light.jpg" alt="First Light" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Rick West &nbsp;·&nbsp; Feb–Mar 2026</span>
-          <h2 class="card-title">First Light</h2>
-          <p class="card-body">Jake Mackenzie returns to the Pensacola coast. The dirty boats. The DEA agent in a sundress. The past refusing to stay offshore.</p>
-          <a href="/the-work/first-light/" class="btn btn--ghost" style="margin-top:1rem;">Read it →</a>
-        </div>
-
-        <div class="card">
-          <img src="../../assets/images/cover-ugly-duckling.jpg" alt="The Ugly Duckling" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">
-          <span class="card-label">Hank Cotton &nbsp;·&nbsp; Jan–Feb 2026</span>
-          <h2 class="card-title">The Ugly Duckling</h2>
-          <p class="card-body">A hotshot truck driver. A girl in six-inch heels on the shoulder of I-75. The road between them.</p>
-          <a href="/the-work/ugly-duckling/" class="btn btn--ghost" style="margin-top:1rem;">Read it →</a>
-        </div>
-
-        <!-- Future features expand here -->
-        <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
-          <div style="text-align:center;">
-            <span class="card-label">Open to Southern writers</span>
-            <p class="card-body" style="font-size:0.9rem;margin-top:0.5rem;">Future features added as the Guild grows.</p>
-            <a href="/the-house/#submit" class="btn btn--ghost" style="margin-top:1rem;font-size:0.6rem;">Submit your work →</a>
-          </div>
-        </div>
-
-      </div>
+      <div class="grid grid--3" id="featured-fiction-grid"></div>
     </div>
   </section>
 
@@ -82,6 +46,26 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchFeaturedFiction, renderBookCard, showLoading, showError } from '../../js/sanity.js'
+    const grid = document.getElementById('featured-fiction-grid')
+    const dashedCard = `
+      <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
+        <div style="text-align:center;">
+          <span class="card-label">Open to Southern writers</span>
+          <p class="card-body" style="font-size:0.9rem;margin-top:0.5rem;">Future features added as the Guild grows.</p>
+          <a href="/the-house/#submit" class="btn btn--ghost" style="margin-top:1rem;font-size:0.6rem;">Submit your work →</a>
+        </div>
+      </div>`
+    showLoading(grid)
+    fetchFeaturedFiction()
+      .then(features => {
+        if (!features || !features.length) { grid.innerHTML = dashedCard; return }
+        grid.innerHTML = features.map(renderBookCard).join('') + dashedCard
+      })
+      .catch(() => showError(grid, 'Featured fiction unavailable.'))
+  </script>
 
   <script src="../../js/nav.js"></script>
 </body>
