@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-28 (4)
+
+Real founder addresses confirmed: beau@ (Rick), hank@ (MJ), gray@ (Grace) — using pen names, not real names, consistent with the Guild's naming convention. Mailboxes exist; Google Accounts for these three still need creating, one-time process each, verified against current Google signup flow. jp@ confirmed as the anchor identity for both the YouTube Brand Account and the shared Guild Drive — one identity, multiple jobs, by design.
+
 ## 2026-08-28 (3)
 
 Step 8 phases 1-2 complete. Videos and Featured Fiction pages rewired to existing Sanity fetch functions (no new schema). New siteSettings singleton added (contactEmail field), House page's two hardcoded addresses now pull from one Sanity document, hardcoded value kept as fallback if the fetch fails. Side effect: the guildVideo showOnHomepage toggle, which existed in a prior unpushed commit, went live in the same deploy — homepage "Right Now" section now actually includes Guild Videos as designed, closing a gap that had existed silently. Phase 3 (Writers page + subpages — needs a new schema type, paused on a real design decision, not started) and Phase 4 (House mission/beliefs copy, guidelines page — low priority) remain open.
