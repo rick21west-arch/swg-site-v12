@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/the-porch/:slug", "destination": "/the-porch/story/index.html" },
     { "source": "/the-porch/:slug/", "destination": "/the-porch/story/index.html" },

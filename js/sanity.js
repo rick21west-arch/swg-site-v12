@@ -2,17 +2,24 @@
    Southern Writers Guild — Sanity CMS fetch layer
    js/sanity.js
    ============================================================ */
- 
+
+   import { createClient } from '@sanity/client'
+
    const SANITY_PROJECT_ID = 'fe6l0kiy'
    const SANITY_DATASET    = 'production'
    const SANITY_API_VER    = '2024-01-01'
-    
-   /* Build the CDN fetch URL for a GROQ query */
-   function sanityUrl(query) {
-     const base = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v${SANITY_API_VER}/data/query/${SANITY_DATASET}`
-     return `${base}?query=${encodeURIComponent(query)}`
-   }
-    
+
+   /* The real Sanity client, not a hand-rolled fetch() — this is what lets
+      the site adopt stega encoding and click-to-edit later, since those
+      depend on the client library's query/response pipeline. useCdn matches
+      the previous .apicdn.sanity.io behavior (cached, public, read-only). */
+   const client = createClient({
+     projectId: SANITY_PROJECT_ID,
+     dataset: SANITY_DATASET,
+     apiVersion: SANITY_API_VER,
+     useCdn: true,
+   })
+
    /* Resolve thumbnail — prefers a manually uploaded Sanity image, then a manual
       thumbnailUrl string, then (for YouTube videos with neither) YouTube's own
       thumbnail, pulled automatically so nobody has to upload one by hand. */
@@ -44,12 +51,10 @@
      return '50% 50%'
    }
     
-   /* Generic fetch helper */
+   /* Generic fetch helper — same signature and behavior as before (resolves
+      to the query result, throws on failure), now backed by the real client. */
    export async function sanityFetch(query) {
-     const res = await fetch(sanityUrl(query))
-     if (!res.ok) throw new Error(`Sanity fetch failed: ${res.status}`)
-     const { result } = await res.json()
-     return result
+     return client.fetch(query)
    }
     
    /* ── Porch stories ─────────────────────────────────────────── */
