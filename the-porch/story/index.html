@@ -91,6 +91,11 @@
       return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
     }
 
+    // TEMPORARY diagnostic — root-causing the "Unable to connect" banner in
+    // Presentation Tool (2026-08-29). Reports this page's own cookie state
+    // back to the server so it shows up in Vercel logs. Remove once resolved.
+    fetch(`/api/preview-debug?cookies=${encodeURIComponent(document.cookie)}&isPreviewing=${isPreviewing()}&href=${encodeURIComponent(location.href)}&referrer=${encodeURIComponent(document.referrer)}`).catch(() => {})
+
     function fetchStory(slug) {
       if (!isPreviewing()) return fetchPorchStoryBySlug(slug)
       return fetch(`/api/preview-story?slug=${encodeURIComponent(slug)}`)

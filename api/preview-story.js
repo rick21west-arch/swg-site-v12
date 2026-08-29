@@ -13,6 +13,15 @@ const API_VERSION = '2024-01-01';
 const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
 export default async function handler(req, res) {
+  // TEMPORARY diagnostic logging — root-causing the "Unable to connect"
+  // banner in Presentation Tool (2026-08-29). Remove once resolved.
+  console.log('PREVIEW_DEBUG /api/preview-story invoked', {
+    method: req.method,
+    hasCookieHeader: !!req.headers.cookie,
+    cookieHeaderRaw: req.headers.cookie,
+    valid: isValidPreviewRequest(req),
+  });
+
   if (req.method !== 'GET' || !isValidPreviewRequest(req)) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     return res.status(404).send('Not found');
