@@ -69,14 +69,10 @@ function isCrossSiteIframeRequest(req) {
 export function setPreviewCookies(req, res, secret) {
   const value = previewCookieValue(secret);
   const partitioned = isCrossSiteIframeRequest(req) ? '; Partitioned' : '';
-  const cookies = [
+  res.setHeader('Set-Cookie', [
     `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${MAX_AGE_SECONDS}${partitioned}`,
     `${HINT_COOKIE_NAME}=1; Path=/; Secure; SameSite=None; Max-Age=${MAX_AGE_SECONDS}${partitioned}`,
-  ];
-  // TEMPORARY diagnostic logging — root-causing the "Unable to connect"
-  // banner in Presentation Tool (2026-08-29). Remove once resolved.
-  console.log('PREVIEW_DEBUG setPreviewCookies', { partitionedApplied: !!partitioned, cookies });
-  res.setHeader('Set-Cookie', cookies);
+  ]);
 }
 
 export function clearPreviewCookies(req, res) {

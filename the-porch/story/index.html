@@ -91,11 +91,6 @@
       return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
     }
 
-    // TEMPORARY diagnostic — root-causing the "Unable to connect" banner in
-    // Presentation Tool (2026-08-29). Reports this page's own cookie state
-    // back to the server so it shows up in Vercel logs. Remove once resolved.
-    fetch(`/api/preview-debug?cookies=${encodeURIComponent(document.cookie)}&isPreviewing=${isPreviewing()}&href=${encodeURIComponent(location.href)}&referrer=${encodeURIComponent(document.referrer)}`).catch(() => {})
-
     function fetchStory(slug) {
       if (!isPreviewing()) return fetchPorchStoryBySlug(slug)
       return fetch(`/api/preview-story?slug=${encodeURIComponent(slug)}`)
@@ -147,41 +142,14 @@
         })
     }
 
+    // The click-to-edit connection itself (enableVisualEditing()) is
+    // bootstrapped from js/nav.js, loaded on every page — see that file
+    // for why. Nothing further is needed here: its DOM scanner picks up
+    // this page's stega-encoded content as soon as loadStory() renders it.
     if (!slug) {
       notFound()
     } else {
       loadStory(slug)
-
-      // Click-to-edit overlay — dynamically imported so its code is never
-      // fetched by a normal visitor's browser at all, not just unused.
-      // enableVisualEditing() itself tells the two click contexts apart:
-      // inside Presentation Tool's iframe it jumps the Studio panel to the
-      // field over its Comlink connection; opened as a bare link outside
-      // Presentation Tool, a click builds a Studio URL from the studioUrl
-      // baked into the story's stega payload (set server-side in
-      // api/preview-story.js) and opens it in a new tab.
-      if (isPreviewing()) {
-        import('@sanity/visual-editing').then(({ enableVisualEditing }) => {
-          enableVisualEditing({
-            history: {
-              subscribe: (navigate) => {
-                const handler = () => navigate({ type: 'pop', url: location.href })
-                addEventListener('popstate', handler)
-                return () => removeEventListener('popstate', handler)
-              },
-              update: (update) => {
-                if (update.type === 'push') history.pushState(null, '', update.url)
-                if (update.type === 'replace') history.replaceState(null, '', update.url)
-              },
-            },
-            refresh: async (payload) => {
-              if (payload.source === 'mutation') {
-                await loadStory(slug)
-              }
-            },
-          })
-        })
-      }
     }
   </script>
 

@@ -81,18 +81,6 @@ async function resolvePresentationToolRedirect(req) {
 }
 
 export default async function handler(req, res) {
-  // TEMPORARY diagnostic logging — root-causing the "Unable to connect"
-  // banner in Presentation Tool (2026-08-29). Remove once resolved.
-  console.log('PREVIEW_DEBUG /api/preview', {
-    method: req.method,
-    url: req.url,
-    'sec-fetch-dest': req.headers['sec-fetch-dest'],
-    'sec-fetch-site': req.headers['sec-fetch-site'],
-    'sec-fetch-mode': req.headers['sec-fetch-mode'],
-    referer: req.headers['referer'],
-    'user-agent': req.headers['user-agent'],
-  });
-
   if (req.method !== 'GET') return fail(res);
 
   const secret = process.env.SANITY_PREVIEW_SECRET;
@@ -118,7 +106,6 @@ export default async function handler(req, res) {
   // point on the cookie set is identical regardless of which one fired,
   // so everything downstream (api/preview-story.js, the story page's own
   // cookie check) is completely unaware anything changed upstream.
-  console.log('PREVIEW_DEBUG /api/preview redirecting', { redirectPath, hasManualSecret });
   setPreviewCookies(req, res, secret);
   res.setHeader('Location', redirectPath);
   return res.status(302).end();

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Southern Writers Guild — static multi-page site. Vite builds js/sanity.js (which uses @sanity/client) and every page's scripts into dist/; api/ functions are separate, unbundled Vercel serverless functions.",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.bootstrap.config.js",
     "preview": "vite preview"
   },
   "dependencies": {
