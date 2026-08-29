@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-29 (3) — Sanity access fully resolved
+
+Sanity access fully resolved. Organization renamed to Southern Writers Guild. MJ and Grace invited as full Administrators, matching the partners' explicit choice to treat all three as equal, not tiered by role. Rick's personal account and the separate primalbeet project confirmed cleanly separated from the Guild's Sanity org. This closes the access gap that had been the actual point of the whole Visual Editing build — the tool has worked since 2026-08-28; as of today, the people it was built for can actually reach it.
+
 ## 2026-08-29 (2) — Click-to-edit fully working, confirmed live
 
 Closes out the "Open, not done" item from the entry below: after shipping click-to-edit, Rick reproduced Presentation Tool's "Unable to connect" banner for real, on the live site, right after that deploy — the follow-up check this session deliberately deferred to. Two real, separate bugs, found and fixed in sequence, each confirmed against actual evidence before moving to the next:

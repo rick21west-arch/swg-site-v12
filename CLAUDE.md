@@ -143,6 +143,8 @@ The canonical infrastructure plan, provided in full by Rick 2026-08-10 (source d
 
 Step 4 confirmed 2026-08-28: real addresses are beau@southernwritersguild.com (Rick), hank@southernwritersguild.com (MJ Polk), gray@southernwritersguild.com (Grace) — mailboxes created and active. Independent Google Accounts for these three not yet created as of this date. jp@southernwritersguild.com already has its own independent Google Account (see Confirmed facts above) and additionally now anchors the YouTube Brand Account as Primary Owner and the shared Guild Drive (Step 5).
 
+Confirmed 2026-08-29: Sanity organization renamed to "Southern Writers Guild." MJ and Grace invited as Administrators at the organization level (pending their acceptance). Rick's personal account fully separated from the Guild's Sanity organization — no longer reachable by SWG admins, no entanglement with the personal music project. Visual Editing (private draft preview + click-to-edit) fully built and confirmed working on Porch stories as of 2026-08-28.
+
 **Confirmed facts, already true:**
 - `jp@southernwritersguild.com` is active with its own independent login, separate from Polk's main IONOS account.
 - The Kit account is already registered in the Guild's name.
