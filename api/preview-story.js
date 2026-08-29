@@ -1,3 +1,4 @@
+import { createClient } from '@sanity/client';
 import { isValidPreviewRequest } from './_lib/preview.js';
 
 // Scoped to Porch stories only — this is the test case before preview
@@ -5,6 +6,11 @@ import { isValidPreviewRequest } from './_lib/preview.js';
 const PROJECT_ID = 'fe6l0kiy';
 const DATASET = 'production';
 const API_VERSION = '2024-01-01';
+
+// Single default-workspace Studio (sanity.config.js: name: 'default', no
+// basePath) — the client omits the workspace segment from intent URLs in
+// that case, so this plain origin is a complete studioUrl on its own.
+const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' || !isValidPreviewRequest(req)) {
@@ -23,25 +29,28 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Preview unavailable' });
   }
 
-  const query = `*[_type == "porchStory" && slug.current == $slug][0]`;
-  const params = new URLSearchParams({
-    query,
+  // The real @sanity/client, not a raw fetch() — this is what lets the
+  // response carry stega encoding. Drafts perspective + a privileged
+  // server-side token so unpublished edits are visible; stega is enabled
+  // only on this client, which only ever runs after isValidPreviewRequest
+  // has already checked the HttpOnly preview cookie above, so an encoded
+  // response can never reach a request that didn't already prove it was
+  // an active preview session.
+  const client = createClient({
+    projectId: PROJECT_ID,
+    dataset: DATASET,
+    apiVersion: API_VERSION,
+    useCdn: false,
     perspective: 'drafts',
-    '$slug': JSON.stringify(slug),
+    token,
+    stega: { enabled: true, studioUrl: STUDIO_URL },
   });
-  const url = `https://${PROJECT_ID}.api.sanity.io/v${API_VERSION}/data/query/${DATASET}?${params.toString()}`;
 
   try {
-    const sanityRes = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!sanityRes.ok) {
-      console.error('Preview draft fetch failed:', sanityRes.status, await sanityRes.text());
-      return res.status(502).json({ error: 'Preview fetch failed' });
-    }
-
-    const { result } = await sanityRes.json();
+    const result = await client.fetch(
+      `*[_type == "porchStory" && slug.current == $slug][0]`,
+      { slug }
+    );
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ result });
   } catch (err) {

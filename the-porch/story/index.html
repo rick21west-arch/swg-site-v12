@@ -52,7 +52,7 @@
   </footer>
 
   <script type="module">
-    import { fetchPorchStoryBySlug, renderPortableText, thumbSrc } from '/js/sanity.js'
+    import { fetchPorchStoryBySlug, renderPortableText, thumbSrc, stegaClean } from '/js/sanity.js'
 
     const titleEl = document.getElementById('story-title')
     const metaEl = document.getElementById('story-meta')
@@ -102,37 +102,81 @@
         .catch(() => fetchPorchStoryBySlug(slug))
     }
 
-    if (!slug) {
-      notFound()
-    } else {
-      fetchStory(slug)
-        .then(story => {
-          if (!story) { notFound(); return }
+    function renderStory(story) {
+      if (!story) { notFound(); return }
 
-          document.title = `${story.title} — The Porch — Southern Writers Guild`
-          titleEl.textContent = story.title
-          metaEl.textContent = [formatDate(story.publishedAt), story.authors].filter(Boolean).join('  ·  ')
+      // document.title and the img alt attribute are both places stega's
+      // invisible edit-metadata characters cause real bugs (Sanity's own
+      // guidance: never let stega reach <head> or an element attribute) —
+      // stegaClean() strips them; it's a no-op on the non-preview path
+      // where story.title was never encoded in the first place. The
+      // visible on-page heading (titleEl) is left un-cleaned on purpose:
+      // that's the actual click-to-edit target for the title field.
+      document.title = `${stegaClean(story.title)} — The Porch — Southern Writers Guild`
+      titleEl.textContent = story.title
+      metaEl.textContent = [formatDate(story.publishedAt), story.authors].filter(Boolean).join('  ·  ')
 
-          const thumb = thumbSrc(story, 1200)
-          if (thumb) {
-            thumbEl.innerHTML = `<img src="${esc(thumb)}" alt="${esc(story.title)}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
-          }
+      const thumb = thumbSrc(story, 1200)
+      if (thumb) {
+        thumbEl.innerHTML = `<img src="${esc(thumb)}" alt="${esc(stegaClean(story.title))}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
+      }
 
-          if (story.body && story.body.length) {
-            bodyEl.innerHTML = renderPortableText(story.body)
-          } else if (story.excerpt) {
-            bodyEl.innerHTML = `<p>${esc(story.excerpt)}</p>`
-          }
+      if (story.body && story.body.length) {
+        bodyEl.innerHTML = renderPortableText(story.body)
+      } else if (story.excerpt) {
+        bodyEl.innerHTML = `<p>${esc(story.excerpt)}</p>`
+      }
 
-          if (story.substackUrl) {
-            fallbackEl.innerHTML = `<p style="margin-top:var(--sp-md);"><a href="${esc(story.substackUrl)}" target="_blank" rel="noopener" class="btn btn--ghost">Read on Substack →</a></p>`
-          }
-        })
+      if (story.substackUrl) {
+        fallbackEl.innerHTML = `<p style="margin-top:var(--sp-md);"><a href="${esc(story.substackUrl)}" target="_blank" rel="noopener" class="btn btn--ghost">Read on Substack →</a></p>`
+      }
+    }
+
+    function loadStory(slug) {
+      return fetchStory(slug)
+        .then(renderStory)
         .catch(() => {
           titleEl.textContent = 'Story unavailable'
           metaEl.textContent = ''
           bodyEl.innerHTML = '<p>Something went wrong loading this story.</p>'
         })
+    }
+
+    if (!slug) {
+      notFound()
+    } else {
+      loadStory(slug)
+
+      // Click-to-edit overlay — dynamically imported so its code is never
+      // fetched by a normal visitor's browser at all, not just unused.
+      // enableVisualEditing() itself tells the two click contexts apart:
+      // inside Presentation Tool's iframe it jumps the Studio panel to the
+      // field over its Comlink connection; opened as a bare link outside
+      // Presentation Tool, a click builds a Studio URL from the studioUrl
+      // baked into the story's stega payload (set server-side in
+      // api/preview-story.js) and opens it in a new tab.
+      if (isPreviewing()) {
+        import('@sanity/visual-editing').then(({ enableVisualEditing }) => {
+          enableVisualEditing({
+            history: {
+              subscribe: (navigate) => {
+                const handler = () => navigate({ type: 'pop', url: location.href })
+                addEventListener('popstate', handler)
+                return () => removeEventListener('popstate', handler)
+              },
+              update: (update) => {
+                if (update.type === 'push') history.pushState(null, '', update.url)
+                if (update.type === 'replace') history.replaceState(null, '', update.url)
+              },
+            },
+            refresh: async (payload) => {
+              if (payload.source === 'mutation') {
+                await loadStory(slug)
+              }
+            },
+          })
+        })
+      }
     }
   </script>
 

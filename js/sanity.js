@@ -5,6 +5,14 @@
 
    import { createClient } from '@sanity/client'
 
+   // Re-exported so pages never need their own @sanity/client/stega import —
+   // strips stega's invisible edit-metadata characters before a value goes
+   // anywhere other than a visible text node (document.title, alt text,
+   // date parsing, URL building). No-op on a string that was never
+   // stega-encoded, so it's safe to call unconditionally on any fetched
+   // value regardless of whether the page is in preview mode.
+   export { stegaClean } from '@sanity/client/stega'
+
    const SANITY_PROJECT_ID = 'fe6l0kiy'
    const SANITY_DATASET    = 'production'
    const SANITY_API_VER    = '2024-01-01'
