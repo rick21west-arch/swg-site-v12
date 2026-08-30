@@ -11,6 +11,20 @@ const DATASET = 'production';
 // straight into the redirect path with no risk of an open redirect.
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PORCH_PATH_PATTERN = /^\/the-porch\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
+const EVENT_PATH_PATTERN = /^\/events\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
+// featuredFiction and guildVideo have no slug field and no individual page —
+// every document of either type resolves to one shared listing page, so
+// these are fixed strings rather than a pattern.
+const STATIC_PREVIEW_PATHS = new Set(['/the-work/featured/', '/the-work/videos/']);
+
+function isAllowedRedirectPath(path) {
+  return (
+    path === '/' ||
+    PORCH_PATH_PATTERN.test(path) ||
+    EVENT_PATH_PATTERN.test(path) ||
+    STATIC_PREVIEW_PATHS.has(path)
+  );
+}
 
 function fail(res) {
   // Same response whether the secret was wrong, expired, or missing, the
@@ -30,14 +44,25 @@ function fullRequestUrl(req) {
 // checked with a constant-time comparison. Kept alongside the Presentation
 // Tool path below for direct testing and for sharing a preview link with
 // someone who doesn't have Studio access.
+//
+// type= defaults to porchStory (the original, still-bare ?secret=&slug=
+// links keep working unchanged). event needs a slug the same way; featured
+// and videos have no slug — they always resolve to their one shared listing
+// page.
 function resolveManualRedirect(req, secret) {
   const providedSecret = req.query && req.query.secret;
   if (typeof providedSecret !== 'string' || !timingSafeEqual(providedSecret, secret)) {
     return null;
   }
-  const slug = req.query && req.query.slug;
-  if (typeof slug !== 'string' || !SLUG_PATTERN.test(slug)) return null;
-  return `/the-porch/${slug}/`;
+  const type = (req.query && req.query.type) || 'porchStory';
+  if (type === 'porchStory' || type === 'event') {
+    const slug = req.query && req.query.slug;
+    if (typeof slug !== 'string' || !SLUG_PATTERN.test(slug)) return null;
+    return type === 'event' ? `/events/${slug}/` : `/the-porch/${slug}/`;
+  }
+  if (type === 'featuredFiction') return '/the-work/featured/';
+  if (type === 'guildVideo') return '/the-work/videos/';
+  return null;
 }
 
 // Presentation Tool path — Sanity's own supported mechanism
@@ -76,7 +101,7 @@ async function resolvePresentationToolRedirect(req) {
   const cleanPath = redirectTo
     ? withoutSecretSearchParams(new URL(redirectTo, requestUrl)).pathname
     : '/';
-  if (cleanPath !== '/' && !PORCH_PATH_PATTERN.test(cleanPath)) return null;
+  if (!isAllowedRedirectPath(cleanPath)) return null;
   return cleanPath;
 }
 

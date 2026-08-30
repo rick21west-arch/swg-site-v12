@@ -58,8 +58,31 @@
           <a href="/the-house/#submit" class="btn btn--ghost" style="margin-top:1rem;font-size:0.6rem;">Submit your work →</a>
         </div>
       </div>`
+
+    // swg_preview_active is a non-secret hint cookie set by /api/preview —
+    // its only job is telling the page whether to attempt the draft route.
+    // The real credential is a separate HttpOnly cookie this script can't
+    // read; /api/preview-featured checks that one server-side. A visitor
+    // with no cookies at all never calls the preview route. Same mechanism
+    // as the Porch story page — featuredFiction has no slug/individual
+    // page, so this whole listing page is the click-to-edit surface.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchFeaturedFictionView() {
+      if (!isPreviewing()) return fetchFeaturedFiction()
+      return fetch('/api/preview-featured')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchFeaturedFiction())
+    }
+
     showLoading(grid)
-    fetchFeaturedFiction()
+    fetchFeaturedFictionView()
       .then(features => {
         if (!features || !features.length) { grid.innerHTML = dashedCard; return }
         grid.innerHTML = features.map(renderBookCard).join('') + dashedCard

@@ -80,11 +80,48 @@
     const archiveGrid = document.getElementById('guild-videos-archive-grid')
     const conversationsGrid = document.getElementById('conversations-grid')
 
+    // swg_preview_active is a non-secret hint cookie set by /api/preview —
+    // its only job is telling the page whether to attempt the draft route.
+    // The real credential is a separate HttpOnly cookie this script can't
+    // read; /api/preview-videos checks that one server-side. A visitor with
+    // no cookies at all never calls the preview route. Same mechanism as
+    // the Porch story page — guildVideo has no slug/individual page, so
+    // this whole listing page (all three sections) is the click-to-edit
+    // surface. One fixed ?view= per section, mirroring the three published
+    // queries below exactly.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchPreviewVideos(view) {
+      return fetch(`/api/preview-videos?view=${view}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+    }
+
+    function fetchVideosView(limit) {
+      if (!isPreviewing()) return fetchVideos(limit)
+      return fetchPreviewVideos('latest').catch(() => fetchVideos(limit))
+    }
+
+    function fetchAllVideosView() {
+      if (!isPreviewing()) return fetchAllVideos()
+      return fetchPreviewVideos('all').catch(() => fetchAllVideos())
+    }
+
+    function fetchConversationsView(limit) {
+      if (!isPreviewing()) return fetchConversations(limit)
+      return fetchPreviewVideos('conversations').catch(() => fetchConversations(limit))
+    }
+
     showLoading(latestGrid)
     showLoading(archiveGrid)
     showLoading(conversationsGrid)
 
-    const latestPromise = fetchVideos(3)
+    const latestPromise = fetchVideosView(3)
       .then(videos => {
         if (!videos || !videos.length) { showError(latestGrid, 'Videos unavailable.'); return [] }
         const [first, ...rest] = videos
@@ -99,7 +136,7 @@
     latestPromise
       .then(latestVideos => {
         const latestIds = new Set(latestVideos.map(v => v._id))
-        return fetchAllVideos().then(videos => {
+        return fetchAllVideosView().then(videos => {
           const archive = (videos || []).filter(v => !latestIds.has(v._id))
           if (!archive.length) { showError(archiveGrid, 'No archived videos yet.'); return }
           archiveGrid.innerHTML = archive.map(v => renderVideoCard(v, 'large')).join('')
@@ -107,7 +144,7 @@
       })
       .catch(() => showError(archiveGrid, 'Videos unavailable.'))
 
-    fetchConversations(6)
+    fetchConversationsView(6)
       .then(conversations => {
         const dashedCard = `
           <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:200px;">

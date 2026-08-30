@@ -4,14 +4,17 @@
    ============================================================ */
 
    import { createClient } from '@sanity/client'
+   import { stegaClean } from '@sanity/client/stega'
 
    // Re-exported so pages never need their own @sanity/client/stega import —
    // strips stega's invisible edit-metadata characters before a value goes
    // anywhere other than a visible text node (document.title, alt text,
    // date parsing, URL building). No-op on a string that was never
    // stega-encoded, so it's safe to call unconditionally on any fetched
-   // value regardless of whether the page is in preview mode.
-   export { stegaClean } from '@sanity/client/stega'
+   // value regardless of whether the page is in preview mode. Also used
+   // directly inside this file's own card renderers (renderBookCard,
+   // renderVideoCard) for the same reason.
+   export { stegaClean }
 
    const SANITY_PROJECT_ID = 'fe6l0kiy'
    const SANITY_DATASET    = 'production'
@@ -357,17 +360,23 @@
    }
 
    export function renderBookCard(book) {
+     // stegaClean() on the img src/alt and the purchase-link hrefs — same
+     // rule as the Porch story page: stega's invisible edit-metadata
+     // characters must never reach an element attribute. No-op when this
+     // card isn't rendering preview (stega-encoded) data. The visible
+     // title/author/note text is left un-cleaned on purpose — that's the
+     // actual click-to-edit target.
      return `
        <div class="card">
          ${book.coverUrl
-           ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">`
+           ? `<img src="${esc(stegaClean(book.coverUrl))}" alt="${esc(stegaClean(book.title))}" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">`
            : `<div style="aspect-ratio:2/3;background:var(--bg-3);margin-bottom:0.75rem;"></div>`}
          <span class="card-label">${esc(book.author || '')}</span>
          <h2 class="card-title">${esc(book.title)}</h2>
          ${book.note ? `<p class="card-body" style="font-size:0.9rem;">${esc(book.note)}</p>` : ''}
          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
-           ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
-           ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
+           ${book.printUrl ? `<a href="${esc(stegaClean(book.printUrl))}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
+           ${book.ebookUrl ? `<a href="${esc(stegaClean(book.ebookUrl))}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
          </div>
        </div>`
    }
@@ -389,13 +398,19 @@
      // box cuts the top/bottom off tall images, so the whole image is shown
      // inside the box instead of cropped to fill it — same fix as the Porch
      // cards use for the same reason.
+     // stegaClean() on the img src/alt and the outbound href — same rule as
+     // the Porch story page and renderBookCard: stega's invisible
+     // edit-metadata characters must never reach an element attribute.
+     // No-op when this card isn't rendering preview (stega-encoded) data.
+     // Visible title/description text stays un-cleaned on purpose — that's
+     // the actual click-to-edit target.
      const imgHtml = thumb
-       ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
+       ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(stegaClean(thumb))}" alt="${esc(stegaClean(video.title))}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
        : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
      const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
      const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
      return `
-       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="${cardClass}" style="display:block;text-decoration:none;">
+       <a href="${esc(stegaClean(video.substackUrl))}" target="_blank" rel="noopener" class="${cardClass}" style="display:block;text-decoration:none;">
          ${imgHtml}
          <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
          <h2 class="${titleClass}">${esc(video.title)}</h2>

@@ -57,7 +57,7 @@
   </footer>
 
   <script type="module">
-    import { fetchEventBySlug, renderPortableText, thumbSrc } from '/js/sanity.js'
+    import { fetchEventBySlug, renderPortableText, thumbSrc, stegaClean } from '/js/sanity.js'
 
     const titleEl = document.getElementById('event-title')
     const metaEl = document.getElementById('event-meta')
@@ -87,42 +87,77 @@
       bodyEl.innerHTML = '<p>We couldn’t find that event. It may have moved.</p>'
     }
 
+    // swg_preview_active is a non-secret hint cookie set by /api/preview —
+    // its only job is telling the page whether to attempt the draft route.
+    // The real credential is a separate HttpOnly cookie this script can't
+    // read; /api/preview-event checks that one server-side. A visitor with
+    // no cookies at all never calls the preview route, so this is additive
+    // to the existing published-only fetch, not a change to it. Same
+    // mechanism as the Porch story page.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchEvent(slug) {
+      if (!isPreviewing()) return fetchEventBySlug(slug)
+      return fetch(`/api/preview-event?slug=${encodeURIComponent(slug)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchEventBySlug(slug))
+    }
+
+    function renderEvent(event) {
+      if (!event) { notFound(); return }
+
+      // document.title and image alt attributes are both places stega's
+      // invisible edit-metadata characters cause real bugs (never let stega
+      // reach <head> or an element attribute) — stegaClean() strips them;
+      // no-op on the non-preview path where event.title was never encoded.
+      // The visible on-page heading (titleEl) is left un-cleaned on
+      // purpose: that's the actual click-to-edit target for the title
+      // field. Same handling as the Porch story page.
+      document.title = `${stegaClean(event.title)} — Events — Southern Writers Guild`
+      titleEl.textContent = event.title
+      metaEl.textContent = [formatDate(event.eventDate), event.timeRange, event.venue].filter(Boolean).join('  ·  ')
+
+      const thumb = thumbSrc(event, 1200)
+      if (thumb) {
+        thumbEl.innerHTML = `<img src="${esc(stegaClean(thumb))}" alt="${esc(stegaClean(event.title))}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
+      }
+
+      if (event.subtitle) {
+        bodyEl.innerHTML += `<p style="font-family:var(--font-serif);font-style:italic;font-size:1.1rem;">${esc(event.subtitle)}</p>`
+      }
+
+      const ticketBits = []
+      if (event.priceInfo) ticketBits.push(`<p>${esc(event.priceInfo)}</p>`)
+      if (event.ticketUrl) ticketBits.push(`<a href="${esc(stegaClean(event.ticketUrl))}" target="_blank" rel="noopener" class="btn btn--primary" style="margin-top:0.5rem;">Get tickets →</a>`)
+      if (ticketBits.length) ticketsEl.innerHTML = ticketBits.join('')
+
+      if (event.body && event.body.length) {
+        bodyEl.innerHTML += renderPortableText(event.body)
+      }
+
+      if (Array.isArray(event.gallery) && event.gallery.length) {
+        galleryEl.innerHTML = event.gallery.map((img, i) => {
+          const src = thumbSrc({ thumbnail: img }, 900)
+          return src ? `<img src="${esc(stegaClean(src))}" alt="${esc(stegaClean(event.title))} — image ${i + 1}">` : ''
+        }).join('')
+      }
+    }
+
+    // The click-to-edit connection itself (enableVisualEditing()) is
+    // bootstrapped from js/nav.js, loaded on every page — see that file
+    // for why. Nothing further is needed here: its DOM scanner picks up
+    // this page's stega-encoded content as soon as renderEvent() renders it.
     if (!slug) {
       notFound()
     } else {
-      fetchEventBySlug(slug)
-        .then(event => {
-          if (!event) { notFound(); return }
-
-          document.title = `${event.title} — Events — Southern Writers Guild`
-          titleEl.textContent = event.title
-          metaEl.textContent = [formatDate(event.eventDate), event.timeRange, event.venue].filter(Boolean).join('  ·  ')
-
-          const thumb = thumbSrc(event, 1200)
-          if (thumb) {
-            thumbEl.innerHTML = `<img src="${esc(thumb)}" alt="${esc(event.title)}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
-          }
-
-          if (event.subtitle) {
-            bodyEl.innerHTML += `<p style="font-family:var(--font-serif);font-style:italic;font-size:1.1rem;">${esc(event.subtitle)}</p>`
-          }
-
-          const ticketBits = []
-          if (event.priceInfo) ticketBits.push(`<p>${esc(event.priceInfo)}</p>`)
-          if (event.ticketUrl) ticketBits.push(`<a href="${esc(event.ticketUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="margin-top:0.5rem;">Get tickets →</a>`)
-          if (ticketBits.length) ticketsEl.innerHTML = ticketBits.join('')
-
-          if (event.body && event.body.length) {
-            bodyEl.innerHTML += renderPortableText(event.body)
-          }
-
-          if (Array.isArray(event.gallery) && event.gallery.length) {
-            galleryEl.innerHTML = event.gallery.map((img, i) => {
-              const src = thumbSrc({ thumbnail: img }, 900)
-              return src ? `<img src="${esc(src)}" alt="${esc(event.title)} — image ${i + 1}">` : ''
-            }).join('')
-          }
-        })
+      fetchEvent(slug)
+        .then(renderEvent)
         .catch(() => {
           titleEl.textContent = 'Event unavailable'
           metaEl.textContent = ''
