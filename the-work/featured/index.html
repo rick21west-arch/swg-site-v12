@@ -48,7 +48,7 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedFiction, renderBookCard, showLoading, showError } from '../../js/sanity.js'
+    import { fetchFeaturedFiction, renderBookCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
     const grid = document.getElementById('featured-fiction-grid')
     const dashedCard = `
       <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
@@ -81,11 +81,24 @@
         .catch(() => fetchFeaturedFiction())
     }
 
+    // renderBookCard() is a shared renderer (js/sanity.js) used by pages
+    // that never preview drafts, so stegaClean() is deliberately not called
+    // inside it — doing that once pulled the stega decode runtime into the
+    // shared bundle chunk every page on the site loads. Instead, only this
+    // page (which actually renders preview/stega-encoded data) cleans the
+    // element attributes stega must never reach (img src/alt, outbound
+    // hrefs) after rendering, on the joined HTML string. No-op when the
+    // data isn't stega-encoded, so this has no effect outside preview mode.
+    function cleanCardAttributes(html) {
+      return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
+    }
+
     showLoading(grid)
     fetchFeaturedFictionView()
       .then(features => {
         if (!features || !features.length) { grid.innerHTML = dashedCard; return }
-        grid.innerHTML = features.map(renderBookCard).join('') + dashedCard
+        const cardsHtml = features.map(renderBookCard).join('')
+        grid.innerHTML = (isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml) + dashedCard
       })
       .catch(() => showError(grid, 'Featured fiction unavailable.'))
   </script>

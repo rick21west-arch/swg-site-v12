@@ -74,7 +74,7 @@
   </footer>
 
   <script type="module">
-    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError } from '../../js/sanity.js'
+    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
 
     const latestGrid = document.getElementById('latest-videos-grid')
     const archiveGrid = document.getElementById('guild-videos-archive-grid')
@@ -117,6 +117,18 @@
       return fetchPreviewVideos('conversations').catch(() => fetchConversations(limit))
     }
 
+    // renderVideoCard() is a shared renderer (js/sanity.js) used by pages
+    // that never preview drafts, so stegaClean() is deliberately not called
+    // inside it — doing that once pulled the stega decode runtime into the
+    // shared bundle chunk every page on the site loads. Instead, only this
+    // page (which actually renders preview/stega-encoded data) cleans the
+    // element attributes stega must never reach (img src/alt, outbound
+    // hrefs) after rendering, on the joined HTML string. No-op when the
+    // data isn't stega-encoded, so this has no effect outside preview mode.
+    function cleanCardAttributes(html) {
+      return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
+    }
+
     showLoading(latestGrid)
     showLoading(archiveGrid)
     showLoading(conversationsGrid)
@@ -126,9 +138,10 @@
         if (!videos || !videos.length) { showError(latestGrid, 'Videos unavailable.'); return [] }
         const [first, ...rest] = videos
         const restHtml = rest.map(v => renderVideoCard(v, 'small')).join('')
-        latestGrid.innerHTML = `
+        const html = `
           ${renderVideoCard(first, 'large')}
           <div style="display:flex;flex-direction:column;gap:1rem;">${restHtml}</div>`
+        latestGrid.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
         return videos
       })
       .catch(() => { showError(latestGrid, 'Videos unavailable.'); return [] })
@@ -139,7 +152,8 @@
         return fetchAllVideosView().then(videos => {
           const archive = (videos || []).filter(v => !latestIds.has(v._id))
           if (!archive.length) { showError(archiveGrid, 'No archived videos yet.'); return }
-          archiveGrid.innerHTML = archive.map(v => renderVideoCard(v, 'large')).join('')
+          const html = archive.map(v => renderVideoCard(v, 'large')).join('')
+          archiveGrid.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
         })
       })
       .catch(() => showError(archiveGrid, 'Videos unavailable.'))
@@ -154,7 +168,8 @@
           conversationsGrid.innerHTML = dashedCard
           return
         }
-        conversationsGrid.innerHTML = conversations.map(v => renderVideoCard(v, 'large')).join('') + dashedCard
+        const html = conversations.map(v => renderVideoCard(v, 'large')).join('')
+        conversationsGrid.innerHTML = (isPreviewing() ? cleanCardAttributes(html) : html) + dashedCard
       })
       .catch(() => showError(conversationsGrid, 'Conversations unavailable.'))
   </script>
