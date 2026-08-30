@@ -177,8 +177,18 @@
         : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
       const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
       const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
+      // data-sanity-edit-target marks this whole card as one click-to-edit
+      // target — Sanity's own first-priority detection method, documented
+      // specifically for a card holding several fields (thumbnail, title,
+      // date, description) in one container. Restored after a diagnostic
+      // pass (2026-08-30) confirmed removing it did NOT change anything:
+      // per-field overlays kept detecting the title/label/description on
+      // their own either way, so the container attribute isn't interfering
+      // with that simpler detection. Kept because it's still a real,
+      // documented improvement on its own merits, not because it was ever
+      // shown to be the cause of anything.
       return `
-        <div class="${cardClass}">
+        <div class="${cardClass}" data-sanity-edit-target="">
           <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" style="display:block;text-decoration:none;">${imgInner}</a>
           <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
           <h2 class="${titleClass}">${esc(video.title)}</h2>
