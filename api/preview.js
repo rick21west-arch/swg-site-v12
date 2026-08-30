@@ -14,15 +14,22 @@ const PORCH_PATH_PATTERN = /^\/the-porch\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const EVENT_PATH_PATTERN = /^\/events\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 // featuredFiction and guildVideo have no slug field and no individual page —
 // every document of either type resolves to one shared listing page, so
-// these are fixed strings rather than a pattern.
-const STATIC_PREVIEW_PATHS = new Set(['/the-work/featured/', '/the-work/videos/']);
+// these are fixed paths rather than a slug pattern. Trailing slash is
+// optional here too, same as every other pattern in this function — an
+// exact-string check (the original version of this) silently rejected
+// whichever form Presentation Tool happened to ask for without one,
+// which meant preview mode never activated for these two pages at all,
+// with no visible error anywhere.
+const FEATURED_PATH_PATTERN = /^\/the-work\/featured\/?$/;
+const VIDEOS_PATH_PATTERN = /^\/the-work\/videos\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
     path === '/' ||
     PORCH_PATH_PATTERN.test(path) ||
     EVENT_PATH_PATTERN.test(path) ||
-    STATIC_PREVIEW_PATHS.has(path)
+    FEATURED_PATH_PATTERN.test(path) ||
+    VIDEOS_PATH_PATTERN.test(path)
   );
 }
 
