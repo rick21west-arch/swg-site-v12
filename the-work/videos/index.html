@@ -177,8 +177,18 @@
         : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
       const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
       const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
+      // data-sanity-edit-target marks this whole card as one click-to-edit
+      // target — Sanity's own first-priority detection method, documented
+      // specifically for a card holding several fields (thumbnail, title,
+      // date, description) in one container. Confirmed directly against
+      // Sanity's current docs before adding this, not assumed: it makes the
+      // overlay system create a single overlay for the whole subtree rather
+      // than relying only on scanning individual stega-tagged text nodes,
+      // which is the likely reason "Documents on this page" comes up empty
+      // for this deeply-nested card shape while the flat Porch story title
+      // works. Plain attribute, no import, no bundle cost.
       return `
-        <div class="${cardClass}">
+        <div class="${cardClass}" data-sanity-edit-target="">
           <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" style="display:block;text-decoration:none;">${imgInner}</a>
           <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
           <h2 class="${titleClass}">${esc(video.title)}</h2>
