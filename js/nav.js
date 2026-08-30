@@ -28,6 +28,32 @@
     return c.indexOf('swg_preview_active=') === 0;
   });
   if (isPreviewing) {
+    // Belt and suspenders, site-wide: while previewing, nothing should be
+    // able to navigate an editor away to an outside site — not just the
+    // specific cards this has been patched on already, but anything with a
+    // real external href (a "Buy print" button, a ticket link, a "Read on
+    // Substack" fallback, a future card nobody's thought to check yet).
+    // Sanity's own overlay is supposed to catch clicks on the fields it
+    // knows about and route them to Studio instead; this catches
+    // everything else, in the capture phase, before a normal link click
+    // ever gets the chance to leave the page. Cross-origin only — internal
+    // links (the nav, "back to Events") still work normally so an editor
+    // can browse the rest of the site while previewing.
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      var url;
+      try {
+        url = new URL(a.href, location.href);
+      } catch (err) {
+        return;
+      }
+      if (url.origin !== location.origin) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
     var link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = '/assets/visual-editing-bootstrap.css';
