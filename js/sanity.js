@@ -420,7 +420,12 @@
     
    /* ── Utilities ─────────────────────────────────────────────── */
     
-   function esc(str) {
+   // Exported (not just used internally) so a page can build its own
+   // preview-only card markup with the same escaping/date formatting —
+   // see the-work/videos/index.html's renderVideoCardPreview. Pure
+   // functions already defined in this file either way, so exporting them
+   // adds no bundle weight.
+   export function esc(str) {
      if (!str) return ''
      return String(str)
        .replace(/&/g, '&amp;')
@@ -428,8 +433,8 @@
        .replace(/>/g, '&gt;')
        .replace(/"/g, '&quot;')
    }
-    
-   function formatDate(dateStr) {
+
+   export function formatDate(dateStr) {
      if (!dateStr) return ''
      const d = new Date(dateStr + 'T12:00:00Z')
      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
