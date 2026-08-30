@@ -181,7 +181,9 @@
       // Fiction, which never had it, was confirmed working end to end by a
       // real click; Guild Video, the only type that had it, was the only
       // one still failing. Matching Featured Fiction's setup exactly: plain
-      // per-field detection only, no container-level target.
+      // per-field detection only, no container-level target. (redeploy
+      // marker: forcing a fresh build after production kept serving a
+      // stale cached copy of the prior deploy for over an hour.)
       return `
         <div class="${cardClass}">
           <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" style="display:block;text-decoration:none;">${imgInner}</a>
