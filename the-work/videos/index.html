@@ -142,6 +142,24 @@
     // never wrapped their title in a link to begin with. Only used when
     // isPreviewing() — a normal visitor still gets the original
     // whole-card-is-a-link renderVideoCard(), unchanged.
+    // Stega only encodes text — an <img> has nothing for it to tag, so the
+    // thumbnail was never a click-to-edit target regardless of anything
+    // else on this page (confirmed directly: it carries no data-sanity
+    // attribute, and Sanity's own docs are explicit that images need one).
+    // This builds that attribute by hand, in the exact semicolon-delimited
+    // format Sanity's docs specify, rather than importing
+    // createDataAttribute() from @sanity/visual-editing — pulling in that
+    // import here would bundle it into this page's always-loaded chunk for
+    // every visitor, not just previewing ones, the same mistake already
+    // made and reverted once this session with stegaClean(). A plain
+    // string template produces the identical output with no new
+    // dependency and no bundle cost.
+    function thumbnailDataSanityAttr(video) {
+      if (!video._id) return ''
+      const base = encodeURIComponent('https://swg-studio.sanity.studio')
+      return `id=${video._id};type=guildVideo;path=thumbnail;base=${base}`
+    }
+
     function renderVideoCardPreview(video, size = 'large') {
       const thumb = thumbSrcSafe(video)
       const btnSize = size === 'large' ? 56 : 38
@@ -155,7 +173,7 @@
           </div>
         </div>`
       const imgInner = thumb
-        ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
+        ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" data-sanity="${esc(thumbnailDataSanityAttr(video))}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
         : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
       const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
       const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
