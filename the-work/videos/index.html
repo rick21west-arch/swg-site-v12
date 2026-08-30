@@ -225,6 +225,30 @@
       })
       .catch(() => { showError(latestGrid, 'Videos unavailable.'); return [] })
 
+    // TEMPORARY — structure isolation test, remove after checking Presentation
+    // Tool. Renders one real video's title in the exact same flat shape the
+    // confirmed-working Porch story title uses (h1, inside one plain div,
+    // inside one section, inside body — no card, no siblings, nothing else
+    // sharing its container) to test whether depth/crowding, not the data
+    // itself, is why "Documents on this page" comes up empty for Guild
+    // Video. Gated on isPreviewing() — a normal visitor never runs this.
+    if (isPreviewing()) {
+      latestPromise.then(videos => {
+        if (!videos || !videos[0]) return
+        const footer = document.querySelector('footer.site-footer')
+        const label = document.createElement('p')
+        label.textContent = 'TEMPORARY STRUCTURE TEST — safe to ignore, will be removed'
+        label.style.cssText = 'background:#b85c38;color:#fff;padding:0.5rem 1rem;font-family:sans-serif;font-size:0.8rem;margin:0;'
+        const testSection = document.createElement('section')
+        testSection.className = 'hero'
+        testSection.id = 'structure-test-block'
+        testSection.innerHTML = '<div class="container"><h1 id="structure-test-title" class="hero-headline"></h1></div>'
+        document.body.insertBefore(label, footer)
+        document.body.insertBefore(testSection, footer)
+        document.getElementById('structure-test-title').textContent = videos[0].title
+      })
+    }
+
     latestPromise
       .then(latestVideos => {
         const latestIds = new Set(latestVideos.map(v => v._id))
