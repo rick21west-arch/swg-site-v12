@@ -74,7 +74,7 @@
   </footer>
 
   <script type="module">
-    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError, stegaClean, esc, formatDate } from '../../js/sanity.js'
+    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
 
     const latestGrid = document.getElementById('latest-videos-grid')
     const archiveGrid = document.getElementById('guild-videos-archive-grid')
@@ -129,92 +129,9 @@
       return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
     }
 
-    // Preview-only alternative to renderVideoCard(): the shared renderer
-    // wraps the WHOLE card, title included, in a real <a> to the video —
-    // fine for a normal visitor, but it means a click meant for Sanity's
-    // click-to-edit overlay on the title falls straight through to that
-    // link instead (confirmed directly: the click reaches the title
-    // element, not the overlay, so the real link underneath wins and
-    // navigates to YouTube). This variant keeps the exact same look but
-    // moves the real link onto just the thumbnail and the "Watch" line,
-    // leaving the title a bare heading with nothing to fall through to —
-    // same fix already true of the Porch story and event pages, which
-    // never wrapped their title in a link to begin with. Only used when
-    // isPreviewing() — a normal visitor still gets the original
-    // whole-card-is-a-link renderVideoCard(), unchanged.
-    // Stega only encodes text — an <img> has nothing for it to tag, so the
-    // thumbnail was never a click-to-edit target regardless of anything
-    // else on this page (confirmed directly: it carries no data-sanity
-    // attribute, and Sanity's own docs are explicit that images need one).
-    // This builds that attribute by hand, in the exact semicolon-delimited
-    // format Sanity's docs specify, rather than importing
-    // createDataAttribute() from @sanity/visual-editing — pulling in that
-    // import here would bundle it into this page's always-loaded chunk for
-    // every visitor, not just previewing ones, the same mistake already
-    // made and reverted once this session with stegaClean(). A plain
-    // string template produces the identical output with no new
-    // dependency and no bundle cost.
-    function thumbnailDataSanityAttr(video) {
-      if (!video._id) return ''
-      const base = encodeURIComponent('https://swg-studio.sanity.studio')
-      return `id=${video._id};type=guildVideo;path=thumbnail;base=${base}`
-    }
-
-    function renderVideoCardPreview(video, size = 'large') {
-      const thumb = thumbSrcSafe(video)
-      const btnSize = size === 'large' ? 56 : 38
-      const borderTop = size === 'large' ? 11 : 8
-      const borderSide = size === 'large' ? 20 : 14
-      const ml = size === 'large' ? 4 : 3
-      const playBtn = `
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <div style="width:${btnSize}px;height:${btnSize}px;border-radius:50%;background:rgba(184,92,56,0.9);display:flex;align-items:center;justify-content:center;">
-            <div style="width:0;height:0;border-top:${borderTop}px solid transparent;border-bottom:${borderTop}px solid transparent;border-left:${borderSide}px solid #EDE5D0;margin-left:${ml}px;"></div>
-          </div>
-        </div>`
-      const imgInner = thumb
-        ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" data-sanity="${esc(thumbnailDataSanityAttr(video))}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
-        : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
-      const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
-      const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
-      // data-sanity-edit-target removed for good (2026-08-30) — Featured
-      // Fiction, which never had it, was confirmed working end to end by a
-      // real click; Guild Video, the only type that had it, was the only
-      // one still failing. Matching Featured Fiction's setup exactly: plain
-      // per-field detection only, no container-level target. (redeploy
-      // marker: forcing a fresh build after production kept serving a
-      // stale cached copy of the prior deploy for over an hour.)
-      return `
-        <div class="${cardClass}">
-          <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" style="display:block;text-decoration:none;">${imgInner}</a>
-          <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
-          <h2 class="${titleClass}">${esc(video.title)}</h2>
-          ${video.description ? `<p class="card-body">${esc(video.description)}</p>` : ''}
-          <p class="card-note" style="margin-top:0.5rem;"><a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${video.duration ? video.duration + ' &nbsp;·&nbsp; ' : ''}Watch →</a></p>
-        </div>`
-    }
-
-    // thumbSrc() (js/sanity.js) isn't exported — only renderVideoCard()
-    // calls it today. Re-derive the same thumbnail logic here rather than
-    // exporting it just for this one preview-only path.
-    function thumbSrcSafe(doc) {
-      if (doc.thumbnail?.asset?._ref) {
-        const ref = doc.thumbnail.asset._ref
-        const parts = ref.replace('image-', '').split('-')
-        const ext = parts.pop()
-        const id = parts.join('-')
-        return `https://cdn.sanity.io/images/fe6l0kiy/production/${id}.${ext}?w=800&auto=format`
-      }
-      if (doc.thumbnailUrl) return doc.thumbnailUrl
-      const yt = (doc.substackUrl || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/)
-      if (yt) return `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg`
-      return null
-    }
-
-    function renderVideos(video, size) {
-      return isPreviewing() ? renderVideoCardPreview(video, size) : renderVideoCard(video, size)
-    }
-
+    // One renderer, used identically whether previewing or not — see the
+    // comment on renderVideoCard() itself (js/sanity.js) for why the
+    // separate preview-only variant that used to live here is gone.
     showLoading(latestGrid)
     showLoading(archiveGrid)
     showLoading(conversationsGrid)
@@ -223,9 +140,9 @@
       .then(videos => {
         if (!videos || !videos.length) { showError(latestGrid, 'Videos unavailable.'); return [] }
         const [first, ...rest] = videos
-        const restHtml = rest.map(v => renderVideos(v, 'small')).join('')
+        const restHtml = rest.map(v => renderVideoCard(v, 'small')).join('')
         const html = `
-          ${renderVideos(first, 'large')}
+          ${renderVideoCard(first, 'large')}
           <div style="display:flex;flex-direction:column;gap:1rem;">${restHtml}</div>`
         latestGrid.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
         return videos
@@ -238,7 +155,7 @@
         return fetchAllVideosView().then(videos => {
           const archive = (videos || []).filter(v => !latestIds.has(v._id))
           if (!archive.length) { showError(archiveGrid, 'No archived videos yet.'); return }
-          const html = archive.map(v => renderVideos(v, 'large')).join('')
+          const html = archive.map(v => renderVideoCard(v, 'large')).join('')
           archiveGrid.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
         })
       })
@@ -254,7 +171,7 @@
           conversationsGrid.innerHTML = dashedCard
           return
         }
-        const html = conversations.map(v => renderVideos(v, 'large')).join('')
+        const html = conversations.map(v => renderVideoCard(v, 'large')).join('')
         conversationsGrid.innerHTML = (isPreviewing() ? cleanCardAttributes(html) : html) + dashedCard
       })
       .catch(() => showError(conversationsGrid, 'Conversations unavailable.'))

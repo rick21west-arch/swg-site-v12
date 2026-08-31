@@ -386,6 +386,33 @@
        </div>`
    }
 
+   // Images carry no stega — text is tagged automatically by the query
+   // pipeline, but an <img> needs this built by hand, in the exact
+   // semicolon-delimited format Sanity's own docs specify, or it's never a
+   // click-to-edit target at all (confirmed directly, independent of
+   // everything else about this card: img.hasAttribute('data-sanity') was
+   // false before this existed). Ships on every visitor's page, previewing
+   // or not — inert to a normal browser, meaningful only to Sanity's own
+   // overlay scanner. A plain string template rather than importing
+   // createDataAttribute() from @sanity/visual-editing, which would bundle
+   // that package into this always-loaded shared chunk for every visitor.
+   function thumbnailDataAttr(doc, type) {
+     if (!doc._id) return ''
+     const base = encodeURIComponent('https://swg-studio.sanity.studio')
+     return `id=${doc._id};type=${type};path=thumbnail;base=${base}`
+   }
+
+   // Structured the same way renderBookCard is, deliberately: a plain
+   // div.card, an unlinked image, a bare heading, and the actual action
+   // (Watch, here; Buy print / Ebook there) as its own small link at the
+   // bottom — never the whole card, never the title, wrapped in a link.
+   // renderBookCard is the one card renderer already confirmed end-to-end
+   // by a real click in Presentation Tool; this mirrors its shape field
+   // for field rather than reproducing the old whole-card-is-a-link
+   // design this file used to have (and the divergent preview-only variant
+   // that grew up next to it in the-work/videos/index.html to work around
+   // that design) — one function, used identically whether previewing or
+   // not, same as featured fiction.
    export function renderVideoCard(video, size = 'large') {
      const thumb = thumbSrc(video)
      const btnSize = size === 'large' ? 56 : 38
@@ -393,7 +420,7 @@
      const borderSide = size === 'large' ? 20 : 14
      const ml = size === 'large' ? 4 : 3
      const playBtn = `
-       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
          <div style="width:${btnSize}px;height:${btnSize}px;border-radius:50%;background:rgba(184,92,56,0.9);display:flex;align-items:center;justify-content:center;">
            <div style="width:0;height:0;border-top:${borderTop}px solid transparent;border-bottom:${borderTop}px solid transparent;border-left:${borderSide}px solid #EDE5D0;margin-left:${ml}px;"></div>
          </div>
@@ -404,18 +431,20 @@
      // inside the box instead of cropped to fill it — same fix as the Porch
      // cards use for the same reason.
      const imgHtml = thumb
-       ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
+       ? `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);overflow:hidden;"><img src="${esc(thumb)}" alt="${esc(video.title)}" data-sanity="${esc(thumbnailDataAttr(video, 'guildVideo'))}" style="width:100%;height:100%;object-fit:contain;display:block;">${playBtn}</div>`
        : `<div style="position:relative;margin-bottom:0.75rem;aspect-ratio:16/9;background:var(--bg-3);display:flex;align-items:center;justify-content:center;">${playBtn}</div>`
      const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
      const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
      return `
-       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="${cardClass}" style="display:block;text-decoration:none;">
+       <div class="${cardClass}">
          ${imgHtml}
          <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
          <h2 class="${titleClass}">${esc(video.title)}</h2>
          ${video.description ? `<p class="card-body">${esc(video.description)}</p>` : ''}
-         <p class="card-note" style="margin-top:0.5rem;">${video.duration ? video.duration + ' &nbsp;·&nbsp; ' : ''}Watch →</p>
-       </a>`
+         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+           <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">${video.duration ? esc(video.duration) + ' &nbsp;·&nbsp; ' : ''}Watch →</a>
+         </div>
+       </div>`
    }
     
    /* ── Utilities ─────────────────────────────────────────────── */
