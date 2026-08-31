@@ -6,6 +6,30 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-08-31 (4) — Isolated individual-page test built for Guild Video, deployed for real-click testing
+
+Not another diagnostic pass — a genuine, isolated new page, built to test whether an individual-page architecture (already proven working for Porch stories and Events) succeeds where the shared Guild Video listing page has been failing all night. Nothing about the existing videos page, its rendering, or the other 11 videos was touched — confirmed directly: the source diff on `js/sanity.js` is purely additive (one new function), and a full local-build comparison against a pre-change baseline showed only two new files added (the new page and its own JS chunk) with every existing page's built output logically identical, down to a byte-level diff (the only differences were cosmetic minifier variable-letter reassignments, an expected side effect of the shared module gaining one more export).
+
+What was built: one video document ("Rick Chats With Harriet and Joe") given an optional slug field and published. A new, single-fetch individual page now lives at `/the-work/videos/rick-chats-with-harriet-and-joe/` (only reachable by direct URL — not linked from anywhere on the site yet), modeled directly on the already-working Porch story page: one request for the whole document, title/date/participants/description/Watch button, same preview-cookie/draft-fetch pattern, same click-to-edit bootstrap every page already has. Studio's resolver config was updated to match — a new slug-conditional route added alongside the existing unconditional Guild Video listing-page entry, so the other 11 videos (no slug) are unaffected and still resolve only to the shared list page. Studio app deployed; live manifest timestamp confirmed fresh, not cached.
+
+**Open:** the new page has not yet been tested in Presentation Tool. That's the actual point of having built it — first confirm it loads correctly with real content on live production, then test whether its title registers a real click the way Porch stories and Events do, where the shared listing page has not.
+
+## 2026-08-31 (3) — Sanity support engaged; three theories tested, one thread still genuinely open
+
+Sanity support engaged directly, three theories proposed and tested against evidence: resolver-returns-empty, stega-filter-exclusion, and separate-fetch-path — all three either disproven by existing evidence or found to describe a page (/the-work) that was never actually where testing happened. Real answer confirmed via a fresh, isolated byte-level check: zero stega markers in the raw HTML shell — expected and non-diagnostic, since this site has no server-side rendering anywhere; confirmed the same architecture applies site-wide, ruling out a bypassed-fetch-path theory for Guild Video specifically. One genuine, still-open thread, never fully closed: whether guildVideo's preview fetch and featuredFiction's preview fetch use the identical stega-enabled Sanity client instance, or two different ones. This exact comparison was requested once tonight but never completed before other priorities intervened. Video links: fixed, live, confirmed. MJ/Grace: full real access via direct Sanity editing, confirmed working. Click-to-edit shortcut: still the only open gap.
+
+## 2026-08-31 (2) — Guild Video click-to-edit still unresolved
+
+New finding: failure confirmed on a type:'guild' document (Porch Tales - Volume 1), not just type:'conversation' — rules out value-specific collision, points to the field itself if the type-field theory holds at all. That theory remains contradicted by two earlier direct tests (official decoder, isolated scan function both resolved this exact field correctly). Two threads open with Sanity support: postMessage monitoring (not yet run — needs Rick's browser), and this type-value comparison (now answered: uniform failure). Video links: fixed, confirmed live. MJ/Grace: full working access via direct document editing, confirmed. Only the one-click shortcut from the live page remains broken.
+
+## 2026-08-31 — Stale deploy resolved; Guild Video's data-sanity-edit-target fix confirmed actually live
+
+The "force fresh deploy" commit referenced in the entry below had been written but was sitting unpushed on the local machine — the underlying removal fix (`b615f8c`) had, in fact, already reached GitHub, but production was still serving a build from before it. Pushed the pending commit. Confirmed the result directly against production, not by inference: pulled the live JavaScript bundle the site actually serves (not the source file) both before and after. Before the push it was `the-work_videos_index-DokLsLJi.js` and still contained `data-sanity-edit-target`. After the push and a short wait for Vercel to rebuild, the live site began serving a differently-named bundle, `the-work_videos_index-C_aZqyLR.js`, pulled and searched directly — zero instances of `data-sanity-edit-target` remain. Confirmed the normal per-field `data-sanity` markers are still present in the same file, so Guild Video's editability wasn't wiped along with the container attribute. Production is now genuinely running the fixed version. Next real test is Rick's own click in Presentation Tool on the Guild Video card.
+
+## 2026-08-30/31 — Events and Featured Fiction confirmed working; Guild Video's fix written but stuck behind a stale production deploy
+
+Extended click-to-edit to Events, Featured Fiction, and Guild Video. Events and Featured Fiction confirmed fully working by Rick's own real click in Presentation Tool. Guild Video still not completing the click — extensive investigation ruled out: scroll timing, tag fragmentation, resolver/mainDocuments mismatch, outdated package versions, and connection/heartbeat issues, all individually checked and closed. Strongest remaining lead, not yet tested live: Guild Video has a `data-sanity-edit-target` container attribute that Featured Fiction (which works) does not — removing it, to match Featured Fiction's proven setup, is the pending fix. That fix was written but never pushed due to a network issue on Claude Code's end. Interviews has no preview-mode code at all yet — separate, smaller, not-yet-started task, not the same bug as Guild Video.
+
 ## 2026-08-30 (5) — A disciplined staged-debugging rule, a real structural finding, and one confirmed fix
 
 Rick added a standing rule to `CLAUDE.md` this session (under Communication rules): before touching code on anything with multiple real stages, write out the intended chain in order and test each stage in that order, stopping at the first actual failure — don't jump to the next plausible cause. Prompted directly by this thread: several fixes landed in a row (trailing-slash validation, a card restructure, a mainDocuments revert-then-restore) without the underlying "why doesn't Guild Video's overlay register" question ever actually closing.
@@ -168,6 +192,25 @@ Step 0 partially cleared: LLC formed and confirmed real; business bank account s
 Step 0 (LLC + bank account) confirmed cleared by Rick. Step 4 (founder email identities) confirmed not yet in place — this is now the live prerequisite before any real Creator Workstation build, since its "your account" tiles are literally these accounts. — Correction, same day: this entry overstated Step 0 as fully cleared. See the "2026-08-28 (2)" entry above for the accurate status: LLC formed and confirmed, business bank account still under evaluation, not final.
 
 ---
+
+## 2026-08-30 (2)
+
+Ruled out stale software as the cause of Guild Video/Featured Fiction's "No matching documents" problem — checked directly, not assumed, per Rick's explicit request.
+
+Site side (`swg-site`): `@sanity/client`, `@sanity/visual-editing`, `@sanity/comlink`, `@sanity/presentation-comlink` — all at the latest version available on npm, no gap.
+
+Studio side (`southern-writers-guild`): `sanity.cli.js` has `autoUpdates: true`, which means the version pinned in `package.json` (5.23.0) is not what's actually served — the deployed Studio resolves its real version dynamically from Sanity's own CDN at request time, constrained only by the semver range. Confirmed this empirically, not from documentation alone: fetched the deployed Studio's real HTML and import map, followed the resolved module URL, and read the `x-resolved-version` response header directly — the live, actually-running version is **5.31.1**, roughly 8 minor versions ahead of the pinned 5.23.0, not behind it.
+
+Pulled the real `packages/sanity/CHANGELOG.md` from `sanity-io/sanity` on GitHub (not doc-site slug guessing, which mostly failed) and grepped the exact range between 5.23.0 and 5.31.2 for anything presentation/overlay/comlink-related. Two hits looked plausible; pulled the full PR text for both rather than trusting the one-line summary:
+
+- `fix(presentation): ChildLink now renders missing docs` (#12958) — fixes the *incoming references* inspector panel specifically, unrelated to the "Documents on this page" panel.
+- `fix(presentation): handle null client.fetch results in PostMessageSchema` (#12904) — fixes a crash when a document doesn't exist at all on the active perspective; our documents exist and render correctly, so this doesn't match either.
+
+Also checked `@sanity/presentation-comlink` specifically (a more specific package than generic `@sanity/comlink`, called out in the same changelog range): site is at 2.2.3 (npm latest), Studio's local `node_modules` has 2.0.1 — a real gap, but moot for the same `autoUpdates` reason above; the deployed Studio doesn't run from local `node_modules`.
+
+Confirmed `js/visual-editing-bootstrap.js`'s call to `enableVisualEditing({ history })` matches the installed `@sanity/visual-editing@6.1.1` type definitions exactly — no API mismatch.
+
+**Conclusion:** stale/mismatched software is ruled out as the cause. The "No matching documents" problem is real and still open — the two live leads remain the DOM-nesting-depth difference between working and non-working pages (found earlier), and the cross-origin-blocked Comlink channel that couldn't be inspected directly. Confirming whether Guild Video/Featured Fiction titles actually jump into Studio still needs a real human click inside an authenticated Presentation Tool session — already established as untestable by automation (the `window.open` control test proved that approach can't tell a working page from a broken one).
 
 ## 2026-08-19 — Session close-out
 

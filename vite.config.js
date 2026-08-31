@@ -34,6 +34,7 @@ const pages = [
   'the-work/opera-rose/index.html',
   'the-work/ugly-duckling/index.html',
   'the-work/videos/index.html',
+  'the-work/videos/video/index.html',
   'welcome/index.html',
   'writers/index.html',
   'writers/beau/index.html',

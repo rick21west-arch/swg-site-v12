@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video — Southern Writers Guild</title>
+  <link rel="stylesheet" href="/css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="/assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/" class="active">The Work</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-sm);">
+    <div class="container" style="max-width:var(--content-w);">
+      <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Videos</span>
+      <h1 id="video-title" class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.6rem);">Loading…</h1>
+      <p id="video-meta" class="hero-sub" style="font-family:var(--font-ui);font-size:0.8rem;letter-spacing:0.04em;"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:var(--content-w);">
+      <div id="video-thumb"></div>
+      <div id="video-description" class="prose"></div>
+      <div id="video-watch"></div>
+      <p style="margin-top:var(--sp-lg);">
+        <a href="/the-work/videos/" style="font-size:14px;color:var(--accent);letter-spacing:0.12em;text-decoration:none;text-transform:uppercase;">← Back to Videos</a>
+      </p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchVideoBySlug, thumbSrc, stegaClean, esc } from '/js/sanity.js'
+
+    const titleEl = document.getElementById('video-title')
+    const metaEl = document.getElementById('video-meta')
+    const thumbEl = document.getElementById('video-thumb')
+    const descriptionEl = document.getElementById('video-description')
+    const watchEl = document.getElementById('video-watch')
+
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const slug = parts[parts.length - 1]
+
+    function formatDate(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr + 'T12:00:00Z')
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    }
+
+    function notFound() {
+      titleEl.textContent = 'Video not found'
+      metaEl.textContent = ''
+      descriptionEl.innerHTML = '<p>We couldn’t find that video. It may have moved.</p>'
+    }
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation. Isolated here
+    // to its own single endpoint (api/preview-video.js), not the
+    // three-section listing page's api/preview-videos.js.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchVideo(slug) {
+      if (!isPreviewing()) return fetchVideoBySlug(slug)
+      return fetch(`/api/preview-video?slug=${encodeURIComponent(slug)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchVideoBySlug(slug))
+    }
+
+    function renderVideo(video) {
+      if (!video) { notFound(); return }
+
+      // document.title is a place stega's invisible characters cause real
+      // bugs (never let stega reach <head>) — stegaClean() strips them,
+      // a no-op outside preview mode. The visible heading (titleEl) is
+      // left un-cleaned on purpose: that's the actual click-to-edit target.
+      document.title = `${stegaClean(video.title)} — The Work — Southern Writers Guild`
+      titleEl.textContent = video.title
+      metaEl.textContent = [formatDate(video.publishedAt), video.participants].filter(Boolean).join('  ·  ')
+
+      const thumb = thumbSrc(video, 1200)
+      if (thumb) {
+        thumbEl.innerHTML = `<img src="${esc(stegaClean(thumb))}" alt="${esc(stegaClean(video.title))}" style="width:100%;height:auto;display:block;margin:var(--sp-md) 0;">`
+      }
+
+      if (video.description) {
+        descriptionEl.innerHTML = `<p>${esc(video.description)}</p>`
+      }
+
+      if (video.substackUrl) {
+        watchEl.innerHTML = `<p style="margin-top:var(--sp-md);"><a href="${esc(stegaClean(video.substackUrl))}" target="_blank" rel="noopener" class="btn btn--primary">${video.duration ? esc(video.duration) + '  ·  ' : ''}Watch →</a></p>`
+      }
+    }
+
+    function loadVideo(slug) {
+      return fetchVideo(slug)
+        .then(renderVideo)
+        .catch(() => {
+          titleEl.textContent = 'Video unavailable'
+          metaEl.textContent = ''
+          descriptionEl.innerHTML = '<p>Something went wrong loading this video.</p>'
+        })
+    }
+
+    // Click-to-edit itself (enableVisualEditing()) is bootstrapped from
+    // js/nav.js, loaded on every page — nothing further needed here.
+    if (!slug) {
+      notFound()
+    } else {
+      loadVideo(slug)
+    }
+  </script>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>

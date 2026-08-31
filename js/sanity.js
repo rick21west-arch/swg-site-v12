@@ -329,7 +329,20 @@
       `*[_type == "guildVideo" && type == "conversation"] | order(publishedAt desc) [0...${limit}]`
     )
   }
-  
+
+   // Isolated test of a single-document, single-fetch individual page for
+   // guildVideo — same pattern as fetchPorchStoryBySlug/fetchEventBySlug
+   // above, deliberately not touched by or wired into the existing
+   // three-section listing page (the-work/videos/index.html) or
+   // renderVideoCard. Only documents with a slug set resolve here; the
+   // other 11 videos have none and are unaffected.
+   export async function fetchVideoBySlug(slug) {
+     const safe = String(slug).replace(/"/g, '\\"')
+     return sanityFetch(
+       `*[_type == "guildVideo" && slug.current == "${safe}"][0]`
+     )
+   }
+
   /* ── Card renderers ─────────────────────────────────────────── /* ── Card renderers ─────────────────────────────────────────── */
     
    export function renderPorchCard(story) {
