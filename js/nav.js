@@ -27,7 +27,20 @@
   var isPreviewing = document.cookie.split('; ').some(function (c) {
     return c.indexOf('swg_preview_active=') === 0;
   });
-  if (isPreviewing) {
+  // The cookie alone isn't enough to gate this: it's a 1-hour hint cookie
+  // that outlives the actual Presentation Tool session, so an editor (or
+  // anyone testing Presentation Tool) who then opens the real site as a
+  // normal top-level visit within that hour still carries it — and every
+  // outbound link on the site (Watch, Buy print, everything) went silently
+  // dead for them, with zero visible feedback, confirmed live in
+  // production 2026-08-31. window.self !== window.top is true only when
+  // this page is actually embedded — which is the one and only context
+  // this protection means anything in: Presentation Tool always loads the
+  // site in an iframe (see the-work/videos/index.html's isPreviewing()
+  // comment), so a real top-level tab was never the thing being protected
+  // against, cookie or no cookie.
+  var isEmbedded = window.self !== window.top;
+  if (isPreviewing && isEmbedded) {
     // Belt and suspenders, site-wide: while previewing, nothing should be
     // able to navigate an editor away to an outside site — not just the
     // specific cards this has been patched on already, but anything with a
