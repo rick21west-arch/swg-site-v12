@@ -29,109 +29,10 @@
 
       <span class="section-eyebrow">How to Submit</span>
       <h1>We read everything.<br>We publish selectively.</h1>
-      <p>Those two sentences can coexist.</p>
 
-      <p>
-        The Southern Writers Guild exists to cultivate work with presence, texture, and a point of
-        view that can stand on its own feet without shouting. We welcome submissions across forms
-        and styles, but we curate with intention. Ruthlessly, when needed. Lovingly, when earned.
-      </p>
-
-      <hr>
-
-      <h2>What we're looking for</h2>
-      <p>We are interested in excellent work, full stop. That includes — but is not limited to:</p>
-      <ul>
-        <li>Essays — personal, cultural, reflective, lyrical</li>
-        <li>Fiction — short stories, excerpts, strange hybrids</li>
-        <li>Poetry — tight, loose, or feral, but deliberate</li>
-        <li>Criticism and commentary — thoughtful, grounded, alive</li>
-        <li>Work that resists easy categorization but knows what it's doing</li>
-      </ul>
-      <p>
-        We're less interested in trends, clout, or hot takes.
-        We're more interested in voice, coherence, and attention.
-        If your piece feels like it had to be written, we want to see it.
-      </p>
-
-      <hr>
-
-      <h2>What we are not looking for</h2>
-      <p>Let's save each other some time.</p>
-      <ul>
-        <li><strong>Agenda-driven work.</strong> We have no truck with manifestos, party lines, or recruitment efforts of any kind.</li>
-        <li><strong>Divisive writing.</strong> Controversy is welcome. Division is not. If the piece relies on flattening, scapegoating, or antagonizing entire groups, it's a no.</li>
-        <li><strong>Performative outrage or moral posturing.</strong> If the work's primary fuel is indignation, it probably won't survive our editorial table.</li>
-        <li><strong>Work that hasn't been finished thinking.</strong> Drafts are fine. Half-formed arguments masquerading as certainty are not.</li>
-      </ul>
-      <p>This isn't about politeness. It's about depth.</p>
-
-      <hr>
-
-      <h2>Our editorial process</h2>
-      <p>
-        All submissions are reviewed by the Editorial Board. At present, the board consists of the
-        three founding members of the Southern Writers Guild. Over time, this board may grow or
-        change as the Guild evolves.
-      </p>
-      <p>Decisions are made collaboratively, with an eye toward:</p>
-      <ul>
-        <li>Craft</li>
-        <li>Voice</li>
-        <li>Resonance with the Guild's ethos</li>
-        <li>How the piece fits into the larger body of work we're curating</li>
-      </ul>
-      <p>We do not publish by quota, trend, or pressure. We publish what holds up.</p>
-
-      <hr>
-
-      <h2>A note on curation</h2>
-      <p>
-        We curate carefully because we intend to protect the integrity of the space.
-        This is not a stream. It's a place.
-      </p>
-      <p>
-        Every piece we publish shapes the tone, temperature, and trust of the Guild.
-        That means acceptance rates may be low — not because we enjoy saying no,
-        but because saying yes carries weight here.
-      </p>
-
-      <blockquote>
-        Rejection is not a referendum on your worth.
-        It's a reflection of fit, timing, and cohesion.
-      </blockquote>
-
-      <hr>
-
-      <h2>How to submit</h2>
-      <ul>
-        <li>Submit one piece at a time unless otherwise noted.</li>
-        <li>Include a brief cover note if you like. Keep it human.</li>
-        <li>Previously published work should be clearly labeled.</li>
-        <li>Simultaneous submissions are fine — just let us know if it's accepted elsewhere.</li>
-      </ul>
-
-      <div class="sk-section" style="min-height:120px;margin:var(--sp-md) 0;">
-        [ Submission form — to be integrated ]<br>
-        Options: Submittable / Google Form / direct email<br>
-        Decision pending among founding members
+      <div id="guidelines-body">
+        <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
       </div>
-
-      <p>
-        We aim to respond thoughtfully, not instantly.
-        Silence does not mean indifference. It means reading takes time.
-      </p>
-
-      <hr>
-
-      <p>
-        The Southern Writers Guild is for writers — and readers — who value attention over
-        acceleration, clarity over noise, and work that can sit quietly in a room and still be felt.
-      </p>
-      <p>
-        If that sounds like your kind of trouble, send the work.<br>
-        We'll be here.
-      </p>
 
     </div>
   </section>
@@ -142,6 +43,40 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchHouseContent, renderPortableText } from '../../js/sanity.js'
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchHouse() {
+      if (!isPreviewing()) return fetchHouseContent()
+      return fetch('/api/preview-house')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchHouseContent())
+    }
+
+    const bodyEl = document.getElementById('guidelines-body')
+
+    fetchHouse()
+      .then(house => {
+        if (!house || !house.submissionGuidelines || !house.submissionGuidelines.length) {
+          throw new Error('No guidelines content')
+        }
+        bodyEl.innerHTML = renderPortableText(house.submissionGuidelines)
+      })
+      .catch(() => {
+        bodyEl.innerHTML = '<p style="color:var(--text-faint);font-size:0.85rem;">Content unavailable.</p>'
+      })
+  </script>
 
   <script src="../../js/nav.js"></script>
 </body>

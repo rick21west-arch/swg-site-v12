@@ -225,6 +225,17 @@
      )
    }
 
+   /* ── House Content ──────────────────────────────────────────── */
+   /* Singleton, same convention as siteSettings — one document feeds two
+      pages (The House, its Submission Guidelines page), each pulling only
+      the fields it needs from the same fetch. */
+
+   export async function fetchHouseContent() {
+     return sanityFetch(
+       `*[_type == "houseContent"][0]`
+     )
+   }
+
    /* ── Writers ────────────────────────────────────────────────── */
    /* Every writer document, in Studio-set display order — not four fixed
       slots, so a fifth entry (real writer or character-only, like

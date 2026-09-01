@@ -57,14 +57,16 @@
       opacity: 0.55;
       margin-top: 9px;
     }
-    .belief-body {
+    .belief-body { margin-top: 18px; }
+    .belief-body p {
       font-family: var(--serif, 'Cormorant Garamond', Georgia, serif);
       font-size: 0.9rem;
       font-weight: 400;
       color: var(--text-muted);
       line-height: 1.75;
-      margin-top: 18px;
+      margin-bottom: 14px;
     }
+    .belief-body p:last-child { margin-bottom: 0; }
     .text-link {
       font-size: 14px;
       letter-spacing: 0.12em;
@@ -241,26 +243,14 @@
   <div class="mission-section">
     <p class="section-label">Mission</p>
     <div class="section-rule"></div>
-    <div class="prose">
-      <p>The Southern Writers Guild exists to encourage, develop, and celebrate writers of the American South by providing opportunities for writers to share their work, develop their craft, connect with other writers, and reach new audiences.</p>
-      <p>The Guild believes that Southern literature is more than a regional tradition—it is an evolving conversation shaped by the voices, experiences, histories, humor, struggles, and imagination of the people who call the South home.</p>
-      <p>Through collaborative writing projects, literary publications, workshops, readings, online programming, and community engagement, the Southern Writers Guild seeks to create an accessible literary community in which both emerging and established writers can participate.</p>
-      <p>Our goal is not simply to publish writers, but to give Southern writers a place to belong, a place to be heard, and an opportunity to grow.</p>
+    <div class="prose" id="mission-body">
+      <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
     </div>
 
     <p class="section-label">Organizational Goals</p>
     <div class="section-rule"></div>
-    <div class="prose">
-      <p>The Southern Writers Guild's primary goals are:</p>
-      <ol class="goals-list">
-        <li>To provide meaningful opportunities for Southern writers to publish and share their work.</li>
-        <li>To encourage emerging writers who may not otherwise have access to traditional literary publishing opportunities.</li>
-        <li>To preserve and promote Southern voices and storytelling traditions while encouraging contemporary interpretations of the South.</li>
-        <li>To create connections among writers through collaborative literary projects and programming.</li>
-        <li>To expand the audience for Southern literature through print, digital, and live literary programming.</li>
-        <li>To make participation accessible, particularly for writers who are geographically isolated from traditional literary centers.</li>
-      </ol>
-      <p>The Guild's long-term vision is to develop a sustainable literary arts organization capable of bringing Southern writers together across geographic and cultural boundaries while creating opportunities for their work to reach readers throughout the region and beyond.</p>
+    <div class="prose" id="goals-body">
+      <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
     </div>
   </div>
 
@@ -270,23 +260,17 @@
     <div>
       <p class="belief-label">Southern</p>
       <div class="belief-rule"></div>
-      <p class="belief-body">The American South is a place: red clay, magnolia shade thick as secrets. Southernness is something else — a refusal to pick a side in the region's oldest argument.</p>
-      <p class="belief-body">It's software engineers debating barbecue sauce with lifelong locals. Heirloom butterbeans next to gochujang-glazed fried chicken on the same menu. The old YeeHaw caricature gathers dust; it never fit.</p>
-      <p class="belief-body">The South is no monolith. It's a permanent, undulating argument with itself — rooted in soil soaked with sorrow, restless enough to build the next app, honor-bound to remember what was lost and stubborn enough to build what might endure.</p>
+      <div class="belief-body" id="belief-southern-body"></div>
     </div>
     <div>
       <p class="belief-label">Writer</p>
       <div class="belief-rule"></div>
-      <p class="belief-body">A writer is someone who cannot not write. An obstinate soul who wrestles the world's chaos onto the page, not for glory, but because silence feels like betrayal.</p>
-      <p class="belief-body">Down South, that means sitting on a creaking porch or a scarred kitchen table, listening to the ghosts argue while the cicadas drone, and trying — stubbornly, imperfectly — to translate the quarrel into something true.</p>
-      <p class="belief-body">A writer notices. Remembers. Disturbs the peace just enough to let the light in. For us, that's the whole job: turning loss into language, fury into form, contradiction into art.</p>
+      <div class="belief-body" id="belief-writer-body"></div>
     </div>
     <div>
       <p class="belief-label">Guild</p>
       <div class="belief-rule"></div>
-      <p class="belief-body">A guild, in the old honest sense, is a covenant of craft — practitioners sworn not to kings or markets, but to the work and to each other.</p>
-      <p class="belief-body">We hold one another to truthfulness over trend, to language that earns its music, to stories that disturb as much as they console. We share resources. We critique without cruelty. We defend the right to write carefully in a culture addicted to speed.</p>
-      <p class="belief-body">A guild is shelter and forge both — a place to warm raw hands after the page has bled them, and a place to hammer drafts into sharper steel. The oath is simple: we write because this place demands witness, and we refuse to do it alone.</p>
+      <div class="belief-body" id="belief-guild-body"></div>
     </div>
   </div>
 
@@ -356,7 +340,7 @@
   </footer>
 
   <script type="module">
-    import { fetchSiteSettings } from '../js/sanity.js'
+    import { fetchSiteSettings, fetchHouseContent, renderPortableText } from '../js/sanity.js'
     fetchSiteSettings()
       .then(settings => {
         const email = settings && settings.contactEmail
@@ -371,6 +355,45 @@
         }
       })
       .catch(() => {})
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchHouse() {
+      if (!isPreviewing()) return fetchHouseContent()
+      return fetch('/api/preview-house')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchHouseContent())
+    }
+
+    function renderField(id, blocks, fallback) {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.innerHTML = (blocks && blocks.length) ? renderPortableText(blocks) : fallback
+    }
+
+    fetchHouse()
+      .then(house => {
+        if (!house) throw new Error('No house content')
+        renderField('mission-body', house.missionStatement, '')
+        renderField('goals-body', house.organizationalGoals, '')
+        renderField('belief-southern-body', house.beliefSouthern, '')
+        renderField('belief-writer-body', house.beliefWriter, '')
+        renderField('belief-guild-body', house.beliefGuild, '')
+      })
+      .catch(() => {
+        ['mission-body', 'goals-body', 'belief-southern-body', 'belief-writer-body', 'belief-guild-body'].forEach(id => {
+          const el = document.getElementById(id)
+          if (el) el.innerHTML = '<p style="color:var(--text-faint);font-size:0.85rem;">Content unavailable.</p>'
+        })
+      })
   </script>
 
   <script src="../js/nav.js"></script>

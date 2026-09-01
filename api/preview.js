@@ -26,6 +26,8 @@ const VIDEO_PATH_PATTERN = /^\/the-work\/videos\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const FEATURED_ARCHIVE_PATH_PATTERN = /^\/the-work\/featured\/archive\/?$/;
 const WRITERS_PATH_PATTERN = /^\/writers\/?$/;
 const WRITER_PATH_PATTERN = /^\/writers\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
+const HOUSE_PATH_PATTERN = /^\/the-house\/?$/;
+const HOUSE_GUIDELINES_PATH_PATTERN = /^\/the-house\/guidelines\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
@@ -37,7 +39,9 @@ function isAllowedRedirectPath(path) {
     VIDEOS_PATH_PATTERN.test(path) ||
     VIDEO_PATH_PATTERN.test(path) ||
     WRITERS_PATH_PATTERN.test(path) ||
-    WRITER_PATH_PATTERN.test(path)
+    WRITER_PATH_PATTERN.test(path) ||
+    HOUSE_PATH_PATTERN.test(path) ||
+    HOUSE_GUIDELINES_PATH_PATTERN.test(path)
   );
 }
 
@@ -86,6 +90,9 @@ function resolveManualRedirect(req, secret) {
     return type === 'writer' ? '/writers/' : '/the-work/videos/';
   }
   if (type === 'featuredFiction') return '/the-work/featured/';
+  // Singleton, no slug, feeds two pages — always resolves to the primary
+  // one; the Submission Guidelines page is reachable from there.
+  if (type === 'houseContent') return '/the-house/';
   return null;
 }
 
