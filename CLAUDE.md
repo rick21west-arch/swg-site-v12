@@ -200,6 +200,8 @@ This is the actual destination behind the site rebuild — not a punch-list item
 
 Steps 1 and 2 are the true prerequisites; nothing past them works without both in place.
 
+**Vercel Hobby plan limit:** 12 serverless functions per deployment. Currently at 11 of 12 as of 2026-09-01, after consolidating several preview endpoints into one shared function. Before adding another dedicated preview endpoint for a new content type, either extend the existing shared function or plan for consolidation first — otherwise the next deploy will fail outright, not degrade gracefully.
+
 ## Hard limits
 
 - Never handle passwords, payment details, or credentials on Rick's behalf.

@@ -6,6 +6,8 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-01 — Join page complete, confirmed via direct API check (real document ID returned, not fallback text). Real infrastructure issue hit and fixed: Vercel's Hobby plan caps at 12 serverless functions; this session's fourth new content type hit that ceiling on deploy. Fixed by consolidating three near-identical preview endpoints into one shared, parameterized function — brought usage to 11 of 12, and means future content types add one line to a list rather than a new function. Visual Editing campaign now covers: Porch, Events, Bookshelf, Guild Video, Writers, House, homepage, Join — all confirmed via real clicks or direct API verification, not visual inspection alone.
+
 ## 2026-09-01 (9) — Join page moved onto Sanity; hit a real Vercel plan limit mid-task
 
 New singleton `joinContent` (Studio repo): headline, tagline, membership benefits (5-item list), pull quote, membership price. Plain string/list fields — checked what's actually on the page first, same as the last three content types, and it's five short single-purpose values, nothing that's ever needed rich text. Populated with the exact live copy, published, resolver added on `/join`. The email signup form (`#oathEmailForm`, its input/button, the plain script posting to `/api/subscribe`) was left completely untouched, per explicit instruction — confirmed byte-identical in the diff before pushing, not just eyeballed.
