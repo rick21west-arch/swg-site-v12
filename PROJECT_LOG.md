@@ -6,6 +6,14 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-01 (8) — The House's Submit Your Work section added to houseContent (was missed in the original field list)
+
+Added the piece of `/the-house/` that got left out when `houseContent` was first built: the pull quote, both criteria lists (with their closing notes), and the how-to-submit copy. Same judgment as the homepage hero — plain string/text/list fields, not Portable Text, since none of this content has ever used a heading, link, or inline image. Patched onto the existing `houseContent` document rather than creating a new one; confirmed directly after publishing that the patch didn't disturb any of the five fields already on that document (mission, goals, three belief cards — block counts unchanged).
+
+No new resolver needed — houseContent's existing `/the-house` and `/the-house/guidelines` routes already cover this. Rendered inside the page's one existing `fetchHouse()` call, not a second fetch — genuinely nothing new to architect, as asked.
+
+This one didn't need the "call the live API directly" verification step used for the homepage hero: the new containers started completely empty (no static fallback text baked in this time, unlike the hero), so real content appearing at all was already proof the fetch worked — there was nothing else that could have produced it. Verified live on production anyway: pull quote line break intact, both lists (5 and 4 items) and both notes matching the original exactly, byte-for-byte bundle match, no console errors, and the neighboring Submission Guidelines page (same document, untouched fields) still renders correctly.
+
 ## 2026-09-01 (7) — Homepage hero moved onto Sanity (homeContent)
 
 New singleton `homeContent` (Studio repo), same convention as `siteSettings`/`houseContent`: `heroHeadline`, `heroSubhead`, `missionBlurb`. Used plain `string`/`text` fields rather than rich text — checked what was actually there first (three short single-purpose lines, nothing that ever used a heading, list, or inline image) rather than defaulting to Portable Text out of habit just because the last two content types used it. Populated with the exact live homepage copy, published, resolver added on the `/` route (both Studio's `mainDocuments`/`locations` and site's `api/preview.js` — the `/` redirect target already existed there from before, only needed the `homeContent` type branch).
