@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Featured Fiction Archive — Southern Writers Guild</title>
+  <title>Bookshelf Archive — Southern Writers Guild</title>
   <link rel="stylesheet" href="../../css/swg.css">
 </head>
 <body>
@@ -28,8 +28,8 @@
 
   <section class="hero" style="padding-bottom:var(--sp-md);">
     <div class="container">
-      <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Featured Fiction</span>
-      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">All featured works.</h1>
+      <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Bookshelf</span>
+      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Bookshelf.</h1>
       <p class="hero-sub">Every writer the Guild has featured, in order. The feature rotates monthly and opens to outside writers. <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
     </div>
   </section>
@@ -100,7 +100,7 @@
         const cardsHtml = features.map(renderBookCard).join('')
         grid.innerHTML = (isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml) + dashedCard
       })
-      .catch(() => showError(grid, 'Featured fiction unavailable.'))
+      .catch(() => showError(grid, 'Bookshelf unavailable.'))
   </script>
 
   <script src="../../js/nav.js"></script>

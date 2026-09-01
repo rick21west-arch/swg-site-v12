@@ -220,7 +220,7 @@
      )
    }
 
-   /* ── Featured fiction ──────────────────────────────────────── */
+   /* ── Bookshelf (featuredFiction) ───────────────────────────── */
     
    export async function fetchFeaturedFiction() {
      return sanityFetch(
@@ -287,7 +287,7 @@
        <div id="archive" style="margin-top:var(--sp-lg);padding-top:var(--sp-md);border-top:0.5px solid var(--border);">
          <div class="section-header" style="margin-bottom:1rem;">
            <span class="section-header-title">Archive</span>
-           <span class="card-label" style="color:var(--text-faint);margin:0;">All featured works</span>
+           <span class="card-label" style="color:var(--text-faint);margin:0;">All Bookshelf picks</span>
          </div>
          <div class="grid grid--3">
            ${archive.map(item => `
