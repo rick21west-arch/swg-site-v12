@@ -38,10 +38,7 @@ const pages = [
   'the-work/videos/video/index.html',
   'welcome/index.html',
   'writers/index.html',
-  'writers/beau/index.html',
-  'writers/gray/index.html',
-  'writers/hank-cotton/index.html',
-  'writers/jean-paul/index.html',
+  'writers/writer/index.html',
 ];
 
 export default defineConfig({

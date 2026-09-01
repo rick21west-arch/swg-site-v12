@@ -20,7 +20,7 @@
     }
     .char-col { display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; }
     .char-photo-wrap { width: 280px; height: 280px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent); box-shadow: 0 0 0 8px var(--bg), 0 0 0 9px var(--border); flex-shrink: 0; }
-    .char-photo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .char-photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .image-left .char-photo-wrap { transform: translateX(-24px); }
     .image-right .char-col { order: 2; }
     .image-right .char-photo-wrap { transform: translateX(24px); }
@@ -37,7 +37,9 @@
     .writer-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
     .writer-name { font-family: var(--serif, Georgia, serif); font-size: 0.95rem; font-weight: 400; color: var(--accent-warm); margin-bottom: 10px; }
     .writer-bio { font-size: 14px; color: var(--text-muted); line-height: 1.7; font-weight: 400; margin-bottom: 16px; }
-    .writer-link { font-size: 14px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+    .writer-bio p { margin-bottom: 0.85em; }
+    .writer-bio p:last-child { margin-bottom: 0; }
+    .writer-link { font-size: 14px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; margin-right: 1rem; display: inline-block; }
     .writer-link:hover { color: var(--accent-light); }
 
     .section-trio {
@@ -62,7 +64,7 @@
     .jp-text { padding: 32px 40px; }
     .jp-photo-col { padding: 24px; display: flex; justify-content: center; align-items: center; }
     .jp-photo-wrap { width: 100%; max-width: 260px; overflow: hidden; border: 1px solid var(--border); border-radius: 2px; }
-    .jp-photo-wrap img { width: 100%; aspect-ratio: 1/1; object-fit: cover; object-position: center top; display: block; }
+    .jp-photo-wrap img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
     .jp-eyebrow { font-size: 14px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
     .jp-name { font-family: var(--serif, Georgia, serif); font-size: 1.1rem; font-weight: 400; color: var(--text); margin-bottom: 8px; }
 
@@ -107,95 +109,8 @@
     <h1 class="writers-headline">Three writers.<br>Three perspectives.<br><em>Infinite possibilities.</em></h1>
   </div>
 
-  <div class="writer-section image-left">
-    <div class="char-col">
-      <div class="char-photo-wrap">
-        <img src="../assets/images/char-hank-cotton.jpg" alt="Hank Cotton">
-      </div>
-      <div class="writer-avatar"><img src="../assets/images/photo-mj-polk.jpg" alt="MJ Polk"></div>
-    </div>
-    <div class="writer-col">
-      <div class="writer-text">
-        <p class="role-label">The Character</p>
-        <h2 class="char-name">Hank Cotton</h2>
-        <p class="char-descriptor">Hotshot driver. Gritty realist. Hard-boiled truth delivered in plain English.</p>
-        <div class="identity-rule"></div>
-        <p class="role-label">The Writer</p>
-        <h3 class="writer-name">MJ Polk</h3>
-        <p class="writer-bio">I'm Hank's handler. Not exactly sure why he trusts me with his stories, but he does. And I've agreed to pass them on to all of you. While Hank tramps around the USA playing Hotshot Hero — writing his memoir in shady diners and truck stops — I'm here in Southern Georgia, studying Philosophy and working on my craft.</p>
-        <a href="https://www.thesoutherncopywriter.com/" target="_blank" rel="noopener" class="writer-link">Southern Copywriter →</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="writer-section image-right">
-    <div class="writer-col">
-      <div class="writer-text">
-        <p class="role-label">The Character</p>
-        <h2 class="char-name">Beau Pritchett IV</h2>
-        <p class="char-descriptor">Regional nuisance. Minor legend. Ersatz poet who seized a guitar by the neck when he was a kid.</p>
-        <div class="identity-rule"></div>
-        <p class="role-label">The Writer</p>
-        <h3 class="writer-name">Rick West</h3>
-        <p class="writer-bio">Rick West — Beau Pritchett's doppelganger — comes from the southeastern United States, that humid land where stories sweat before they speak. He wanders now. Portugal, Istanbul. Greece. Albania. Even Florida. He takes good notes, asks bad questions, shoots the gap, works the edges, passes the signal along. Author of <em>First Light</em>, <em>Saudade</em>, <em>Antique Bastards</em>, <em>The Mango Chronicles</em>, and <em>When the Boogeyman Comes Calling</em>. Musician, multimedia artist. A walking contradiction, partly truth and partly fiction.</p>
-        <a href="https://www.rick-west.com" target="_blank" rel="noopener" class="writer-link">rick-west.com →</a>
-      </div>
-    </div>
-    <div class="char-col">
-      <div class="char-photo-wrap">
-        <img src="../assets/images/char-beau.jpg" alt="Beau Pritchett IV">
-      </div>
-      <div class="writer-avatar"><img src="../assets/images/photo-rick-west.jpg" alt="Rick West"></div>
-    </div>
-  </div>
-
-  <div class="writer-section image-left">
-    <div class="char-col">
-      <div class="char-photo-wrap">
-        <img src="../assets/images/char-grace.jpg" alt="Grace Lynn">
-      </div>
-      <div class="writer-avatar"><img src="../assets/images/photo-gray.jpg" alt="Gray"></div>
-    </div>
-    <div class="writer-col">
-      <div class="writer-text">
-        <p class="role-label">The Character</p>
-        <h2 class="char-name">Grace · Grace Lynn</h2>
-        <p class="char-descriptor">Lyrical. Confessional. Southern goth with softer edges — stories that are sometimes fiction but always true.</p>
-        <div class="identity-rule"></div>
-        <p class="role-label">The Writer</p>
-        <h3 class="writer-name">Gray</h3>
-        <p class="writer-bio">My stories are sometimes fiction, always true. I'm not the Gray or Grace in these stories. But we've walked a lot of the same roads. Heard a lot of the same songs. Cried over a lot of the same things. For a long time, I lived mostly in my head. These days, I write it out. Author of the <em>Opera Rose</em> trilogy.</p>
-        <a href="https://turtlemeatpodcast.substack.com" target="_blank" rel="noopener" class="writer-link">Turtle Meat Mixtapes →</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="section-trio">
-    <div class="trio-text-left">
-      <p class="trio-eyebrow">The Trio</p>
-      <h2 class="trio-headline">On the<br>Porch steps.</h2>
-      <div class="identity-rule"></div>
-    </div>
-    <div class="trio-photo">
-      <img src="../assets/images/char-trio.jpg" alt="Hank, Grace, and Beau on the Porch steps">
-    </div>
-    <div class="trio-text-right">
-      <p class="writer-bio">Hank, Grace, and Beau — the characters who showed up first and never really left. They're the reason The Porch exists. Everything else grew from that.</p>
-    </div>
-  </div>
-
-  <div class="section-jp">
-    <div class="jp-text">
-      <p class="jp-eyebrow">Also Present</p>
-      <h3 class="jp-name">Jean-Paul</h3>
-      <div class="identity-rule"></div>
-      <p class="writer-bio" style="max-width:520px;">Strangely sentient. Taxidermied. One eye cracked, one glowing blue-green since Pensacola — nobody's talking about it. He answers to French curses and banana pudding. He was there before the rest of them knew they were starting something. He already knows what's in the cooler. He emits low-level observational signal. The humans continue regardless.</p>
-    </div>
-    <div class="jp-photo-col">
-      <div class="jp-photo-wrap">
-        <img src="../assets/images/char-jean-paul.jpg" alt="Jean-Paul">
-      </div>
-    </div>
+  <div id="writers-list">
+    <div style="padding:48px 60px;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.1em;text-align:center;">Loading…</div>
   </div>
 
   <footer class="site-footer">
@@ -204,6 +119,145 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchWriters, esc, stegaClean } from '../js/sanity.js'
+
+    const listEl = document.getElementById('writers-list')
+
+    // Same mechanism as every other preview-aware page this session — see
+    // the-work/featured/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchWritersView() {
+      if (!isPreviewing()) return fetchWriters()
+      return fetch('/api/preview-writers')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchWriters())
+    }
+
+    // Same attribute-safety pattern used everywhere else this session —
+    // stega must never reach an element attribute (img src/alt, hrefs).
+    function cleanCardAttributes(html) {
+      return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
+    }
+
+    function photoPosition(hotspot) {
+      if (hotspot && typeof hotspot.x === 'number' && typeof hotspot.y === 'number') {
+        return `${(hotspot.x * 100).toFixed(1)}% ${(hotspot.y * 100).toFixed(1)}%`
+      }
+      return 'center top'
+    }
+
+    // Multi-paragraph bios were written as separate <p> tags on the old
+    // hardcoded pages — preserved here rather than collapsing to one
+    // block, since these bios read that way on purpose.
+    function renderParagraphs(text) {
+      if (!text) return ''
+      return text.split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('')
+    }
+
+    function renderLinks(links) {
+      if (!links || !links.length) return ''
+      return links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener" class="writer-link">${esc(l.label)}</a>`).join('')
+    }
+
+    // Paired treatment (circular character photo + small real-person
+    // avatar) for any writer with an avatar photo set. alignLeft
+    // alternates strictly by position among paired writers, independent
+    // of who occupies which slot, so reordering in Studio just works.
+    function renderPairedSection(w, alignLeft) {
+      const pos = photoPosition(w.characterPhotoHotspot)
+      const photo = `
+        <div class="char-col">
+          <div class="char-photo-wrap">
+            <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" style="object-position:${pos};">
+          </div>
+          <div class="writer-avatar"><img src="${esc(w.avatarPhotoUrl || '')}" alt="${esc(w.realName || '')}"></div>
+        </div>`
+      const text = `
+        <div class="writer-col">
+          <div class="writer-text">
+            <p class="role-label">The Character</p>
+            <h2 class="char-name">${esc(w.characterName)}</h2>
+            ${w.characterDescriptor ? `<p class="char-descriptor">${esc(w.characterDescriptor)}</p>` : ''}
+            <div class="identity-rule"></div>
+            <p class="role-label">The Writer</p>
+            <h3 class="writer-name">${esc(w.realName || '')}</h3>
+            <div class="writer-bio">${renderParagraphs(w.writerBio)}</div>
+            ${renderLinks(w.links)}
+          </div>
+        </div>`
+      return `<div class="writer-section ${alignLeft ? 'image-left' : 'image-right'}">${alignLeft ? photo + text : text + photo}</div>`
+    }
+
+    // Character-only treatment (no avatar photo) — Jean-Paul today, any
+    // future character-only entry automatically.
+    function renderCharacterOnlySection(w) {
+      return `
+        <div class="section-jp">
+          <div class="jp-text">
+            <p class="jp-eyebrow">Also Present</p>
+            <h3 class="jp-name">${esc(w.characterName)}</h3>
+            <div class="identity-rule"></div>
+            <div class="writer-bio" style="max-width:520px;">${renderParagraphs(w.writerBio)}</div>
+            ${renderLinks(w.links)}
+          </div>
+          <div class="jp-photo-col">
+            <div class="jp-photo-wrap">
+              <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}">
+            </div>
+          </div>
+        </div>`
+    }
+
+    const trioSection = `
+      <div class="section-trio">
+        <div class="trio-text-left">
+          <p class="trio-eyebrow">The Trio</p>
+          <h2 class="trio-headline">On the<br>Porch steps.</h2>
+          <div class="identity-rule"></div>
+        </div>
+        <div class="trio-photo">
+          <img src="../assets/images/char-trio.jpg" alt="Hank, Grace, and Beau on the Porch steps">
+        </div>
+        <div class="trio-text-right">
+          <p class="writer-bio">Hank, Grace, and Beau — the characters who showed up first and never really left. They're the reason The Porch exists. Everything else grew from that.</p>
+        </div>
+      </div>`
+
+    fetchWritersView()
+      .then(writers => {
+        if (!writers || !writers.length) {
+          listEl.innerHTML = '<div style="padding:48px 60px;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;text-align:center;">No writers found.</div>'
+          return
+        }
+        let pairedIndex = 0
+        let trioInserted = false
+        const parts = []
+        writers.forEach(w => {
+          if (w.avatarPhotoUrl) {
+            parts.push(renderPairedSection(w, pairedIndex % 2 === 0))
+            pairedIndex++
+          } else {
+            if (!trioInserted) { parts.push(trioSection); trioInserted = true }
+            parts.push(renderCharacterOnlySection(w))
+          }
+        })
+        if (!trioInserted) parts.push(trioSection)
+        const html = parts.join('')
+        listEl.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
+      })
+      .catch(() => {
+        listEl.innerHTML = '<div style="padding:48px 60px;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;text-align:center;">Writers unavailable.</div>'
+      })
+  </script>
 
   <script src="../js/nav.js"></script>
 </body>

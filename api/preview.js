@@ -22,6 +22,10 @@ const EVENT_PATH_PATTERN = /^\/events\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 // with no visible error anywhere.
 const FEATURED_PATH_PATTERN = /^\/the-work\/featured\/?$/;
 const VIDEOS_PATH_PATTERN = /^\/the-work\/videos\/?$/;
+const VIDEO_PATH_PATTERN = /^\/the-work\/videos\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
+const FEATURED_ARCHIVE_PATH_PATTERN = /^\/the-work\/featured\/archive\/?$/;
+const WRITERS_PATH_PATTERN = /^\/writers\/?$/;
+const WRITER_PATH_PATTERN = /^\/writers\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
@@ -29,7 +33,11 @@ function isAllowedRedirectPath(path) {
     PORCH_PATH_PATTERN.test(path) ||
     EVENT_PATH_PATTERN.test(path) ||
     FEATURED_PATH_PATTERN.test(path) ||
-    VIDEOS_PATH_PATTERN.test(path)
+    FEATURED_ARCHIVE_PATH_PATTERN.test(path) ||
+    VIDEOS_PATH_PATTERN.test(path) ||
+    VIDEO_PATH_PATTERN.test(path) ||
+    WRITERS_PATH_PATTERN.test(path) ||
+    WRITER_PATH_PATTERN.test(path)
   );
 }
 
@@ -67,8 +75,17 @@ function resolveManualRedirect(req, secret) {
     if (typeof slug !== 'string' || !SLUG_PATTERN.test(slug)) return null;
     return type === 'event' ? `/events/${slug}/` : `/the-porch/${slug}/`;
   }
+  if (type === 'guildVideo' || type === 'writer') {
+    // Both types have an optional slug: with one, resolve to that
+    // document's own page; without one, resolve to the shared listing.
+    const slug = req.query && req.query.slug;
+    if (typeof slug === 'string' && slug) {
+      if (!SLUG_PATTERN.test(slug)) return null;
+      return type === 'writer' ? `/writers/${slug}/` : `/the-work/videos/${slug}/`;
+    }
+    return type === 'writer' ? '/writers/' : '/the-work/videos/';
+  }
   if (type === 'featuredFiction') return '/the-work/featured/';
-  if (type === 'guildVideo') return '/the-work/videos/';
   return null;
 }
 

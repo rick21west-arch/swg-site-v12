@@ -220,6 +220,34 @@
      )
    }
 
+   /* ── Writers ────────────────────────────────────────────────── */
+   /* Every writer document, in Studio-set display order — not four fixed
+      slots, so a fifth entry (real writer or character-only, like
+      Jean-Paul) needs no code change here or on either page that uses
+      this. realName is the signal the listing/individual pages use to
+      pick a layout: present means a paired character/real-person
+      treatment, blank means a character-only one. */
+
+   const WRITER_FIELDS = `characterName, characterDescriptor, realName,
+        writerBio, characterBio, displayOrder, "slug": slug.current,
+        "characterPhotoUrl": characterPhoto.asset->url,
+        "characterPhotoHotspot": characterPhoto.hotspot,
+        "avatarPhotoUrl": avatarPhoto.asset->url,
+        links`
+
+   export async function fetchWriters() {
+     return sanityFetch(
+       `*[_type == "writer"] | order(displayOrder asc) {${WRITER_FIELDS}}`
+     )
+   }
+
+   export async function fetchWriterBySlug(slug) {
+     const safe = String(slug).replace(/"/g, '\\"')
+     return sanityFetch(
+       `*[_type == "writer" && slug.current == "${safe}"][0] {${WRITER_FIELDS}}`
+     )
+   }
+
    /* ── Bookshelf (featuredFiction) ───────────────────────────── */
     
    export async function fetchFeaturedFiction() {

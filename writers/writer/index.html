@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writer — Southern Writers Guild</title>
+  <link rel="stylesheet" href="../../css/swg.css">
+  <style>
+    .writer-hero {
+      padding: var(--sp-xl) 0 var(--sp-lg);
+      border-bottom: 1px solid rgba(237,229,208,0.08);
+    }
+    .writer-hero-inner {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .writer-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(237,229,208,0.12);
+      display: block;
+    }
+    .writer-meta { padding-top: 0.5rem; }
+    .writer-persona {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .writer-name {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.1;
+      margin: 0 0 0.4rem;
+    }
+    .writer-tag {
+      font-family: var(--font-ui);
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin: 0 0 1.5rem;
+      line-height: 1.6;
+    }
+    .writer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .writer-body { padding: var(--sp-lg) 0; }
+    .writer-body h2 {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 1rem;
+    }
+    .writer-body p {
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      max-width: 620px;
+      margin-bottom: 1rem;
+    }
+    .back-link {
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: var(--sp-sm) 0;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+    @media (max-width: 600px) {
+      .writer-hero-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .writer-photo { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link"><img src="/assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo"></a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="writer-hero">
+    <div class="container">
+      <a href="/writers/" class="back-link">← The Writers</a>
+      <div id="writer-hero-content">
+        <div style="padding:3rem 0;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.1em;">Loading…</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="writer-body">
+    <div class="container" id="writer-body-content"></div>
+  </section>
+
+  <div class="jp-strip" id="jp-strip" style="display:none;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <p class="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
+      <a href="/writers/jean-paul/" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;" id="jp-strip-link">Who is Jean-Paul?</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchWriterBySlug, esc, stegaClean } from '/js/sanity.js'
+
+    const heroEl = document.getElementById('writer-hero-content')
+    const bodyEl = document.getElementById('writer-body-content')
+    const jpStrip = document.getElementById('jp-strip')
+    const jpStripLink = document.getElementById('jp-strip-link')
+
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const slug = parts[parts.length - 1]
+
+    // Same mechanism as every other preview-aware page this session.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchWriter(slug) {
+      if (!isPreviewing()) return fetchWriterBySlug(slug)
+      return fetch(`/api/preview-writer?slug=${encodeURIComponent(slug)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchWriterBySlug(slug))
+    }
+
+    function cleanAttributes(html) {
+      return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
+    }
+
+    function renderParagraphs(text) {
+      if (!text) return ''
+      return text.split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('')
+    }
+
+    function renderLinks(links) {
+      if (!links || !links.length) return ''
+      return `<div class="writer-links">${links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener" class="btn btn--ghost">${esc(l.label)}</a>`).join('')}</div>`
+    }
+
+    function notFound() {
+      heroEl.innerHTML = '<h1 class="writer-name">Writer not found</h1>'
+      bodyEl.innerHTML = '<p>We couldn’t find that writer. They may have moved.</p>'
+    }
+
+    function renderWriter(w) {
+      if (!w) { notFound(); return }
+
+      document.title = `${stegaClean(w.characterName)} — Southern Writers Guild`
+
+      const isCharacterOnly = !w.avatarPhotoUrl
+      const persona = isCharacterOnly
+        ? (w.characterDescriptor ? esc(w.characterDescriptor) : 'Guild Mascot')
+        : `${esc(w.realName || '')} writing as`
+
+      let hero = `
+        <div class="writer-hero-inner">
+          <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" class="writer-photo">
+          <div class="writer-meta">
+            <span class="writer-persona">${persona}</span>
+            <h1 class="writer-name">${esc(w.characterName)}</h1>
+            ${w.characterDescriptor && !isCharacterOnly ? `<p class="writer-tag">${esc(w.characterDescriptor)}</p>` : ''}
+            ${renderLinks(w.links)}
+          </div>
+        </div>`
+      heroEl.innerHTML = isPreviewing() ? cleanAttributes(hero) : hero
+
+      let body = ''
+      if (w.writerBio) {
+        body += `<h2>${isCharacterOnly ? 'Who He Is' : 'The Writer'}</h2>${renderParagraphs(w.writerBio)}`
+      }
+      if (w.characterBio) {
+        body += `<div style="height:2rem;"></div><h2>${isCharacterOnly ? 'More' : 'The Character'}</h2>${renderParagraphs(w.characterBio)}`
+      }
+      bodyEl.innerHTML = body
+
+      if (slug !== 'jean-paul') {
+        jpStrip.style.display = ''
+      } else {
+        jpStripLink.style.display = 'none'
+      }
+    }
+
+    if (!slug) {
+      notFound()
+    } else {
+      fetchWriter(slug).then(renderWriter).catch(() => {
+        heroEl.innerHTML = '<h1 class="writer-name">Writer unavailable</h1>'
+        bodyEl.innerHTML = '<p>Something went wrong loading this page.</p>'
+      })
+    }
+  </script>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>

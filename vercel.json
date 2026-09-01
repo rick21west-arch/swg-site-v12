@@ -7,6 +7,8 @@
     { "source": "/events/:slug", "destination": "/events/event/index.html" },
     { "source": "/events/:slug/", "destination": "/events/event/index.html" },
     { "source": "/the-work/videos/:slug", "destination": "/the-work/videos/video/index.html" },
-    { "source": "/the-work/videos/:slug/", "destination": "/the-work/videos/video/index.html" }
+    { "source": "/the-work/videos/:slug/", "destination": "/the-work/videos/video/index.html" },
+    { "source": "/writers/:slug", "destination": "/writers/writer/index.html" },
+    { "source": "/writers/:slug/", "destination": "/writers/writer/index.html" }
   ]
 }
