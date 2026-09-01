@@ -174,18 +174,19 @@
     // of who occupies which slot, so reordering in Studio just works.
     function renderPairedSection(w, alignLeft) {
       const pos = photoPosition(w.characterPhotoHotspot)
+      const href = `/writers/${esc(w.slug)}/`
       const photo = `
         <div class="char-col">
-          <div class="char-photo-wrap">
+          <a href="${href}" class="char-photo-wrap" style="display:block;">
             <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" style="object-position:${pos};">
-          </div>
+          </a>
           <div class="writer-avatar"><img src="${esc(w.avatarPhotoUrl || '')}" alt="${esc(w.realName || '')}"></div>
         </div>`
       const text = `
         <div class="writer-col">
           <div class="writer-text">
             <p class="role-label">The Character</p>
-            <h2 class="char-name">${esc(w.characterName)}</h2>
+            <h2 class="char-name"><a href="${href}" style="color:inherit;text-decoration:none;">${esc(w.characterName)}</a></h2>
             ${w.characterDescriptor ? `<p class="char-descriptor">${esc(w.characterDescriptor)}</p>` : ''}
             <div class="identity-rule"></div>
             <p class="role-label">The Writer</p>
@@ -200,19 +201,20 @@
     // Character-only treatment (no avatar photo) — Jean-Paul today, any
     // future character-only entry automatically.
     function renderCharacterOnlySection(w) {
+      const href = `/writers/${esc(w.slug)}/`
       return `
         <div class="section-jp">
           <div class="jp-text">
             <p class="jp-eyebrow">Also Present</p>
-            <h3 class="jp-name">${esc(w.characterName)}</h3>
+            <h3 class="jp-name"><a href="${href}" style="color:inherit;text-decoration:none;">${esc(w.characterName)}</a></h3>
             <div class="identity-rule"></div>
             <div class="writer-bio" style="max-width:520px;">${renderParagraphs(w.writerBio)}</div>
             ${renderLinks(w.links)}
           </div>
           <div class="jp-photo-col">
-            <div class="jp-photo-wrap">
+            <a href="${href}" class="jp-photo-wrap" style="display:block;">
               <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}">
-            </div>
+            </a>
           </div>
         </div>`
     }
