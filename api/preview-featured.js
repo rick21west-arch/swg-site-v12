@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     const result = await client.fetch(
       `*[_type == "featuredFiction"] | order(_createdAt desc) {
         title, author, description, status, featuredMonth,
-        substackUrl, printUrl, ebookUrl, note,
+        substackUrl, printUrl, ebookUrl, note, commentary,
         "coverUrl": coverImage.asset->url
       }`
     );

@@ -226,7 +226,7 @@
      return sanityFetch(
        `*[_type == "featuredFiction"] | order(_createdAt desc) {
          title, author, description, status, featuredMonth,
-         substackUrl, printUrl, ebookUrl, note,
+         substackUrl, printUrl, ebookUrl, note, commentary,
          "coverUrl": coverImage.asset->url
        }`
      )
@@ -407,6 +407,7 @@
          <span class="card-label">${esc(book.author || '')}</span>
          <h2 class="card-title">${esc(book.title)}</h2>
          ${book.note ? `<p class="card-body" style="font-size:0.9rem;">${esc(book.note)}</p>` : ''}
+         ${book.commentary ? `<p class="card-body" style="font-size:0.9rem;font-style:italic;">${esc(book.commentary)}</p>` : ''}
          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;${linkToPage ? 'position:relative;z-index:1;' : ''}">
            ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
            ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
