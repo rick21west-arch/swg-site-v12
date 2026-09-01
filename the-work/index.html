@@ -153,7 +153,7 @@
     fetchGuildTalks(2)
       .then(talks => {
         if (!talks || !talks.length) { hideTalksSection(); return }
-        talksGrid.innerHTML = talks.map(t => renderSmallThumb(t, { size: 'medium' })).join('')
+        talksGrid.innerHTML = talks.map(t => renderSmallThumb(t, { linkToPage: true, size: 'medium' })).join('')
       })
       .catch(hideTalksSection)
 
@@ -177,7 +177,7 @@
     fetchMusicVideos()
       .then(videos => {
         if (!videos || !videos.length) { hideMusicSection(); return }
-        musicGrid.innerHTML = videos.map(renderSmallThumb).join('')
+        musicGrid.innerHTML = videos.map(v => renderSmallThumb(v, { linkToPage: true })).join('')
       })
       .catch(hideMusicSection)
   </script>

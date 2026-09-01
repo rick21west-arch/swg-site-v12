@@ -128,7 +128,7 @@
 
    export async function fetchMusicVideos() {
      return sanityFetch(
-       `*[_type == "guildVideo" && type == "music"] | order(publishedAt desc) {title, thumbnail, substackUrl}`
+       `*[_type == "guildVideo" && type == "music"] | order(publishedAt desc) {title, thumbnail, substackUrl, slug}`
      )
    }
 
@@ -138,7 +138,7 @@
 
    export async function fetchGuildTalks(limit = 2) {
      return sanityFetch(
-       `*[_type == "guildVideo" && type == "guild"] | order(publishedAt desc) [0...${limit}] {title, thumbnail, substackUrl}`
+       `*[_type == "guildVideo" && type == "guild"] | order(publishedAt desc) [0...${limit}] {title, thumbnail, substackUrl, slug}`
      )
    }
 
