@@ -112,7 +112,7 @@
 
    export async function fetchInterviews(limit = 9) {
      return sanityFetch(
-       `*[_type == "guildVideo" && type == "conversation" && (featured == true || !defined(featured))] | order(publishedAt desc) [0...${limit}] {title, description, participants, publishedAt, duration, thumbnail, substackUrl}`
+       `*[_type == "guildVideo" && type == "conversation" && (featured == true || !defined(featured))] | order(publishedAt desc) [0...${limit}] {title, description, participants, publishedAt, duration, thumbnail, substackUrl, slug}`
      )
    }
 
@@ -383,16 +383,31 @@
      )
    }
 
-   export function renderBookCard(book) {
+   // linkToPage wraps the whole card in a real internal link to the shared
+   // Bookshelf page (featuredFiction has no individual page — see
+   // the-work/featured), same pattern as renderPorchCard's whole-card link.
+   // Off by default so every existing caller (the-work/books,
+   // the-work/featured itself) renders exactly as before; only
+   // the-work/index.html's Books section opts in. The overlay link is
+   // absolutely positioned behind the card content and the outbound
+   // Buy print/Ebook buttons are raised above it (position:relative +
+   // z-index), so those keep working as their own separate links — an <a>
+   // can't validly nest inside another <a>, so this stacks two siblings
+   // instead of nesting.
+   export function renderBookCard(book, { linkToPage = false } = {}) {
+     const overlay = linkToPage
+       ? `<a href="/the-work/featured/" aria-label="${esc(book.title)}" style="position:absolute;inset:0;"></a>`
+       : ''
      return `
-       <div class="card">
+       <div class="card"${linkToPage ? ' style="position:relative;"' : ''}>
+         ${overlay}
          ${book.coverUrl
            ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}" style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;margin-bottom:0.75rem;">`
            : `<div style="aspect-ratio:2/3;background:var(--bg-3);margin-bottom:0.75rem;"></div>`}
          <span class="card-label">${esc(book.author || '')}</span>
          <h2 class="card-title">${esc(book.title)}</h2>
          ${book.note ? `<p class="card-body" style="font-size:0.9rem;">${esc(book.note)}</p>` : ''}
-         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;${linkToPage ? 'position:relative;z-index:1;' : ''}">
            ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
            ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
          </div>
@@ -426,8 +441,25 @@
    // that grew up next to it in the-work/videos/index.html to work around
    // that design) — one function, used identically whether previewing or
    // not, same as featured fiction.
-   export function renderVideoCard(video, size = 'large') {
+   // linkToPage wraps the whole card in a real internal link to the
+   // video's own individual page (only exists for documents with a slug —
+   // see api/preview-video.js / the-work/videos/video). Off by default so
+   // every existing caller (the crowded the-work/videos listing, the
+   // homepage, the-work/interviews) renders exactly as before — that
+   // whole-card-links-out design was the confirmed root cause of an
+   // earlier bug (see PROJECT_LOG), so this must stay opt-in, never the
+   // default. Only the-work/index.html's Interviews section opts in. Same
+   // overlay-behind-content stacking trick as renderBookCard's
+   // linkToPage, so the outbound Watch button keeps working as its own
+   // separate link instead of nesting inside the internal one.
+   export function renderVideoCard(video, size = 'large', { linkToPage = false } = {}) {
      const thumb = thumbSrc(video)
+     const pageHref = linkToPage && video.slug && video.slug.current
+       ? `/the-work/videos/${video.slug.current}/`
+       : null
+     const overlay = pageHref
+       ? `<a href="${esc(pageHref)}" aria-label="${esc(video.title)}" style="position:absolute;inset:0;z-index:1;"></a>`
+       : ''
      const btnSize = size === 'large' ? 56 : 38
      const borderTop = size === 'large' ? 11 : 8
      const borderSide = size === 'large' ? 20 : 14
@@ -449,12 +481,13 @@
      const cardClass = size === 'large' ? 'card card--highlight' : 'card card--dim'
      const titleClass = size === 'large' ? 'card-title' : 'card-title card-title--sm'
      return `
-       <div class="${cardClass}">
+       <div class="${cardClass}"${pageHref ? ' style="position:relative;"' : ''}>
+         ${overlay}
          ${imgHtml}
          <span class="card-label">${esc(formatDate(video.publishedAt))} &nbsp;·&nbsp; ${esc(video.participants || '')}</span>
          <h2 class="${titleClass}">${esc(video.title)}</h2>
          ${video.description ? `<p class="card-body">${esc(video.description)}</p>` : ''}
-         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+         <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;${pageHref ? 'position:relative;z-index:2;' : ''}">
            <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">${video.duration ? esc(video.duration) + ' &nbsp;·&nbsp; ' : ''}Watch →</a>
          </div>
        </div>`

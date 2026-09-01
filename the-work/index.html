@@ -127,7 +127,7 @@
     fetchFeaturedBooks(9)
       .then(books => {
         if (!books || !books.length) { showError(booksGrid, 'Books unavailable.'); return }
-        booksGrid.innerHTML = books.map(renderBookCard).join('')
+        booksGrid.innerHTML = books.map(b => renderBookCard(b, { linkToPage: true })).join('')
       })
       .catch(() => showError(booksGrid, 'Books unavailable.'))
 
@@ -151,7 +151,7 @@
           interviewsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
           return
         }
-        interviewsGrid.innerHTML = interviews.map(v => renderVideoCard(v, 'large')).join('')
+        interviewsGrid.innerHTML = interviews.map(v => renderVideoCard(v, 'large', { linkToPage: true })).join('')
       })
       .catch(() => showError(interviewsGrid, 'Interviews unavailable.'))
 
