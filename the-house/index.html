@@ -282,38 +282,27 @@
     </div>
     <div class="section-rule"></div>
 
-    <div class="pull-quote">
-      <p>We read everything. We publish selectively.<br>Those two sentences can coexist.</p>
+    <div class="pull-quote" id="submit-pull-quote">
+      <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
     </div>
 
     <div class="lists-grid">
       <div>
         <p class="list-label">What we're looking for</p>
-        <ul class="criteria-list">
-          <li>Essays — personal, cultural, reflective, lyrical</li>
-          <li>Fiction — short stories, excerpts, strange hybrids</li>
-          <li>Poetry — tight, loose, or feral, but deliberate</li>
-          <li>Criticism and commentary — thoughtful, grounded, alive</li>
-          <li>Work that resists easy categorization but knows what it's doing</li>
-        </ul>
-        <p class="criteria-note">If your piece feels like it had to be written, we want to see it.</p>
+        <ul class="criteria-list" id="submit-looking-for-list"></ul>
+        <p class="criteria-note" id="submit-looking-for-note"></p>
       </div>
       <div>
         <p class="list-label">What we are not looking for</p>
-        <ul class="criteria-list">
-          <li>Agenda-driven work or party-line writing</li>
-          <li>Writing that relies on flattening or scapegoating</li>
-          <li>Performative outrage or moral posturing</li>
-          <li>Work that hasn't been finished thinking</li>
-        </ul>
-        <p class="criteria-note">This isn't about politeness. It's about depth.</p>
+        <ul class="criteria-list" id="submit-not-looking-for-list"></ul>
+        <p class="criteria-note" id="submit-not-looking-for-note"></p>
       </div>
     </div>
 
     <div class="how-box">
       <p class="how-label">How to Submit</p>
-      <p class="how-body">Submit one piece at a time. Include a brief cover note if you like — keep it human. Previously published work should be clearly labeled. Simultaneous submissions are fine — just let us know if it's accepted elsewhere.</p>
-      <p class="how-note">We aim to respond thoughtfully, not instantly. Silence does not mean indifference. It means reading takes time.</p>
+      <p class="how-body" id="submit-how-body"></p>
+      <p class="how-note" id="submit-how-note"></p>
       <a href="mailto:jp@southernwritersguild.com" id="submit-contact-link" class="text-link">Submit your work →</a>
     </div>
   </div>
@@ -379,6 +368,34 @@
       el.innerHTML = (blocks && blocks.length) ? renderPortableText(blocks) : fallback
     }
 
+    function esc(str) {
+      const d = document.createElement('div')
+      d.textContent = str || ''
+      return d.innerHTML
+    }
+
+    // Plain text, not Portable Text — a literal newline is the only
+    // structure this field has (two short lines), so it's rendered as
+    // its own <br> rather than routed through renderPortableText.
+    function renderPullQuote(id, text) {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.innerHTML = text ? `<p>${esc(text).split('\n').join('<br>')}</p>` : ''
+    }
+
+    function renderList(id, items) {
+      const el = document.getElementById(id)
+      if (!el) return
+      el.innerHTML = (items || []).map(item => `<li>${esc(item)}</li>`).join('')
+    }
+
+    const SUBMIT_TEXT_FIELDS = [
+      ['submit-looking-for-note', 'submitLookingForNote'],
+      ['submit-not-looking-for-note', 'submitNotLookingForNote'],
+      ['submit-how-body', 'submitHowBody'],
+      ['submit-how-note', 'submitHowNote'],
+    ]
+
     fetchHouse()
       .then(house => {
         if (!house) throw new Error('No house content')
@@ -387,9 +404,16 @@
         renderField('belief-southern-body', house.beliefSouthern, '')
         renderField('belief-writer-body', house.beliefWriter, '')
         renderField('belief-guild-body', house.beliefGuild, '')
+        renderPullQuote('submit-pull-quote', house.submitPullQuote)
+        renderList('submit-looking-for-list', house.submitLookingFor)
+        renderList('submit-not-looking-for-list', house.submitNotLookingFor)
+        SUBMIT_TEXT_FIELDS.forEach(([id, field]) => {
+          const el = document.getElementById(id)
+          if (el) el.textContent = house[field] || ''
+        })
       })
       .catch(() => {
-        ['mission-body', 'goals-body', 'belief-southern-body', 'belief-writer-body', 'belief-guild-body'].forEach(id => {
+        ['mission-body', 'goals-body', 'belief-southern-body', 'belief-writer-body', 'belief-guild-body', 'submit-pull-quote'].forEach(id => {
           const el = document.getElementById(id)
           if (el) el.innerHTML = '<p style="color:var(--text-faint);font-size:0.85rem;">Content unavailable.</p>'
         })
