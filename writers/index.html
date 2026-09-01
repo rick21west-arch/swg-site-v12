@@ -121,7 +121,7 @@
   </footer>
 
   <script type="module">
-    import { fetchWriters, esc, stegaClean } from '../js/sanity.js'
+    import { fetchWriters, esc, stegaClean, sanityImageDataAttr } from '../js/sanity.js'
 
     const listEl = document.getElementById('writers-list')
 
@@ -178,9 +178,9 @@
       const photo = `
         <div class="char-col">
           <a href="${href}" class="char-photo-wrap" style="display:block;">
-            <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" style="object-position:${pos};">
+            <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" data-sanity="${esc(sanityImageDataAttr(w, 'writer', 'characterPhoto'))}" style="object-position:${pos};">
           </a>
-          <div class="writer-avatar"><img src="${esc(w.avatarPhotoUrl || '')}" alt="${esc(w.realName || '')}"></div>
+          <div class="writer-avatar"><img src="${esc(w.avatarPhotoUrl || '')}" alt="${esc(w.realName || '')}" data-sanity="${esc(sanityImageDataAttr(w, 'writer', 'avatarPhoto'))}"></div>
         </div>`
       const text = `
         <div class="writer-col">
@@ -213,7 +213,7 @@
           </div>
           <div class="jp-photo-col">
             <a href="${href}" class="jp-photo-wrap" style="display:block;">
-              <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}">
+              <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" data-sanity="${esc(sanityImageDataAttr(w, 'writer', 'characterPhoto'))}">
             </a>
           </div>
         </div>`

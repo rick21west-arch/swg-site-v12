@@ -137,7 +137,7 @@
   </footer>
 
   <script type="module">
-    import { fetchWriterBySlug, esc, stegaClean } from '/js/sanity.js'
+    import { fetchWriterBySlug, esc, stegaClean, sanityImageDataAttr } from '/js/sanity.js'
 
     const heroEl = document.getElementById('writer-hero-content')
     const bodyEl = document.getElementById('writer-body-content')
@@ -194,7 +194,7 @@
 
       let hero = `
         <div class="writer-hero-inner">
-          <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" class="writer-photo">
+          <img src="${esc(w.characterPhotoUrl || '')}" alt="${esc(w.characterName)}" data-sanity="${esc(sanityImageDataAttr(w, 'writer', 'characterPhoto'))}" class="writer-photo">
           <div class="writer-meta">
             <span class="writer-persona">${persona}</span>
             <h1 class="writer-name">${esc(w.characterName)}</h1>

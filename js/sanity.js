@@ -233,7 +233,7 @@
       pick a layout: present means a paired character/real-person
       treatment, blank means a character-only one. */
 
-   const WRITER_FIELDS = `characterName, characterDescriptor, realName,
+   const WRITER_FIELDS = `_id, characterName, characterDescriptor, realName,
         writerBio, characterBio, displayOrder, "slug": slug.current,
         "characterPhotoUrl": characterPhoto.asset->url,
         "characterPhotoHotspot": characterPhoto.hotspot,
@@ -462,6 +462,17 @@
      if (!doc._id) return ''
      const base = encodeURIComponent('https://swg-studio.sanity.studio')
      return `id=${doc._id};type=${type};path=thumbnail;base=${base}`
+   }
+
+   // Same mechanism as thumbnailDataAttr above, generalized with a path
+   // argument — writer documents have two separate image fields
+   // (characterPhoto, avatarPhoto), not the one guildVideo has. Exported
+   // since writer pages build their markup directly rather than through a
+   // shared render*Card function.
+   export function sanityImageDataAttr(doc, type, path) {
+     if (!doc._id) return ''
+     const base = encodeURIComponent('https://swg-studio.sanity.studio')
+     return `id=${doc._id};type=${type};path=${path};base=${base}`
    }
 
    // Structured the same way renderBookCard is, deliberately: a plain

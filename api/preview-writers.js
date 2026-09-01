@@ -9,7 +9,7 @@ const DATASET = 'production';
 const API_VERSION = '2024-01-01';
 const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
-const FIELDS = `characterName, characterDescriptor, realName,
+const FIELDS = `_id, characterName, characterDescriptor, realName,
         writerBio, characterBio, displayOrder, "slug": slug.current,
         "characterPhotoUrl": characterPhoto.asset->url,
         "characterPhotoHotspot": characterPhoto.hotspot,
