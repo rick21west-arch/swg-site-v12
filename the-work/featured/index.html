@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bookshelf Archive — Southern Writers Guild</title>
+  <title>Bookshelf — Southern Writers Guild</title>
   <link rel="stylesheet" href="../../css/swg.css">
+  <style>
+    /* Same visual treatment as the-porch/index.html's own archive link —
+       kept here rather than in swg.css since it's page-local there too. */
+    .archive-link {
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .archive-link:hover { color: var(--accent-light); }
+  </style>
 </head>
 <body>
 
@@ -30,12 +44,15 @@
     <div class="container">
       <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Bookshelf</span>
       <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Bookshelf.</h1>
-      <p class="hero-sub">Every writer the Guild has featured, in order. The feature rotates monthly and opens to outside writers. <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
+      <p class="hero-sub">The Guild's currently featured writers. The feature rotates monthly and opens to outside writers. <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
+      <div style="text-align:right;margin-bottom:1rem;">
+        <a href="/the-work/featured/archive/" class="archive-link">See the full Bookshelf archive →</a>
+      </div>
       <div class="grid grid--3" id="featured-fiction-grid"></div>
     </div>
   </section>
@@ -48,7 +65,7 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedFiction, renderBookCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
+    import { fetchFeaturedBooks, renderBookCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
     const grid = document.getElementById('featured-fiction-grid')
     const dashedCard = `
       <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
@@ -71,14 +88,14 @@
     }
 
     function fetchFeaturedFictionView() {
-      if (!isPreviewing()) return fetchFeaturedFiction()
-      return fetch('/api/preview-featured')
+      if (!isPreviewing()) return fetchFeaturedBooks(9)
+      return fetch('/api/preview-featured?view=main')
         .then(res => {
           if (!res.ok) throw new Error('Preview fetch failed')
           return res.json()
         })
         .then(data => data.result)
-        .catch(() => fetchFeaturedFiction())
+        .catch(() => fetchFeaturedBooks(9))
     }
 
     // renderBookCard() is a shared renderer (js/sanity.js) used by pages

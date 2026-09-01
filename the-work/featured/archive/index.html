@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookshelf Archive — Southern Writers Guild</title>
+  <link rel="stylesheet" href="../../../css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="../../../assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/" class="active">The Work</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-md);">
+    <div class="container">
+      <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Bookshelf</span>
+      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Every book we've featured.</h1>
+      <p class="hero-sub">Every writer the Guild has featured, most recent first. <a href="/the-work/featured/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to Bookshelf</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid grid--3" id="archive-grid"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchFeaturedFiction, renderBookCard, showLoading, showError, stegaClean } from '../../../js/sanity.js'
+    const grid = document.getElementById('archive-grid')
+
+    // Same mechanism as the-work/featured/index.html — see that page's
+    // comment for the full explanation. This page's own view is "all",
+    // the unfiltered featuredFiction query, matching fetchFeaturedFiction()
+    // exactly.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchArchiveView() {
+      if (!isPreviewing()) return fetchFeaturedFiction()
+      return fetch('/api/preview-featured?view=all')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchFeaturedFiction())
+    }
+
+    // Same attribute-safety pattern as the-work/featured/index.html — see
+    // that page's comment for why this lives here instead of in
+    // renderBookCard itself.
+    function cleanCardAttributes(html) {
+      return html.replace(/(src|href|alt)="([^"]*)"/g, (m, attr, value) => `${attr}="${stegaClean(value)}"`)
+    }
+
+    showLoading(grid)
+    fetchArchiveView()
+      .then(books => {
+        if (!books || !books.length) { showError(grid, 'No books found.'); return }
+        const cardsHtml = books.map(renderBookCard).join('')
+        grid.innerHTML = isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml
+      })
+      .catch(() => showError(grid, 'Archive unavailable.'))
+  </script>
+
+  <script src="../../../js/nav.js"></script>
+</body>
+</html>

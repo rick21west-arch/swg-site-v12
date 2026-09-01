@@ -377,7 +377,7 @@
      return sanityFetch(
        `*[_type == "featuredFiction" && (featured == true || !defined(featured))] | order(_createdAt desc) [0...${limit}] {
          title, author, description, status, featuredMonth,
-         substackUrl, printUrl, ebookUrl, note,
+         substackUrl, printUrl, ebookUrl, note, commentary,
          "coverUrl": coverImage.asset->url
        }`
      )

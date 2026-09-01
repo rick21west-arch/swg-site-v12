@@ -29,6 +29,7 @@ const pages = [
   'the-work/index.html',
   'the-work/books/index.html',
   'the-work/featured/index.html',
+  'the-work/featured/archive/index.html',
   'the-work/first-light/index.html',
   'the-work/interviews/index.html',
   'the-work/opera-rose/index.html',
