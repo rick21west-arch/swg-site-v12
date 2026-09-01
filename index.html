@@ -305,7 +305,7 @@
 
     function fetchHome() {
       if (!isPreviewing()) return fetchHomeContent()
-      return fetch('/api/preview-home')
+      return fetch('/api/preview-singleton?type=homeContent')
         .then(res => {
           if (!res.ok) throw new Error('Preview fetch failed')
           return res.json()

@@ -311,7 +311,7 @@
 
     function fetchJoin() {
       if (!isPreviewing()) return fetchJoinContent()
-      return fetch('/api/preview-join')
+      return fetch('/api/preview-singleton?type=joinContent')
         .then(res => {
           if (!res.ok) throw new Error('Preview fetch failed')
           return res.json()
