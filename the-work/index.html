@@ -18,8 +18,6 @@
     .section-header-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
     #books-grid { max-width: 70%; margin-left: auto; margin-right: auto; }
     @media (max-width: 768px) { #books-grid { max-width: 100%; } }
-    #interviews-grid { max-width: 85%; margin-left: auto; margin-right: auto; }
-    @media (max-width: 768px) { #interviews-grid { max-width: 100%; } }
     .text-link { font-size: 14px; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
     .text-link:hover { color: var(--accent-light); }
     .music-grid { display: flex; flex-wrap: wrap; gap: 18px; }
@@ -32,6 +30,10 @@
     }
     .small-thumb-title { display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.3; }
     .small-thumb:hover .small-thumb-title { color: var(--text); }
+    /* Interviews and Just the Three of Us share this size — roughly 20%
+       larger than Music's default 150px small-thumb. Music stays at the
+       default size untouched. */
+    .small-thumb--medium { width: 180px; }
     @media (max-width: 768px) {
       .work-header { padding: 36px 24px 28px; }
       .work-section { padding: 36px 24px 40px; }
@@ -79,6 +81,16 @@
     <div class="grid grid--3" id="essays-grid" style="margin-top:28px;"></div>
   </div>
 
+  <hr class="work-divider" id="talks-divider">
+
+  <div class="work-section" id="talks-section">
+    <p class="section-label">Just the Three of Us</p>
+    <div class="section-rule"></div>
+    <p class="section-desc">The founders, talking — recorded and hosted on our YouTube channel.</p>
+    <div class="music-grid" id="talks-grid"></div>
+    <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">More on our YouTube channel →</a>
+  </div>
+
   <hr class="work-divider">
 
   <div class="work-section">
@@ -88,18 +100,8 @@
     </div>
     <div class="section-rule"></div>
     <p class="section-desc">The Guild in dialogue with writers, musicians, and people worth talking to — recorded and hosted on our YouTube channel.</p>
-    <div class="grid grid--3" id="interviews-grid" style="margin-top:28px;"></div>
+    <div class="music-grid" id="interviews-grid" style="margin-top:28px;"></div>
     <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">Everything on our YouTube channel →</a>
-  </div>
-
-  <hr class="work-divider" id="talks-divider">
-
-  <div class="work-section" id="talks-section">
-    <p class="section-label">Just the Three of Us</p>
-    <div class="section-rule"></div>
-    <p class="section-desc">The founders, talking — recorded and hosted on our YouTube channel.</p>
-    <div class="music-grid" id="talks-grid"></div>
-    <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">More on our YouTube channel →</a>
   </div>
 
   <hr class="work-divider" id="music-divider">
@@ -120,7 +122,7 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchInterviews, renderVideoCard, fetchMusicVideos, fetchGuildTalks, renderSmallThumb, showLoading, showError } from '../js/sanity.js'
+    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchInterviews, fetchMusicVideos, fetchGuildTalks, renderSmallThumb, showLoading, showError } from '../js/sanity.js'
 
     const booksGrid = document.getElementById('books-grid')
     showLoading(booksGrid)
@@ -143,18 +145,6 @@
       })
       .catch(() => showError(essaysGrid, 'Essays unavailable.'))
 
-    const interviewsGrid = document.getElementById('interviews-grid')
-    showLoading(interviewsGrid)
-    fetchInterviews(9)
-      .then(interviews => {
-        if (!interviews || !interviews.length) {
-          interviewsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
-          return
-        }
-        interviewsGrid.innerHTML = interviews.map(v => renderVideoCard(v, 'large', { linkToPage: true })).join('')
-      })
-      .catch(() => showError(interviewsGrid, 'Interviews unavailable.'))
-
     const talksGrid = document.getElementById('talks-grid')
     function hideTalksSection() {
       document.getElementById('talks-section').style.display = 'none'
@@ -163,9 +153,21 @@
     fetchGuildTalks(2)
       .then(talks => {
         if (!talks || !talks.length) { hideTalksSection(); return }
-        talksGrid.innerHTML = talks.map(renderSmallThumb).join('')
+        talksGrid.innerHTML = talks.map(t => renderSmallThumb(t, { size: 'medium' })).join('')
       })
       .catch(hideTalksSection)
+
+    const interviewsGrid = document.getElementById('interviews-grid')
+    showLoading(interviewsGrid)
+    fetchInterviews(9)
+      .then(interviews => {
+        if (!interviews || !interviews.length) {
+          interviewsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-faint);font-family:var(--font-serif);font-style:italic;font-size:0.95rem;">More to follow.</div>'
+          return
+        }
+        interviewsGrid.innerHTML = interviews.map(v => renderSmallThumb(v, { linkToPage: true, size: 'medium' })).join('')
+      })
+      .catch(() => showError(interviewsGrid, 'Interviews unavailable.'))
 
     const musicGrid = document.getElementById('music-grid')
     function hideMusicSection() {

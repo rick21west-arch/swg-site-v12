@@ -142,10 +142,15 @@
      )
    }
 
-   export function renderSmallThumb(video) {
+   export function renderSmallThumb(video, { linkToPage = false, size = '' } = {}) {
      const thumb = thumbSrc(video, 300)
+     const pageHref = linkToPage && video.slug && video.slug.current
+       ? `/the-work/videos/${video.slug.current}/`
+       : null
+     const href = pageHref || video.substackUrl
+     const sizeClass = size ? ` small-thumb--${size}` : ''
      return `
-       <a href="${esc(video.substackUrl)}" target="_blank" rel="noopener" class="small-thumb">
+       <a href="${esc(href)}"${pageHref ? '' : ' target="_blank" rel="noopener"'} class="small-thumb${sizeClass}">
          ${thumb
            ? `<img src="${esc(thumb)}" alt="${esc(video.title)}">`
            : `<div class="small-thumb-fallback"></div>`}
