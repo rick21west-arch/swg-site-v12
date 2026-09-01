@@ -243,8 +243,8 @@
 
   <div class="join-header-row">
     <div class="join-header">
-      <h1 class="join-headline">We want you to join. As a reader. As a writer. Whatever moves you.</h1>
-      <p class="join-sub">You have been cited for being delightful.</p>
+      <h1 class="join-headline" id="join-headline">We want you to join. As a reader. As a writer. Whatever moves you.</h1>
+      <p class="join-sub" id="join-tagline">You have been cited for being delightful.</p>
     </div>
     <div class="join-badge">
       <img src="../assets/images/join-you-are-delightful-hq.jpg" alt="Vintage circular sign reading 'You are delightful'" class="join-badge-img">
@@ -259,19 +259,19 @@
       <div class="tier-top">
         <p class="tier-eyebrow">Guild Member</p>
         <div class="tier-price-wrap">
-          <p class="tier-price-main">$96 <span>/ year</span></p>
+          <p class="tier-price-main" id="join-price-main">$96 <span>/ year</span></p>
         </div>
       </div>
       <div class="tier-rule"></div>
       <p class="tier-desc">Everything the Guild makes, straight to you — and the satisfaction of keeping it going.</p>
-      <ul class="tier-list">
+      <ul class="tier-list" id="join-benefits-list">
         <li>All Porch stories</li>
         <li>Full fiction archive</li>
         <li>Early access to new work</li>
         <li>Conversations and music</li>
         <li>Support the writers directly</li>
       </ul>
-      <a href="#oathEmailForm" class="tier-cta-btn">Join — $96/year →</a>
+      <a href="#oathEmailForm" class="tier-cta-btn" id="join-cta-btn">Join — $96/year →</a>
       <span class="tier-via">Memberships open very soon — leave your email below</span>
     </div>
 
@@ -280,7 +280,7 @@
   <hr class="join-divider">
 
   <div class="oath-section">
-    <p class="oath-quote">"What if she double-dog dared you?" Nin asked her, snubbing out her cigarette.</p>
+    <p class="oath-quote" id="join-pull-quote">"What if she double-dog dared you?" Nin asked her, snubbing out her cigarette.</p>
     <p style="font-family:var(--font-ui, inherit);font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;">Paid memberships open very soon — leave your email and we'll write the moment the doors do.</p>
     <form class="oath-email-form" id="oathEmailForm">
       <input type="email" name="email" id="oathEmailInput" placeholder="your@email.com" required>
@@ -299,6 +299,62 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchJoinContent } from '../js/sanity.js'
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchJoin() {
+      if (!isPreviewing()) return fetchJoinContent()
+      return fetch('/api/preview-join')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchJoinContent())
+    }
+
+    function esc(str) {
+      const d = document.createElement('div')
+      d.textContent = str || ''
+      return d.innerHTML
+    }
+
+    // The markup already carries the real, current copy as static
+    // fallback text, so a slow or failed fetch never shows an empty
+    // page — this only overwrites it once real data arrives.
+    fetchJoin()
+      .then(join => {
+        if (!join) return
+        const headlineEl = document.getElementById('join-headline')
+        const taglineEl = document.getElementById('join-tagline')
+        const quoteEl = document.getElementById('join-pull-quote')
+        const priceEl = document.getElementById('join-price-main')
+        const ctaEl = document.getElementById('join-cta-btn')
+        const benefitsEl = document.getElementById('join-benefits-list')
+
+        if (headlineEl && join.headline) headlineEl.textContent = join.headline
+        if (taglineEl && join.tagline) taglineEl.textContent = join.tagline
+        if (quoteEl && join.pullQuote) quoteEl.textContent = join.pullQuote
+
+        if (join.membershipPrice) {
+          const parts = join.membershipPrice.split('/')
+          if (priceEl) priceEl.innerHTML = `${esc(parts[0])} <span>/ ${esc(parts[1] || '')}</span>`
+          if (ctaEl) ctaEl.textContent = `Join — ${join.membershipPrice} →`
+        }
+
+        if (benefitsEl && join.membershipBenefits && join.membershipBenefits.length) {
+          benefitsEl.innerHTML = join.membershipBenefits.map(item => `<li>${esc(item)}</li>`).join('')
+        }
+      })
+      .catch(() => {})
+  </script>
 
   <script>
     (function () {

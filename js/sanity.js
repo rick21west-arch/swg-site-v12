@@ -246,6 +246,17 @@
      )
    }
 
+   /* ── Join Content ───────────────────────────────────────────── */
+   /* Singleton, same convention as siteSettings/houseContent/homeContent
+      — the Join page's headline, tagline, membership benefits, pull
+      quote, and price. The email signup form itself is untouched, unrelated. */
+
+   export async function fetchJoinContent() {
+     return sanityFetch(
+       `*[_type == "joinContent"][0]`
+     )
+   }
+
    /* ── Writers ────────────────────────────────────────────────── */
    /* Every writer document, in Studio-set display order — not four fixed
       slots, so a fifth entry (real writer or character-only, like

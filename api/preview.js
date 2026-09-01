@@ -28,6 +28,7 @@ const WRITERS_PATH_PATTERN = /^\/writers\/?$/;
 const WRITER_PATH_PATTERN = /^\/writers\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const HOUSE_PATH_PATTERN = /^\/the-house\/?$/;
 const HOUSE_GUIDELINES_PATH_PATTERN = /^\/the-house\/guidelines\/?$/;
+const JOIN_PATH_PATTERN = /^\/join\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
@@ -41,7 +42,8 @@ function isAllowedRedirectPath(path) {
     WRITERS_PATH_PATTERN.test(path) ||
     WRITER_PATH_PATTERN.test(path) ||
     HOUSE_PATH_PATTERN.test(path) ||
-    HOUSE_GUIDELINES_PATH_PATTERN.test(path)
+    HOUSE_GUIDELINES_PATH_PATTERN.test(path) ||
+    JOIN_PATH_PATTERN.test(path)
   );
 }
 
@@ -95,6 +97,8 @@ function resolveManualRedirect(req, secret) {
   if (type === 'houseContent') return '/the-house/';
   // Singleton, one page — the homepage itself.
   if (type === 'homeContent') return '/';
+  // Singleton, one page — the Join page.
+  if (type === 'joinContent') return '/join/';
   return null;
 }
 
