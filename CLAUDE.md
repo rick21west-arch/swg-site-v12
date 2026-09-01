@@ -130,7 +130,7 @@ Nav currently reads: THE PORCH · THE WORK · EVENTS · THE HOUSE · WRITERS · 
 
 ## Content management
 
-Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction. Writer bios, photos, and conversations are still hardcoded and need moving into Sanity. House contact address and the videos/featured-fiction pages were moved to Sanity 2026-08-28 (Step 8, phases 1-2). When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
+Sanity CMS (project `fe6l0kiy`, studio at swg-studio.sanity.studio) powers Porch stories, book pages, featured fiction, and the Writers section. House contact address and the videos/featured-fiction pages were moved to Sanity 2026-08-28 (Step 8, phases 1-2); Writers (schema, all four bios, listing page, individual pages) moved 2026-09-01 (Step 8, phase 3 — closes the last item on this list). When the domain changes, Sanity CORS origins must be updated or content silently fails to load.
 
 ### Sanity MCP schema lookup gotcha
 
