@@ -93,6 +93,8 @@ function resolveManualRedirect(req, secret) {
   // Singleton, no slug, feeds two pages — always resolves to the primary
   // one; the Submission Guidelines page is reachable from there.
   if (type === 'houseContent') return '/the-house/';
+  // Singleton, one page — the homepage itself.
+  if (type === 'homeContent') return '/';
   return null;
 }
 

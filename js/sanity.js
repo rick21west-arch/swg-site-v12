@@ -236,6 +236,16 @@
      )
    }
 
+   /* ── Home Content ───────────────────────────────────────────── */
+   /* Singleton, same convention as siteSettings/houseContent — the
+      homepage hero (headline, subhead, mission blurb). */
+
+   export async function fetchHomeContent() {
+     return sanityFetch(
+       `*[_type == "homeContent"][0]`
+     )
+   }
+
    /* ── Writers ────────────────────────────────────────────────── */
    /* Every writer document, in Studio-set display order — not four fixed
       slots, so a fifth entry (real writer or character-only, like

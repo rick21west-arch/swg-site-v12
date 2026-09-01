@@ -190,14 +190,14 @@
   </nav>
 
   <section class="home-hero">
-    <h1 class="home-headline">turning loss into language, fury into form, chaos into art</h1>
-    <p class="home-sub">Not every story is about the South, but the South is in every story.</p>
+    <h1 class="home-headline" id="home-headline">turning loss into language, fury into form, chaos into art</h1>
+    <p class="home-sub" id="home-subhead">Not every story is about the South, but the South is in every story.</p>
     <form class="home-email-form" id="homeEmailForm" method="post">
       <input type="email" name="email" id="homeEmailInput" placeholder="your@email.com" required>
       <button type="submit" aria-label="Submit">&#8594;</button>
     </form>
     <p class="home-form-status" id="homeFormStatus"></p>
-    <p class="home-value-prop">The Southern Writers Guild is a new, writer-led Southern literary organization that is already doing the work of a literary organization—publishing writers, creating original literary programming, developing collaborative publications, building an audience, and creating opportunities for contemporary Southern voices.</p>
+    <p class="home-value-prop" id="home-mission-blurb">The Southern Writers Guild is a new, writer-led Southern literary organization that is already doing the work of a literary organization—publishing writers, creating original literary programming, developing collaborative publications, building an audience, and creating opportunities for contemporary Southern voices.</p>
     <div class="home-value-rule"></div>
     <a class="home-micro-link" href="/the-porch/" aria-label="Enter the Porch here">
       <p class="home-micro">Enter the Porch here</p>
@@ -281,7 +281,7 @@
   <script src="/js/nav.js"></script>
 
   <script type="module">
-    import { fetchHomepageHighlights, renderPorchCard, renderVideoCard, showLoading, showError } from '/js/sanity.js'
+    import { fetchHomepageHighlights, renderPorchCard, renderVideoCard, showLoading, showError, fetchHomeContent } from '/js/sanity.js'
 
     const highlightsGrid = document.getElementById('highlights-grid')
     showLoading(highlightsGrid)
@@ -296,6 +296,38 @@
         ).join('')
       })
       .catch(() => showError(highlightsGrid, 'Unable to load right now.'))
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchHome() {
+      if (!isPreviewing()) return fetchHomeContent()
+      return fetch('/api/preview-home')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchHomeContent())
+    }
+
+    // The hero markup already carries the real, current copy as static
+    // fallback text, so a slow or failed fetch never shows an empty or
+    // "Loading…" hero — this only overwrites it once real data arrives.
+    fetchHome()
+      .then(home => {
+        if (!home) return
+        const headlineEl = document.getElementById('home-headline')
+        const subheadEl = document.getElementById('home-subhead')
+        const blurbEl = document.getElementById('home-mission-blurb')
+        if (headlineEl && home.heroHeadline) headlineEl.textContent = home.heroHeadline
+        if (subheadEl && home.heroSubhead) subheadEl.textContent = home.heroSubhead
+        if (blurbEl && home.missionBlurb) blurbEl.textContent = home.missionBlurb
+      })
+      .catch(() => {})
   </script>
 </body>
 </html>
