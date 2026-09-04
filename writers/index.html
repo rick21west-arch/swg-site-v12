@@ -105,7 +105,7 @@
   </nav>
 
   <div class="writers-header">
-    <p class="writers-eyebrow">The Founders</p>
+    <p class="writers-eyebrow" id="writers-eyebrow-founders">The Founders</p>
     <h1 class="writers-headline">Three writers.<br>Three perspectives.<br><em>Infinite possibilities.</em></h1>
   </div>
 
@@ -121,7 +121,7 @@
   </footer>
 
   <script type="module">
-    import { fetchWriters, esc, stegaClean, sanityImageDataAttr } from '../js/sanity.js'
+    import { fetchWriters, esc, stegaClean, sanityImageDataAttr, fetchWritersPageSettings } from '../js/sanity.js'
 
     const listEl = document.getElementById('writers-list')
 
@@ -140,6 +140,17 @@
         })
         .then(data => data.result)
         .catch(() => fetchWriters())
+    }
+
+    function fetchSettingsView() {
+      if (!isPreviewing()) return fetchWritersPageSettings()
+      return fetch('/api/preview-singleton?type=writersPageSettings')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchWritersPageSettings())
     }
 
     // Same attribute-safety pattern used everywhere else this session —
@@ -172,7 +183,7 @@
     // avatar) for any writer with an avatar photo set. alignLeft
     // alternates strictly by position among paired writers, independent
     // of who occupies which slot, so reordering in Studio just works.
-    function renderPairedSection(w, alignLeft) {
+    function renderPairedSection(w, alignLeft, labels) {
       const pos = photoPosition(w.characterPhotoHotspot)
       const href = `/writers/${esc(w.slug)}/`
       const photo = `
@@ -185,11 +196,11 @@
       const text = `
         <div class="writer-col">
           <div class="writer-text">
-            <p class="role-label">The Character</p>
+            <p class="role-label">${esc(labels.cardLabelCharacter)}</p>
             <h2 class="char-name"><a href="${href}" style="color:inherit;text-decoration:none;">${esc(w.characterName)}</a></h2>
             ${w.characterDescriptor ? `<p class="char-descriptor">${esc(w.characterDescriptor)}</p>` : ''}
             <div class="identity-rule"></div>
-            <p class="role-label">The Writer</p>
+            <p class="role-label">${esc(labels.cardLabelWriter)}</p>
             <h3 class="writer-name">${esc(w.realName || '')}</h3>
             <div class="writer-bio">${renderParagraphs(w.writerBio)}</div>
             ${renderLinks(w.links)}
@@ -200,12 +211,12 @@
 
     // Character-only treatment (no avatar photo) — Jean-Paul today, any
     // future character-only entry automatically.
-    function renderCharacterOnlySection(w) {
+    function renderCharacterOnlySection(w, labels) {
       const href = `/writers/${esc(w.slug)}/`
       return `
         <div class="section-jp">
           <div class="jp-text">
-            <p class="jp-eyebrow">Also Present</p>
+            <p class="jp-eyebrow">${esc(labels.labelAlsoPresent)}</p>
             <h3 class="jp-name"><a href="${href}" style="color:inherit;text-decoration:none;">${esc(w.characterName)}</a></h3>
             <div class="identity-rule"></div>
             <div class="writer-bio" style="max-width:520px;">${renderParagraphs(w.writerBio)}</div>
@@ -219,42 +230,82 @@
         </div>`
     }
 
-    const trioSection = `
+    // Fixed defaults match the real live copy — used if writersPageSettings
+    // hasn't loaded yet or a field is unset, same fallback philosophy as
+    // every other Sanity-fetched field on this site.
+    const TRIO_DEFAULTS = {
+      eyebrowTrio: 'The Trio',
+      trioHeading: 'On the\nPorch steps.',
+      trioImageUrl: '../assets/images/char-trio.jpg',
+      trioImageAlt: 'Hank, Grace, and Beau on the Porch steps',
+      trioDescription: 'Hank, Grace, and Beau — the characters who showed up first and never really left. They\'re the reason The Porch exists. Everything else grew from that.'
+    }
+
+    function renderTrioSection(settings) {
+      const s = Object.assign({}, TRIO_DEFAULTS, settings ? {
+        eyebrowTrio: settings.eyebrowTrio || TRIO_DEFAULTS.eyebrowTrio,
+        trioHeading: settings.trioHeading || TRIO_DEFAULTS.trioHeading,
+        trioImageUrl: settings.trioImageUrl || TRIO_DEFAULTS.trioImageUrl,
+        trioImageAlt: (settings.trioImage && settings.trioImage.alt) || TRIO_DEFAULTS.trioImageAlt,
+        trioDescription: settings.trioDescription || TRIO_DEFAULTS.trioDescription
+      } : {})
+      const headingHtml = s.trioHeading.split('\n').map(esc).join('<br>')
+      return `
       <div class="section-trio">
         <div class="trio-text-left">
-          <p class="trio-eyebrow">The Trio</p>
-          <h2 class="trio-headline">On the<br>Porch steps.</h2>
+          <p class="trio-eyebrow">${esc(s.eyebrowTrio)}</p>
+          <h2 class="trio-headline">${headingHtml}</h2>
           <div class="identity-rule"></div>
         </div>
         <div class="trio-photo">
-          <img src="../assets/images/char-trio.jpg" alt="Hank, Grace, and Beau on the Porch steps">
+          <img src="${esc(s.trioImageUrl)}" alt="${esc(s.trioImageAlt)}">
         </div>
         <div class="trio-text-right">
-          <p class="writer-bio">Hank, Grace, and Beau — the characters who showed up first and never really left. They're the reason The Porch exists. Everything else grew from that.</p>
+          <p class="writer-bio">${esc(s.trioDescription)}</p>
         </div>
       </div>`
+    }
 
-    fetchWritersView()
-      .then(writers => {
+    const LABEL_DEFAULTS = {
+      cardLabelCharacter: 'The Character',
+      cardLabelWriter: 'The Writer',
+      labelAlsoPresent: 'Also Present'
+    }
+
+    Promise.all([fetchWritersView(), fetchSettingsView().catch(() => null)])
+      .then(([writers, settings]) => {
         if (!writers || !writers.length) {
           listEl.innerHTML = '<div style="padding:48px 60px;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;text-align:center;">No writers found.</div>'
           return
         }
+        const labels = Object.assign({}, LABEL_DEFAULTS, settings ? {
+          cardLabelCharacter: settings.cardLabelCharacter || LABEL_DEFAULTS.cardLabelCharacter,
+          cardLabelWriter: settings.cardLabelWriter || LABEL_DEFAULTS.cardLabelWriter,
+          labelAlsoPresent: settings.labelAlsoPresent || LABEL_DEFAULTS.labelAlsoPresent
+        } : {})
+        const trioSection = renderTrioSection(settings)
         let pairedIndex = 0
         let trioInserted = false
         const parts = []
         writers.forEach(w => {
           if (w.avatarPhotoUrl) {
-            parts.push(renderPairedSection(w, pairedIndex % 2 === 0))
+            parts.push(renderPairedSection(w, pairedIndex % 2 === 0, labels))
             pairedIndex++
           } else {
             if (!trioInserted) { parts.push(trioSection); trioInserted = true }
-            parts.push(renderCharacterOnlySection(w))
+            parts.push(renderCharacterOnlySection(w, labels))
           }
         })
         if (!trioInserted) parts.push(trioSection)
         const html = parts.join('')
         listEl.innerHTML = isPreviewing() ? cleanCardAttributes(html) : html
+
+        const eyebrowEl = document.getElementById('writers-eyebrow-founders')
+        if (eyebrowEl && settings && settings.eyebrowFounders) eyebrowEl.textContent = settings.eyebrowFounders
+        if (settings && settings.writersMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', settings.writersMetaDescription)
+        }
       })
       .catch(() => {
         listEl.innerHTML = '<div style="padding:48px 60px;color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;text-align:center;">Writers unavailable.</div>'

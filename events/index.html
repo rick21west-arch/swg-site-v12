@@ -79,7 +79,7 @@
   <div class="events-header">
     <div>
       <p class="events-label">Events</p>
-      <p class="events-tagline">Where the Guild shows up in person.</p>
+      <p class="events-tagline" id="events-tagline">Where the Guild shows up in person.</p>
     </div>
   </div>
 
@@ -103,7 +103,7 @@
   </footer>
 
   <script type="module">
-    import { fetchEvents, renderEventCard, showLoading, showError } from '../js/sanity.js'
+    import { fetchEvents, renderEventCard, showLoading, showError, fetchSitePageCopy } from '../js/sanity.js'
     const grid = document.getElementById('events-grid')
     showLoading(grid)
     fetchEvents(9)
@@ -115,6 +115,35 @@
         grid.innerHTML = events.map(renderEventCard).join('')
       })
       .catch(() => showError(grid, 'Events unavailable.'))
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const taglineEl = document.getElementById('events-tagline')
+        if (taglineEl && copy.eventsTagline) taglineEl.textContent = copy.eventsTagline
+        if (copy.eventsMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', copy.eventsMetaDescription)
+        }
+      })
+      .catch(() => {})
   </script>
 
   <script src="../js/nav.js"></script>

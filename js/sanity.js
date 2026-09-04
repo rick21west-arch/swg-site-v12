@@ -257,6 +257,34 @@
      )
    }
 
+   /* ── Site Page Copy ─────────────────────────────────────────── */
+   /* Singleton, same convention as the other page-furniture documents —
+      scattered small copy on The Porch, The Work (and its Books/
+      Bookshelf/Videos/Interviews subpages), and Events. None of these
+      pages had an existing settings document to extend. */
+
+   export async function fetchSitePageCopy() {
+     return sanityFetch(
+       `*[_type == "sitePageCopy"][0]`
+     )
+   }
+
+   /* ── Writers Page Settings ─────────────────────────────────────── */
+   /* Singleton, same convention — Writers page-level furniture (eyebrows,
+      card labels, the Trio section, the Jean-Paul quote strip shared by
+      every individual writer page). Per-writer content stays on the
+      writer document type above, untouched. */
+
+   export async function fetchWritersPageSettings() {
+     return sanityFetch(
+       `*[_type == "writersPageSettings"][0]{
+         ...,
+         "trioImageUrl": trioImage.asset->url,
+         "trioImageHotspot": trioImage.hotspot
+       }`
+     )
+   }
+
    /* ── Writers ────────────────────────────────────────────────── */
    /* Every writer document, in Studio-set display order — not four fixed
       slots, so a fifth entry (real writer or character-only, like

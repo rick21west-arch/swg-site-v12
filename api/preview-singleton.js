@@ -14,7 +14,7 @@ const DATASET = 'production';
 const API_VERSION = '2024-01-01';
 const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
-const ALLOWED_TYPES = new Set(['houseContent', 'homeContent', 'joinContent']);
+const ALLOWED_TYPES = new Set(['houseContent', 'homeContent', 'joinContent', 'sitePageCopy', 'writersPageSettings']);
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' || !isValidPreviewRequest(req)) {
@@ -45,8 +45,14 @@ export default async function handler(req, res) {
 
   try {
     // type is validated against ALLOWED_TYPES above, so this is never
-    // arbitrary user input reaching the query.
-    const result = await client.fetch(`*[_type == "${type}"][0]`);
+    // arbitrary user input reaching the query. writersPageSettings is the
+    // only one of these with an image field (trioImage), so it's the only
+    // one that needs a projection to dereference the asset URL — every
+    // other type is a bare [0], same as before.
+    const projection = type === 'writersPageSettings'
+      ? `{ ..., "trioImageUrl": trioImage.asset->url, "trioImageHotspot": trioImage.hotspot }`
+      : '';
+    const result = await client.fetch(`*[_type == "${type}"][0]${projection}`);
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ result });
   } catch (err) {

@@ -58,14 +58,14 @@
 
   <div class="work-header">
     <p class="work-eyebrow">The Work</p>
-    <p class="work-tagline">Three writers. Three perspectives. Infinite possibilities.</p>
+    <p class="work-tagline" id="work-intro">Three writers. Three perspectives. Infinite possibilities.</p>
   </div>
 
   <hr class="work-divider">
 
   <div class="work-section">
     <div class="section-header-row">
-      <p class="section-label">The Books</p>
+      <p class="section-label" id="section-label-books">The Books</p>
       <a href="/the-work/books/" class="text-link">See the full catalog →</a>
     </div>
     <div class="section-rule"></div>
@@ -77,16 +77,16 @@
   <div class="work-section">
     <p class="section-label">The Kitchen Table</p>
     <div class="section-rule"></div>
-    <p class="section-desc">Work that doesn't involve the Unholy Trio — first published on the Porch, given its own space here.</p>
+    <p class="section-desc" id="work-kitchen-table-desc">Work that doesn't involve the Unholy Trio — first published on the Porch, given its own space here.</p>
     <div class="grid grid--3" id="essays-grid" style="margin-top:28px;"></div>
   </div>
 
   <hr class="work-divider" id="talks-divider">
 
   <div class="work-section" id="talks-section">
-    <p class="section-label">Just the Three of Us</p>
+    <p class="section-label" id="section-label-just-three">Just the Three of Us</p>
     <div class="section-rule"></div>
-    <p class="section-desc">The founders, talking — recorded and hosted on our YouTube channel.</p>
+    <p class="section-desc" id="work-conversations-desc">The founders, talking — recorded and hosted on our YouTube channel.</p>
     <div class="music-grid" id="talks-grid"></div>
     <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">More on our YouTube channel →</a>
   </div>
@@ -99,7 +99,7 @@
       <a href="/the-work/interviews/" class="text-link">See all interviews →</a>
     </div>
     <div class="section-rule"></div>
-    <p class="section-desc">The Guild in dialogue with writers, musicians, and people worth talking to — recorded and hosted on our YouTube channel.</p>
+    <p class="section-desc" id="work-interviews-desc">The Guild in dialogue with writers, musicians, and people worth talking to — recorded and hosted on our YouTube channel.</p>
     <div class="music-grid" id="interviews-grid" style="margin-top:28px;"></div>
     <a href="https://www.youtube.com/@southernwritersguild" target="_blank" rel="noopener" class="btn btn--ghost" style="margin-top:1.5rem;">Everything on our YouTube channel →</a>
   </div>
@@ -122,7 +122,48 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchInterviews, fetchMusicVideos, fetchGuildTalks, renderSmallThumb, showLoading, showError } from '../js/sanity.js'
+    import { fetchFeaturedBooks, renderBookCard, fetchEssays, renderPorchCard, fetchInterviews, fetchMusicVideos, fetchGuildTalks, renderSmallThumb, showLoading, showError, fetchSitePageCopy } from '../js/sanity.js'
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    // The markup already carries the real, current copy as static
+    // fallback text, so a slow or failed fetch never shows an empty page.
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const FIELDS = [
+          ['work-intro', 'workIntro'],
+          ['section-label-books', 'sectionLabelBooks'],
+          ['section-label-just-three', 'sectionLabelJustThree'],
+          ['work-kitchen-table-desc', 'workKitchenTableDesc'],
+          ['work-conversations-desc', 'workConversationsDesc'],
+          ['work-interviews-desc', 'workInterviewsDesc'],
+        ]
+        FIELDS.forEach(([id, field]) => {
+          const el = document.getElementById(id)
+          if (el && copy[field]) el.textContent = copy[field]
+        })
+        if (copy.workMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', copy.workMetaDescription)
+        }
+      })
+      .catch(() => {})
 
     const booksGrid = document.getElementById('books-grid')
     showLoading(booksGrid)

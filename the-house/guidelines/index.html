@@ -27,8 +27,8 @@
   <section style="padding:var(--sp-xl) 0 var(--sp-lg);">
     <div class="container--narrow prose">
 
-      <span class="section-eyebrow">How to Submit</span>
-      <h1>We read everything.<br>We publish selectively.</h1>
+      <span class="section-eyebrow" id="guidelines-eyebrow">How to Submit</span>
+      <h1 id="guidelines-h1">We read everything.<br>We publish selectively.</h1>
 
       <div id="guidelines-body">
         <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
@@ -68,7 +68,13 @@
 
     fetchHouse()
       .then(house => {
-        if (!house || !house.submissionGuidelines || !house.submissionGuidelines.length) {
+        if (!house) throw new Error('No house content')
+        if (house.guidelinesPageTitle) document.title = house.guidelinesPageTitle
+        const eyebrowEl = document.getElementById('guidelines-eyebrow')
+        if (eyebrowEl && house.guidelinesEyebrow) eyebrowEl.textContent = house.guidelinesEyebrow
+        const h1El = document.getElementById('guidelines-h1')
+        if (h1El && house.guidelinesH1) h1El.innerHTML = house.guidelinesH1.split('\n').map(esc).join('<br>')
+        if (!house.submissionGuidelines || !house.submissionGuidelines.length) {
           throw new Error('No guidelines content')
         }
         bodyEl.innerHTML = renderPortableText(house.submissionGuidelines)
@@ -76,6 +82,12 @@
       .catch(() => {
         bodyEl.innerHTML = '<p style="color:var(--text-faint);font-size:0.85rem;">Content unavailable.</p>'
       })
+
+    function esc(str) {
+      const d = document.createElement('div')
+      d.textContent = str || ''
+      return d.innerHTML
+    }
   </script>
 
   <script src="../../js/nav.js"></script>

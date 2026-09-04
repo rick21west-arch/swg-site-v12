@@ -247,7 +247,7 @@
       <p class="join-sub" id="join-tagline">You have been cited for being delightful.</p>
     </div>
     <div class="join-badge">
-      <img src="../assets/images/join-you-are-delightful-hq.jpg" alt="Vintage circular sign reading 'You are delightful'" class="join-badge-img">
+      <img src="../assets/images/join-you-are-delightful-hq.jpg" alt="Vintage circular sign reading 'You are delightful'" class="join-badge-img" id="join-badge-img">
     </div>
   </div>
 
@@ -263,7 +263,7 @@
         </div>
       </div>
       <div class="tier-rule"></div>
-      <p class="tier-desc">Everything the Guild makes, straight to you — and the satisfaction of keeping it going.</p>
+      <p class="tier-desc" id="join-tagline-secondary">Everything the Guild makes, straight to you — and the satisfaction of keeping it going.</p>
       <ul class="tier-list" id="join-benefits-list">
         <li>All Porch stories</li>
         <li>Full fiction archive</li>
@@ -272,7 +272,7 @@
         <li>Support the writers directly</li>
       </ul>
       <a href="#oathEmailForm" class="tier-cta-btn" id="join-cta-btn">Join — $96/year →</a>
-      <span class="tier-via">Memberships open very soon — leave your email below</span>
+      <span class="tier-via" id="join-memberships-soon-short">Memberships open very soon — leave your email below</span>
     </div>
 
   </div>
@@ -281,7 +281,7 @@
 
   <div class="oath-section">
     <p class="oath-quote" id="join-pull-quote">"What if she double-dog dared you?" Nin asked her, snubbing out her cigarette.</p>
-    <p style="font-family:var(--font-ui, inherit);font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;">Paid memberships open very soon — leave your email and we'll write the moment the doors do.</p>
+    <p style="font-family:var(--font-ui, inherit);font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;" id="join-memberships-soon-long">Paid memberships open very soon — leave your email and we'll write the moment the doors do.</p>
     <form class="oath-email-form" id="oathEmailForm">
       <input type="email" name="email" id="oathEmailInput" placeholder="your@email.com" required>
       <button type="submit" aria-label="Submit">&#8594;</button>
@@ -351,6 +351,23 @@
 
         if (benefitsEl && join.membershipBenefits && join.membershipBenefits.length) {
           benefitsEl.innerHTML = join.membershipBenefits.map(item => `<li>${esc(item)}</li>`).join('')
+        }
+
+        const badgeImgEl = document.getElementById('join-badge-img')
+        if (badgeImgEl && join.joinImageAlt) badgeImgEl.setAttribute('alt', join.joinImageAlt)
+
+        const taglineSecondaryEl = document.getElementById('join-tagline-secondary')
+        if (taglineSecondaryEl && join.joinTaglineSecondary) taglineSecondaryEl.textContent = join.joinTaglineSecondary
+
+        const soonShortEl = document.getElementById('join-memberships-soon-short')
+        if (soonShortEl && join.joinMembershipsSoonShort) soonShortEl.textContent = join.joinMembershipsSoonShort
+
+        const soonLongEl = document.getElementById('join-memberships-soon-long')
+        if (soonLongEl && join.joinMembershipsSoonLong) soonLongEl.textContent = join.joinMembershipsSoonLong
+
+        if (join.joinMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', join.joinMetaDescription)
         }
       })
       .catch(() => {})

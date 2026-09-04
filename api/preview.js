@@ -29,12 +29,24 @@ const WRITER_PATH_PATTERN = /^\/writers\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const HOUSE_PATH_PATTERN = /^\/the-house\/?$/;
 const HOUSE_GUIDELINES_PATH_PATTERN = /^\/the-house\/guidelines\/?$/;
 const JOIN_PATH_PATTERN = /^\/join\/?$/;
+// sitePageCopy feeds these seven pages; none had an allowed-redirect entry
+// before now, since none previously had any Sanity-fetched content at all
+// (a page with static-only content never needed Presentation Tool to
+// activate preview mode on it). Without these, clicking a sitePageCopy
+// field in Studio would never actually land the editor on the live page.
+const PORCH_ROOT_PATH_PATTERN = /^\/the-porch\/?$/;
+const WORK_ROOT_PATH_PATTERN = /^\/the-work\/?$/;
+const WORK_BOOKS_PATH_PATTERN = /^\/the-work\/books\/?$/;
+const WORK_INTERVIEWS_PATH_PATTERN = /^\/the-work\/interviews\/?$/;
+const EVENTS_ROOT_PATH_PATTERN = /^\/events\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
     path === '/' ||
     PORCH_PATH_PATTERN.test(path) ||
+    PORCH_ROOT_PATH_PATTERN.test(path) ||
     EVENT_PATH_PATTERN.test(path) ||
+    EVENTS_ROOT_PATH_PATTERN.test(path) ||
     FEATURED_PATH_PATTERN.test(path) ||
     FEATURED_ARCHIVE_PATH_PATTERN.test(path) ||
     VIDEOS_PATH_PATTERN.test(path) ||
@@ -43,7 +55,10 @@ function isAllowedRedirectPath(path) {
     WRITER_PATH_PATTERN.test(path) ||
     HOUSE_PATH_PATTERN.test(path) ||
     HOUSE_GUIDELINES_PATH_PATTERN.test(path) ||
-    JOIN_PATH_PATTERN.test(path)
+    JOIN_PATH_PATTERN.test(path) ||
+    WORK_ROOT_PATH_PATTERN.test(path) ||
+    WORK_BOOKS_PATH_PATTERN.test(path) ||
+    WORK_INTERVIEWS_PATH_PATTERN.test(path)
   );
 }
 
@@ -99,6 +114,11 @@ function resolveManualRedirect(req, secret) {
   if (type === 'homeContent') return '/';
   // Singleton, one page — the Join page.
   if (type === 'joinContent') return '/join/';
+  // Singleton, seven pages — always resolves to the first, same pattern
+  // as houseContent above.
+  if (type === 'sitePageCopy') return '/the-porch/';
+  // Singleton, two pages — always resolves to the listing page.
+  if (type === 'writersPageSettings') return '/writers/';
   return null;
 }
 

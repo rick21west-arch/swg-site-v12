@@ -31,8 +31,8 @@
       <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Videos</span>
       <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Guild videos.</h1>
       <p class="hero-sub">
-        The Trio, about twice a month — and occasional conversations with writers, musicians,
-        and people doing interesting things in the contemporary South. All episodes live on Substack.
+        <span id="videos-page-desc">The Trio, about twice a month — and occasional conversations with writers, musicians,
+        and people doing interesting things in the contemporary South. All episodes live on Substack.</span>
         <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a>
       </p>
     </div>
@@ -59,7 +59,7 @@
         <div class="section-header" style="margin-bottom:0.5rem;">
           <span class="section-header-title">Conversations</span>
         </div>
-        <p class="card-body" style="margin-bottom:1.25rem;font-size:0.95rem;">Writers, musicians, and people doing interesting things in the contemporary South.</p>
+        <p class="card-body" style="margin-bottom:1.25rem;font-size:0.95rem;" id="videos-sub-desc">Writers, musicians, and people doing interesting things in the contemporary South.</p>
         <div class="grid grid--3" id="conversations-grid"></div>
       </div>
 
@@ -74,7 +74,7 @@
   </footer>
 
   <script type="module">
-    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
+    import { fetchVideos, fetchAllVideos, fetchConversations, renderVideoCard, showLoading, showError, stegaClean, fetchSitePageCopy } from '../../js/sanity.js'
 
     const latestGrid = document.getElementById('latest-videos-grid')
     const archiveGrid = document.getElementById('guild-videos-archive-grid')
@@ -175,6 +175,27 @@
         conversationsGrid.innerHTML = (isPreviewing() ? cleanCardAttributes(html) : html) + dashedCard
       })
       .catch(() => showError(conversationsGrid, 'Conversations unavailable.'))
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const descEl = document.getElementById('videos-page-desc')
+        if (descEl && copy.videosPageDesc) descEl.textContent = copy.videosPageDesc
+        const subDescEl = document.getElementById('videos-sub-desc')
+        if (subDescEl && copy.videosSubDesc) subDescEl.textContent = copy.videosSubDesc
+      })
+      .catch(() => {})
   </script>
 
   <script src="../../js/nav.js"></script>

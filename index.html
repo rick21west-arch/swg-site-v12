@@ -228,7 +228,7 @@
   <hr class="home-divider">
 
   <div class="scratches-section">
-    <div class="scratches">
+    <div class="scratches" id="scratches-list">
       <div class="scratch">Yanking is for amateurs and dentists.</div>
       <div class="scratch">Peace of mind is a premium product.</div>
       <div class="scratch">Noise is a currency and silence is usually sold too cheap.</div>
@@ -326,6 +326,14 @@
         if (headlineEl && home.heroHeadline) headlineEl.textContent = home.heroHeadline
         if (subheadEl && home.heroSubhead) subheadEl.textContent = home.heroSubhead
         if (blurbEl && home.missionBlurb) blurbEl.textContent = home.missionBlurb
+        const scratchesEl = document.getElementById('scratches-list')
+        if (scratchesEl && home.scratchQuotes && home.scratchQuotes.length) {
+          scratchesEl.innerHTML = home.scratchQuotes.map(q => {
+            const d = document.createElement('div')
+            d.textContent = q
+            return `<div class="scratch">${d.innerHTML}</div>`
+          }).join('')
+        }
       })
       .catch(() => {})
   </script>

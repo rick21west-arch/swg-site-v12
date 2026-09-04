@@ -90,7 +90,7 @@
   <div class="porch-header">
     <div>
       <p class="porch-label">The Porch</p>
-      <p class="porch-tagline">A little bit of YeeHaw. A lot of Rebel Yell. And a touch of Grace.</p>
+      <p class="porch-tagline" id="porch-tagline">A little bit of YeeHaw. A lot of Rebel Yell. And a touch of Grace.</p>
     </div>
   </div>
 
@@ -103,7 +103,7 @@
   </div>
 
   <div class="porch-footer">
-    <p class="jp-quote">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
+    <p class="jp-quote" id="porch-jp-quote">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
     <a href="/the-porch/archive/" class="archive-link">Every story from the Porch →</a>
   </div>
 
@@ -115,7 +115,7 @@
   </footer>
 
   <script type="module">
-    import { fetchPorchStories, renderPorchCard, showLoading, showError } from '../js/sanity.js'
+    import { fetchPorchStories, renderPorchCard, showLoading, showError, fetchSitePageCopy } from '../js/sanity.js'
     const grid = document.getElementById('porch-grid')
     showLoading(grid)
     fetchPorchStories(9)
@@ -127,6 +127,39 @@
         grid.innerHTML = stories.map(renderPorchCard).join('')
       })
       .catch(() => showError(grid, 'Stories unavailable — visit us on Substack.'))
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    // The markup already carries the real, current copy as static
+    // fallback text, so a slow or failed fetch never shows an empty page.
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const taglineEl = document.getElementById('porch-tagline')
+        if (taglineEl && copy.porchTagline) taglineEl.textContent = copy.porchTagline
+        const quoteEl = document.getElementById('porch-jp-quote')
+        if (quoteEl && copy.porchJPQuote) quoteEl.textContent = copy.porchJPQuote
+        if (copy.porchMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', copy.porchMetaDescription)
+        }
+      })
+      .catch(() => {})
   </script>
 
   <script src="/js/nav.js"></script>

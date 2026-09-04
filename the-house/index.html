@@ -241,13 +241,13 @@
   </nav>
 
   <div class="mission-section">
-    <p class="section-label">Mission</p>
+    <p class="section-label" id="section-label-mission">Mission</p>
     <div class="section-rule"></div>
     <div class="prose" id="mission-body">
       <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
     </div>
 
-    <p class="section-label">Organizational Goals</p>
+    <p class="section-label" id="section-label-goals">Organizational Goals</p>
     <div class="section-rule"></div>
     <div class="prose" id="goals-body">
       <p style="color:var(--text-faint);font-size:0.85rem;">Loading…</p>
@@ -258,17 +258,17 @@
 
   <div class="beliefs-grid">
     <div>
-      <p class="belief-label">Southern</p>
+      <p class="belief-label" id="belief-label-southern">Southern</p>
       <div class="belief-rule"></div>
       <div class="belief-body" id="belief-southern-body"></div>
     </div>
     <div>
-      <p class="belief-label">Writer</p>
+      <p class="belief-label" id="belief-label-writer">Writer</p>
       <div class="belief-rule"></div>
       <div class="belief-body" id="belief-writer-body"></div>
     </div>
     <div>
-      <p class="belief-label">Guild</p>
+      <p class="belief-label" id="belief-label-guild">Guild</p>
       <div class="belief-rule"></div>
       <div class="belief-body" id="belief-guild-body"></div>
     </div>
@@ -278,7 +278,7 @@
 
   <div class="submit-section" id="submit">
     <div class="section-header-row">
-      <p class="section-label">Submit Your Work</p>
+      <p class="section-label" id="section-label-submit">Submit Your Work</p>
     </div>
     <div class="section-rule"></div>
 
@@ -288,22 +288,22 @@
 
     <div class="lists-grid">
       <div>
-        <p class="list-label">What we're looking for</p>
+        <p class="list-label" id="list-label-looking-for">What we're looking for</p>
         <ul class="criteria-list" id="submit-looking-for-list"></ul>
         <p class="criteria-note" id="submit-looking-for-note"></p>
       </div>
       <div>
-        <p class="list-label">What we are not looking for</p>
+        <p class="list-label" id="list-label-not-looking-for">What we are not looking for</p>
         <ul class="criteria-list" id="submit-not-looking-for-list"></ul>
         <p class="criteria-note" id="submit-not-looking-for-note"></p>
       </div>
     </div>
 
     <div class="how-box">
-      <p class="how-label">How to Submit</p>
+      <p class="how-label" id="how-label">How to Submit</p>
       <p class="how-body" id="submit-how-body"></p>
       <p class="how-note" id="submit-how-note"></p>
-      <a href="mailto:jp@southernwritersguild.com" id="submit-contact-link" class="text-link">Submit your work →</a>
+      <a href="mailto:jp@southernwritersguild.com" id="submit-contact-link" class="text-link"><span id="submit-button-text">Submit your work →</span></a>
     </div>
   </div>
 
@@ -315,7 +315,7 @@
     <div class="contact-grid">
       <div class="contact-card">
         <p class="contact-label">Contact SWG</p>
-        <p class="contact-desc">Questions about the Guild, the Porch, membership, reprint requests, licensing, or anything else.</p>
+        <p class="contact-desc" id="contact-intro-line">Questions about the Guild, the Porch, membership, reprint requests, licensing, or anything else.</p>
         <a href="mailto:jp@southernwritersguild.com" id="contact-email-link" class="text-link">jp@southernwritersguild.com →</a>
       </div>
     </div>
@@ -396,6 +396,23 @@
       ['submit-how-note', 'submitHowNote'],
     ]
 
+    // Fixed section labels/captions — the static markup already carries
+    // the real live text as a fallback, same as every other field here;
+    // this just overwrites it once the fetch succeeds.
+    const LABEL_FIELDS = [
+      ['section-label-mission', 'sectionLabelMission'],
+      ['section-label-goals', 'sectionLabelGoals'],
+      ['belief-label-southern', 'beliefCardSouthern'],
+      ['belief-label-writer', 'beliefCardWriter'],
+      ['belief-label-guild', 'beliefCardGuild'],
+      ['section-label-submit', 'sectionLabelSubmit'],
+      ['list-label-looking-for', 'listLabelLookingFor'],
+      ['list-label-not-looking-for', 'listLabelNotLookingFor'],
+      ['how-label', 'boxLabelHowToSubmit'],
+      ['submit-button-text', 'submitButtonText'],
+      ['contact-intro-line', 'contactIntroLine'],
+    ]
+
     fetchHouse()
       .then(house => {
         if (!house) throw new Error('No house content')
@@ -411,6 +428,14 @@
           const el = document.getElementById(id)
           if (el) el.textContent = house[field] || ''
         })
+        LABEL_FIELDS.forEach(([id, field]) => {
+          const el = document.getElementById(id)
+          if (el && house[field]) el.textContent = house[field]
+        })
+        if (house.houseMetaDescription) {
+          const meta = document.querySelector('meta[name="description"]')
+          if (meta) meta.setAttribute('content', house.houseMetaDescription)
+        }
       })
       .catch(() => {
         ['mission-body', 'goals-body', 'belief-southern-body', 'belief-writer-body', 'belief-guild-body', 'submit-pull-quote'].forEach(id => {

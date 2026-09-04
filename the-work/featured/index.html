@@ -44,7 +44,7 @@
     <div class="container">
       <span class="hero-eyebrow">The Work &nbsp;·&nbsp; Bookshelf</span>
       <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Bookshelf.</h1>
-      <p class="hero-sub">The Guild's currently featured writers. The feature rotates monthly and opens to outside writers. <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
+      <p class="hero-sub"><span id="bookshelf-page-desc">The Guild's currently featured writers. The feature rotates monthly and opens to outside writers.</span> <a href="/the-work/" class="btn btn--ghost" style="font-size:0.62rem;margin-left:1rem;">← Back to The Work</a></p>
     </div>
   </section>
 
@@ -65,7 +65,7 @@
   </footer>
 
   <script type="module">
-    import { fetchFeaturedBooks, renderBookCard, showLoading, showError, stegaClean } from '../../js/sanity.js'
+    import { fetchFeaturedBooks, renderBookCard, showLoading, showError, stegaClean, fetchSitePageCopy } from '../../js/sanity.js'
     const grid = document.getElementById('featured-fiction-grid')
     const dashedCard = `
       <div class="card card--dim" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:300px;">
@@ -118,6 +118,25 @@
         grid.innerHTML = (isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml) + dashedCard
       })
       .catch(() => showError(grid, 'Bookshelf unavailable.'))
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const descEl = document.getElementById('bookshelf-page-desc')
+        if (descEl && copy.bookshelfPageDesc) descEl.textContent = copy.bookshelfPageDesc
+      })
+      .catch(() => {})
   </script>
 
   <script src="../../js/nav.js"></script>

@@ -124,7 +124,7 @@
 
   <div class="jp-strip" id="jp-strip" style="display:none;">
     <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-      <p class="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
+      <p class="jp-strip-text" id="jp-strip-text">"I emit low-level observational signal. The humans continue regardless." — Jean-Paul</p>
       <a href="/writers/jean-paul/" class="btn btn--ghost" style="font-size:0.58rem;white-space:nowrap;" id="jp-strip-link">Who is Jean-Paul?</a>
     </div>
   </div>
@@ -137,7 +137,7 @@
   </footer>
 
   <script type="module">
-    import { fetchWriterBySlug, esc, stegaClean, sanityImageDataAttr } from '/js/sanity.js'
+    import { fetchWriterBySlug, esc, stegaClean, sanityImageDataAttr, fetchWritersPageSettings } from '/js/sanity.js'
 
     const heroEl = document.getElementById('writer-hero-content')
     const bodyEl = document.getElementById('writer-body-content')
@@ -228,6 +228,28 @@
         bodyEl.innerHTML = '<p>Something went wrong loading this page.</p>'
       })
     }
+
+    function fetchSettingsView() {
+      if (!isPreviewing()) return fetchWritersPageSettings()
+      return fetch('/api/preview-singleton?type=writersPageSettings')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchWritersPageSettings())
+    }
+
+    // The markup already carries the real, current quote as static
+    // fallback text — this only overwrites it once real data arrives.
+    fetchSettingsView()
+      .then(settings => {
+        if (!settings) return
+        const textEl = document.getElementById('jp-strip-text')
+        if (textEl && settings.jpQuoteStrip) textEl.textContent = settings.jpQuoteStrip
+        if (jpStripLink && settings.jpQuoteLabel) jpStripLink.textContent = settings.jpQuoteLabel
+      })
+      .catch(() => {})
   </script>
 
   <script src="/js/nav.js"></script>
