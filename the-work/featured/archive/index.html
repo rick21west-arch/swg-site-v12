@@ -81,7 +81,7 @@
     fetchArchiveView()
       .then(books => {
         if (!books || !books.length) { showError(grid, 'No books found.'); return }
-        const cardsHtml = books.map(renderBookCard).join('')
+        const cardsHtml = books.map(b => renderBookCard(b, { linkToPage: true })).join('')
         grid.innerHTML = isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml
       })
       .catch(() => showError(grid, 'Archive unavailable.'))

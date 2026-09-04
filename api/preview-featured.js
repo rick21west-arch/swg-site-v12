@@ -2,13 +2,13 @@ import { createClient } from '@sanity/client';
 import { isValidPreviewRequest } from './_lib/preview.js';
 
 // Same pattern as api/preview-videos.js, for featuredFiction instead of
-// guildVideo. featuredFiction has no slug and no individual page — every
-// document resolves to one of two shared listing pages
+// guildVideo. Three views: main and all are the two shared listing pages
 // (the-work/featured/ shows the 9 most recent featured;
-// the-work/featured/archive/ shows everything), so a fixed ?view= enum
-// mirrors those two literal queries (fetchFeaturedBooks(9) and
-// fetchFeaturedFiction() in js/sanity.js) rather than accepting an
-// arbitrary query from the client.
+// the-work/featured/archive/ shows everything), mirroring the literal
+// queries fetchFeaturedBooks(9) and fetchFeaturedFiction() in js/sanity.js.
+// byslug is the individual book page (the-work/featured/book) — added
+// when featuredFiction gained a real slug field and each book its own
+// page; kept on this same shared endpoint rather than a new function.
 const PROJECT_ID = 'fe6l0kiy';
 const DATASET = 'production';
 const API_VERSION = '2024-01-01';
@@ -16,7 +16,8 @@ const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
 const FIELDS = `title, author, description, status, featuredMonth,
         substackUrl, printUrl, ebookUrl, note, commentary,
-        "coverUrl": coverImage.asset->url`;
+        "coverUrl": coverImage.asset->url,
+        "slug": slug.current`;
 
 const VIEWS = {
   main: `*[_type == "featuredFiction" && (featured == true || !defined(featured))] | order(_createdAt desc) [0...9] {${FIELDS}}`,
@@ -30,8 +31,17 @@ export default async function handler(req, res) {
   }
 
   const view = req.query && req.query.view;
-  if (typeof view !== 'string' || !Object.prototype.hasOwnProperty.call(VIEWS, view)) {
+  const isByslug = view === 'byslug';
+  if (typeof view !== 'string' || (!isByslug && !Object.prototype.hasOwnProperty.call(VIEWS, view))) {
     return res.status(400).json({ error: 'Missing or invalid view' });
+  }
+
+  let slug;
+  if (isByslug) {
+    slug = req.query && req.query.slug;
+    if (typeof slug !== 'string' || !slug) {
+      return res.status(400).json({ error: 'Missing slug' });
+    }
   }
 
   const token = process.env.SANITY_PREVIEW_TOKEN;
@@ -51,7 +61,9 @@ export default async function handler(req, res) {
   });
 
   try {
-    const result = await client.fetch(VIEWS[view]);
+    const result = isByslug
+      ? await client.fetch(`*[_type == "featuredFiction" && slug.current == $slug][0] {${FIELDS}}`, { slug })
+      : await client.fetch(VIEWS[view]);
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ result });
   } catch (err) {

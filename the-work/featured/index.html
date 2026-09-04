@@ -114,7 +114,7 @@
     fetchFeaturedFictionView()
       .then(features => {
         if (!features || !features.length) { grid.innerHTML = dashedCard; return }
-        const cardsHtml = features.map(renderBookCard).join('')
+        const cardsHtml = features.map(b => renderBookCard(b, { linkToPage: true })).join('')
         grid.innerHTML = (isPreviewing() ? cleanCardAttributes(cardsHtml) : cardsHtml) + dashedCard
       })
       .catch(() => showError(grid, 'Bookshelf unavailable.'))

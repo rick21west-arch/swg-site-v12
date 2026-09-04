@@ -12,18 +12,23 @@ const DATASET = 'production';
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PORCH_PATH_PATTERN = /^\/the-porch\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const EVENT_PATH_PATTERN = /^\/events\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
-// featuredFiction and guildVideo have no slug field and no individual page —
-// every document of either type resolves to one shared listing page, so
-// these are fixed paths rather than a slug pattern. Trailing slash is
+// guildVideo and featuredFiction both have a required slug and their own
+// individual page now; the shared listing paths below stay fixed rather
+// than slug patterns since they're not per-document. Trailing slash is
 // optional here too, same as every other pattern in this function — an
 // exact-string check (the original version of this) silently rejected
-// whichever form Presentation Tool happened to ask for without one,
-// which meant preview mode never activated for these two pages at all,
-// with no visible error anywhere.
+// whichever form Presentation Tool happened to ask for without one, which
+// meant preview mode never activated for these pages at all, with no
+// visible error anywhere.
 const FEATURED_PATH_PATTERN = /^\/the-work\/featured\/?$/;
 const VIDEOS_PATH_PATTERN = /^\/the-work\/videos\/?$/;
 const VIDEO_PATH_PATTERN = /^\/the-work\/videos\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const FEATURED_ARCHIVE_PATH_PATTERN = /^\/the-work\/featured\/archive\/?$/;
+// featuredFiction's individual page — matched before the archive fixed
+// path is checked separately below, but tested independently so either
+// pattern alone is sufficient (archive still resolves via its own
+// pattern; this one covers everything else under /the-work/featured/).
+const FEATURED_BOOK_PATH_PATTERN = /^\/the-work\/featured\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const WRITERS_PATH_PATTERN = /^\/writers\/?$/;
 const WRITER_PATH_PATTERN = /^\/writers\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/;
 const HOUSE_PATH_PATTERN = /^\/the-house\/?$/;
@@ -53,6 +58,7 @@ function isAllowedRedirectPath(path) {
     EVENTS_ROOT_PATH_PATTERN.test(path) ||
     FEATURED_PATH_PATTERN.test(path) ||
     FEATURED_ARCHIVE_PATH_PATTERN.test(path) ||
+    FEATURED_BOOK_PATH_PATTERN.test(path) ||
     VIDEOS_PATH_PATTERN.test(path) ||
     VIDEO_PATH_PATTERN.test(path) ||
     WRITERS_PATH_PATTERN.test(path) ||
@@ -102,17 +108,20 @@ function resolveManualRedirect(req, secret) {
     if (typeof slug !== 'string' || !SLUG_PATTERN.test(slug)) return null;
     return type === 'event' ? `/events/${slug}/` : `/the-porch/${slug}/`;
   }
-  if (type === 'guildVideo' || type === 'writer') {
-    // Both types have an optional slug: with one, resolve to that
+  if (type === 'guildVideo' || type === 'writer' || type === 'featuredFiction') {
+    // All three types have an optional slug: with one, resolve to that
     // document's own page; without one, resolve to the shared listing.
     const slug = req.query && req.query.slug;
     if (typeof slug === 'string' && slug) {
       if (!SLUG_PATTERN.test(slug)) return null;
-      return type === 'writer' ? `/writers/${slug}/` : `/the-work/videos/${slug}/`;
+      if (type === 'writer') return `/writers/${slug}/`;
+      if (type === 'featuredFiction') return `/the-work/featured/${slug}/`;
+      return `/the-work/videos/${slug}/`;
     }
-    return type === 'writer' ? '/writers/' : '/the-work/videos/';
+    if (type === 'writer') return '/writers/';
+    if (type === 'featuredFiction') return '/the-work/featured/';
+    return '/the-work/videos/';
   }
-  if (type === 'featuredFiction') return '/the-work/featured/';
   // Singleton, no slug, feeds two pages — always resolves to the primary
   // one; the Submission Guidelines page is reachable from there.
   if (type === 'houseContent') return '/the-house/';

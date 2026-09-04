@@ -9,6 +9,16 @@
     { "source": "/the-work/videos/:slug", "destination": "/the-work/videos/video/index.html" },
     { "source": "/the-work/videos/:slug/", "destination": "/the-work/videos/video/index.html" },
     { "source": "/writers/:slug", "destination": "/writers/writer/index.html" },
-    { "source": "/writers/:slug/", "destination": "/writers/writer/index.html" }
+    { "source": "/writers/:slug/", "destination": "/writers/writer/index.html" },
+    { "source": "/the-work/featured/:slug", "destination": "/the-work/featured/book/index.html" },
+    { "source": "/the-work/featured/:slug/", "destination": "/the-work/featured/book/index.html" }
+  ],
+  "redirects": [
+    { "source": "/the-work/opera-rose/", "destination": "/the-work/featured/opera-rose/", "permanent": true },
+    { "source": "/the-work/opera-rose", "destination": "/the-work/featured/opera-rose/", "permanent": true },
+    { "source": "/the-work/first-light/", "destination": "/the-work/featured/first-light/", "permanent": true },
+    { "source": "/the-work/first-light", "destination": "/the-work/featured/first-light/", "permanent": true },
+    { "source": "/the-work/ugly-duckling/", "destination": "/the-work/featured/the-ugly-duckling/", "permanent": true },
+    { "source": "/the-work/ugly-duckling", "destination": "/the-work/featured/the-ugly-duckling/", "permanent": true }
   ]
 }

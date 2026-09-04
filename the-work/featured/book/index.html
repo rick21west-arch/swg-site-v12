@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book — Southern Writers Guild</title>
+  <link rel="stylesheet" href="/css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="/assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/" class="active">The Work</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section">
+    <div class="container">
+      <a href="/the-work/featured/" class="btn btn--ghost" style="font-size:0.6rem;display:inline-block;margin-bottom:var(--sp-md);">← Back to Bookshelf</a>
+      <div id="book-content">
+        <div style="color:var(--text-faint);font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.1em;padding:3rem 0;text-align:center;">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script src="/js/nav.js"></script>
+  <script type="module">
+    import { fetchFeaturedBookBySlug, esc, stegaClean } from '/js/sanity.js'
+
+    const el = document.getElementById('book-content')
+    const parts = window.location.pathname.split('/').filter(Boolean)
+    const slug = parts[parts.length - 1]
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation. Uses
+    // api/preview-featured.js's byslug view — the same shared endpoint
+    // the Bookshelf and Archive pages already use for their two listing
+    // views, just a third view rather than a new function.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchBook(slug) {
+      if (!isPreviewing()) return fetchFeaturedBookBySlug(slug)
+      return fetch(`/api/preview-featured?view=byslug&slug=${encodeURIComponent(slug)}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchFeaturedBookBySlug(slug))
+    }
+
+    function notFound() {
+      el.innerHTML = '<p style="color:var(--text-faint);text-align:center;padding:3rem;">We couldn’t find that book. It may have moved.</p>'
+    }
+
+    function renderBook(book) {
+      if (!book) { notFound(); return }
+
+      // document.title is a place stega's invisible characters cause real
+      // bugs (never let stega reach <head>) — stegaClean() strips them, a
+      // no-op outside preview mode. The visible heading is left un-cleaned
+      // on purpose: that's the actual click-to-edit target.
+      document.title = `${stegaClean(book.title)} — Southern Writers Guild`
+
+      el.innerHTML = `
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:var(--sp-lg);align-items:start;">
+          ${book.coverUrl
+            ? `<img src="${esc(book.coverUrl)}" alt="${esc(book.title)}" style="width:100%;height:auto;display:block;">`
+            : '<div style="width:280px;height:420px;background:var(--bg-3);"></div>'}
+          <div>
+            <span class="section-eyebrow">${esc(book.author || '')} &nbsp;·&nbsp; Fiction</span>
+            <h1 class="section-title">${esc(book.title)}</h1>
+            ${book.note ? `<p class="card-note" style="margin-bottom:var(--sp-sm);">${esc(book.note)}</p>` : ''}
+            ${book.featuredMonth ? `<p class="card-note" style="margin-bottom:var(--sp-sm);">Featured: ${esc(book.featuredMonth)}</p>` : ''}
+            ${book.description ? `<p class="card-body" style="margin-top:var(--sp-sm);font-size:1rem;line-height:1.75;">${esc(book.description)}</p>` : ''}
+            ${book.commentary ? `<p class="card-body" style="margin-top:var(--sp-sm);font-size:1rem;line-height:1.75;font-style:italic;">${esc(book.commentary)}</p>` : ''}
+            <div style="display:flex;gap:1rem;margin-top:var(--sp-md);flex-wrap:wrap;">
+              ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary">Buy print</a>` : ''}
+              ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost">Ebook →</a>` : ''}
+            </div>
+          </div>
+        </div>`
+    }
+
+    function loadBook(slug) {
+      return fetchBook(slug)
+        .then(renderBook)
+        .catch(() => {
+          el.innerHTML = '<p style="color:var(--text-faint);text-align:center;padding:3rem;">Something went wrong loading this book.</p>'
+        })
+    }
+
+    // Click-to-edit itself (enableVisualEditing()) is bootstrapped from
+    // js/nav.js, loaded on every page — nothing further needed here.
+    if (!slug) {
+      notFound()
+    } else {
+      loadBook(slug)
+    }
+  </script>
+</body>
+</html>

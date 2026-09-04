@@ -331,7 +331,8 @@
        `*[_type == "featuredFiction"] | order(_createdAt desc) {
          title, author, description, status, featuredMonth,
          substackUrl, printUrl, ebookUrl, note, commentary,
-         "coverUrl": coverImage.asset->url
+         "coverUrl": coverImage.asset->url,
+         "slug": slug.current
        }`
      )
    }
@@ -482,25 +483,40 @@
        `*[_type == "featuredFiction" && (featured == true || !defined(featured))] | order(_createdAt desc) [0...${limit}] {
          title, author, description, status, featuredMonth,
          substackUrl, printUrl, ebookUrl, note, commentary,
-         "coverUrl": coverImage.asset->url
+         "coverUrl": coverImage.asset->url,
+         "slug": slug.current
        }`
      )
    }
 
-   // linkToPage wraps the whole card in a real internal link to the shared
-   // Bookshelf page (featuredFiction has no individual page — see
-   // the-work/featured), same pattern as renderPorchCard's whole-card link.
-   // Off by default so every existing caller (the-work/books,
-   // the-work/featured itself) renders exactly as before; only
-   // the-work/index.html's Books section opts in. The overlay link is
-   // absolutely positioned behind the card content and the outbound
-   // Buy print/Ebook buttons are raised above it (position:relative +
-   // z-index), so those keep working as their own separate links — an <a>
+   const FEATURED_BOOK_FIELDS = `title, author, description, status, featuredMonth,
+        substackUrl, printUrl, ebookUrl, note, commentary,
+        "coverUrl": coverImage.asset->url,
+        "slug": slug.current`
+
+   export async function fetchFeaturedBookBySlug(slug) {
+     const safe = String(slug).replace(/"/g, '\\"')
+     return sanityFetch(
+       `*[_type == "featuredFiction" && slug.current == "${safe}"][0] {${FEATURED_BOOK_FIELDS}}`
+     )
+   }
+
+   // linkToPage wraps the whole card in a real internal link to the book's
+   // own individual page (every featuredFiction document has a required
+   // slug now — see the-work/featured/book) — same pattern as
+   // renderPorchCard's whole-card link. Off by default so every existing
+   // caller (the-work/books) renders exactly as before; the-work/featured/,
+   // its archive, and the-work/index.html's Books section opt in. The
+   // overlay link is absolutely positioned behind the card content and the
+   // outbound Buy print/Ebook buttons are raised above it (position:relative
+   // + z-index), so those keep working as their own separate links — an <a>
    // can't validly nest inside another <a>, so this stacks two siblings
-   // instead of nesting.
+   // instead of nesting. Commentary is deliberately not shown here — moved
+   // to be individual-page-only, so the card itself stays a teaser.
    export function renderBookCard(book, { linkToPage = false } = {}) {
+     const pageHref = book.slug ? `/the-work/featured/${book.slug}/` : '/the-work/featured/'
      const overlay = linkToPage
-       ? `<a href="/the-work/featured/" aria-label="${esc(book.title)}" style="position:absolute;inset:0;"></a>`
+       ? `<a href="${esc(pageHref)}" aria-label="${esc(book.title)}" style="position:absolute;inset:0;"></a>`
        : ''
      return `
        <div class="card"${linkToPage ? ' style="position:relative;"' : ''}>
@@ -511,7 +527,6 @@
          <span class="card-label">${esc(book.author || '')}</span>
          <h2 class="card-title">${esc(book.title)}</h2>
          ${book.note ? `<p class="card-body" style="font-size:0.9rem;">${esc(book.note)}</p>` : ''}
-         ${book.commentary ? `<p class="card-body" style="font-size:0.9rem;font-style:italic;">${esc(book.commentary)}</p>` : ''}
          <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;${linkToPage ? 'position:relative;z-index:1;' : ''}">
            ${book.printUrl ? `<a href="${esc(book.printUrl)}" target="_blank" rel="noopener" class="btn btn--primary" style="font-size:0.6rem;">Buy print</a>` : ''}
            ${book.ebookUrl ? `<a href="${esc(book.ebookUrl)}" target="_blank" rel="noopener" class="btn btn--ghost" style="font-size:0.6rem;">Ebook →</a>` : ''}
