@@ -6,7 +6,7 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
-## 2026-09-02 — Full granular hardcoded-content audit completed (66 real items found via line-by-line scan, not estimate), itemized in a spreadsheet
+## 2026-09-04 (3) — Full granular hardcoded-content audit completed (66 real items found via line-by-line scan, not estimate), itemized in a spreadsheet
 
 8 of those were already-fixed fallback text from earlier work, not real gaps. Remaining 58 moved to Sanity in two batches:
 
