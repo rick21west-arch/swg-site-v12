@@ -6,6 +6,12 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-04 (6) — Site repo switched to Private; full git history reviewed for a sensitive-exposure concern
+
+swg-site-v12 switched from Public to Private under the Organization — confirmed before and after the change, not assumed from the command alone.
+
+Separately: full history reviewed by Rick directly, clean.
+
 ## 2026-09-04 (5) — Both repos' git remotes moved to the new GitHub Organization; both verified with a real fetch
 
 Local remotes for both repos were still pointing at the old personal account (`rick21west-arch`) even though the repos themselves had already been transferred to the Guild's GitHub Organization — Step 6 of the Going Pro plan, done ahead of its own formal sequencing. Didn't have the new org's name on hand, so it wasn't guessed: checked directly with `gh repo view` against the old address, which resolves a transferred repo to its real current location — came back `southern-writers-guild` for both. Updated both local `origin` URLs to match:
