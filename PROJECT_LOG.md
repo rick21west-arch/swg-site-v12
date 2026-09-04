@@ -6,6 +6,20 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-04 (2) — Batch B: Shop and Welcome moved onto Sanity; Welcome given a real audit, not just the one line already on record
+
+Same full protocol as Batch A earlier today: baseline build saved first, schema validated locally before deploy, full dist-vs-baseline diff after (only Shop and Welcome's own output differed logically — every other page's diff was the same cosmetic asset-hash rename from the shared `js/sanity.js` chunk growing, confirmed by diffing one of those files directly), rollback point recorded before pushing (site `ca705bb`, Studio `d981870`), then live re-verification with real evidence — read the actual rendered DOM on both pages, and cross-checked one field from each against Sanity's own database directly from the live page's own origin, confirming the real document `_id`s come back.
+
+**Welcome got the actual audit it was flagged as never having had**, not just the single line (the pitch, `welcome/index.html:303`) the original full-site audit had on record. Read the entire 365-line file start to finish. Found 9 real hardcoded strings, not 1: the `<title>` tag, the small wordmark, the pitch's main clause *and* its italicized closing clause (split into two fields so the emphasis can be edited independently — previously one line with an inline `<em>`), the email field's placeholder, the submit button text, the skip-link text, the post-signup success line, and the "Go now" link. Deliberately left three items hardcoded rather than migrating everything found: the "Joining..." and error status strings (transient JS form-feedback text — the homepage and Join pages leave the identical pattern hardcoded too, so this matches existing site convention rather than being a gap) and the footer peacock image plus its alt text (a base64-embedded icon, hardcoded exactly the same way on every other page's footer sitewide, never a Sanity field anywhere). New singleton `welcomeContent` — Welcome is a standalone landing page outside the main nav, so it didn't join the `sitePageCopy` catch-all.
+
+**Shop** was the small, expected piece: 3 fields (the description paragraph, the "not ready yet" line, "In the meantime") joined the existing `sitePageCopy` document rather than getting a new type, matching how Shop's page fits the same "orphan page with no settings document" shape.
+
+**Found the same preview-routing gap as Batch A, again**: neither Shop nor Welcome had ever had an allowed-redirect pattern in `api/preview.js`, so Presentation Tool could never have activated preview mode on either page. Fixed both, same as the Porch/Work/Events gap found and closed earlier today.
+
+**No new serverless function** — both new singletons went into the existing shared `preview-singleton.js` allow-list; function count confirmed still 11 of 12 by listing the `api/` directory directly after the change, not assumed.
+
+Commits: site `1848147`; Studio `f744065`.
+
 ## 2026-09-04 — Batch A: House labels, homepage scratches, Join tier copy, and seven pages of scattered furniture moved onto Sanity
 
 Extended three existing Sanity singletons and added two new ones, in one deploy, following the full protocol: baseline build saved before touching anything, schema validated locally before deploy, full dist-vs-baseline diff after (confirmed the only real changes were the 13 pages actually touched — every other page's diff was a cosmetic asset-hash rename from the shared `js/sanity.js` chunk growing, not a logical change), rollback point recorded before pushing (site `7062a1f`, Studio `6d195e2`), then real re-verification on live production after deploy — not just a visual read of the page, but a direct call to Sanity's own CDN from the live page's own origin confirming the real published document `_id` comes back, plus (for the Writers page) the Trio photo now serving from `cdn.sanity.io` instead of the old static file path, which only a genuinely working fetch could produce.
