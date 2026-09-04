@@ -6,6 +6,18 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-02 — Full granular hardcoded-content audit completed (66 real items found via line-by-line scan, not estimate), itemized in a spreadsheet
+
+8 of those were already-fixed fallback text from earlier work, not real gaps. Remaining 58 moved to Sanity in two batches:
+
+Batch A (one deploy): House and Guidelines labels/captions, homepage "scratch" quotes (7, confirmed via direct query — genuinely an open list, not fixed-count, no schema change needed to add more later), Join's remaining fields, a new shared "sitePageCopy" document covering scattered Porch/Work/Events copy across 7 pages, and Writers page-level furniture (eyebrows, role labels, the Trio section including a real uploaded photo, the shared Jean-Paul quote strip). Two corrections made to the original work order during the build, both flagged rather than silently applied: 7 real scratch quotes existed, not 6 as originally miscounted; two work-section description fields were swapped in the original naming and were renamed to match their actual content.
+
+Batch B: Welcome page received a full line-by-line inventory (never previously done) — 9 of 12 real items moved to a new "welcomeContent" singleton; 3 deliberately left hardcoded (transient JS status text, and the footer peacock icon, both matching existing sitewide convention rather than being oversights). Shop's remaining 3 fields added to the existing sitePageCopy document. Both pages also lacked an allowed-redirect entry for preview mode — a real gap, same category as Guild Video's original resolver issue — found and fixed for both.
+
+Vercel function count held at 11 of 12 throughout — no new dedicated functions created; all new content types route through the existing shared preview function.
+
+Still open, unchanged: Bookshelf individual pages (status unconfirmed, needs verification), Grace's Sanity access (invite not yet accepted), Media Library tier (needs Rick's own login to check), user manual (not started). Going Pro Steps 1-7 remain the next real campaign, untouched.
+
 ## 2026-09-04 (2) — Batch B: Shop and Welcome moved onto Sanity; Welcome given a real audit, not just the one line already on record
 
 Same full protocol as Batch A earlier today: baseline build saved first, schema validated locally before deploy, full dist-vs-baseline diff after (only Shop and Welcome's own output differed logically — every other page's diff was the same cosmetic asset-hash rename from the shared `js/sanity.js` chunk growing, confirmed by diffing one of those files directly), rollback point recorded before pushing (site `ca705bb`, Studio `d981870`), then live re-verification with real evidence — read the actual rendered DOM on both pages, and cross-checked one field from each against Sanity's own database directly from the live page's own origin, confirming the real document `_id`s come back.
