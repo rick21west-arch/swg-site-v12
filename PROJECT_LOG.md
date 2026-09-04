@@ -6,6 +6,29 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-04 (5) — Both repos' git remotes moved to the new GitHub Organization; both verified with a real fetch
+
+Local remotes for both repos were still pointing at the old personal account (`rick21west-arch`) even though the repos themselves had already been transferred to the Guild's GitHub Organization — Step 6 of the Going Pro plan, done ahead of its own formal sequencing. Didn't have the new org's name on hand, so it wasn't guessed: checked directly with `gh repo view` against the old address, which resolves a transferred repo to its real current location — came back `southern-writers-guild` for both. Updated both local `origin` URLs to match:
+
+- Site repo: `https://github.com/southern-writers-guild/swg-site-v12.git`
+- Studio repo: `https://github.com/southern-writers-guild/swg-sanity-studio.git`
+
+Confirmed with a real `git fetch` against each new remote, not just trusting that the URL edit alone meant it worked — both came back clean, every branch "up to date" (site repo: `main` plus 8 feature branches including `typography-pass` and `visual-editing-step2`; Studio repo: `main` and `porch-slug-body-fields`), confirming genuine network round-trips against real, matching repository history, not a same-named lookalike.
+
+## 2026-09-04 (4) — Bookshelf given real individual pages for all 6 books, replacing the 3 pre-Sanity orphaned ones found and flagged earlier today
+
+Same full protocol as every batch this week: baseline build saved first, schema validated before deploy, full dist-vs-baseline diff after (only the touched pages differed logically; the rest were the same cosmetic shared-chunk hash rename seen all week), rollback point recorded before pushing, then live re-verification with real evidence for all 6 URLs — read the actual rendered content, and cross-checked one book directly against Sanity's own database from the live page's own origin. Rollback points: site `16fa542`, Studio `f744065`.
+
+Today's earlier audit entry (below) flagged Bookshelf's individual-page status as unconfirmed; checking it directly (in-session, not separately logged) found three real individual book pages already existed (Opera Rose, First Light, The Ugly Duckling) but were completely orphaned — unlinked from the live site, unknown to Presentation Tool, and resolved by matching a hardcoded title string against the full book list rather than a real slug. Asked to wire those three in; the actual instruction that followed replaced them outright with a real system instead: `featuredFiction` gained a required `slug` field (Studio repo), matching the guildVideo/writer convention exactly. All 6 books — not just the 3 that already had pages — got real, generated slugs, published. One new generic template, `the-work/featured/book/index.html`, replaces the three separate hand-built pages: one fetch by slug, same shape as the guildVideo individual-page template. Routed with a Vercel rewrite (`/the-work/featured/:slug`), same mechanism already proven safe alongside a same-named real subdirectory (`/the-work/featured/archive/` coexists exactly the way `/events/archive/` already coexists with `/events/:slug`).
+
+Rewired the Bookshelf grid and its Archive page so each card's image/title link to the book's own page instead of straight to Amazon — the shared `renderBookCard()` already had a `linkToPage` option built for this (previously falling back to the shared listing page since no book had its own page); it now builds a real per-book href once a slug exists. That same fix automatically corrected The Work page's own "Books" teaser section too, which had opted into `linkToPage` in an earlier session but had nowhere real to send anyone until now — a genuine side effect, not separate scope. Outbound Buy print/Ebook buttons on every card are untouched, confirmed by reading their actual href values before and after. The Archive page was already querying with no limit — confirmed, not assumed, and it now correctly shows all 6.
+
+`commentary` (currently empty on all 6 books) was quietly duplicated onto the card grid before this session — moved to be individual-page-only, so the card stays a teaser and the field has exactly one home instead of two.
+
+Retired the three old orphaned URLs rather than leaving them dangling: deleted the old pages, added permanent redirects from all three to their real new addresses (checked directly with curl afterward, not assumed — all three came back a real 308 to the correct new URL). No new serverless function — the individual page's preview fetch is a third view (`byslug`) added to the existing `api/preview-featured.js`; function count checked directly at 11 of 12, unchanged. Found and fixed the same preview-routing gap as every other content type touched this week: `/the-work/featured/<slug>` had no allowed-redirect pattern, so Presentation Tool could never have activated preview mode on any of these pages before now.
+
+Commits: site `ef40257`; Studio `7865439`.
+
 ## 2026-09-04 (3) — Full granular hardcoded-content audit completed (66 real items found via line-by-line scan, not estimate), itemized in a spreadsheet
 
 8 of those were already-fixed fallback text from earlier work, not real gaps. Remaining 58 moved to Sanity in two batches:
