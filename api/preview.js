@@ -39,6 +39,10 @@ const WORK_ROOT_PATH_PATTERN = /^\/the-work\/?$/;
 const WORK_BOOKS_PATH_PATTERN = /^\/the-work\/books\/?$/;
 const WORK_INTERVIEWS_PATH_PATTERN = /^\/the-work\/interviews\/?$/;
 const EVENTS_ROOT_PATH_PATTERN = /^\/events\/?$/;
+// Same gap, found again in Batch B: Shop and Welcome never had any
+// Sanity-fetched content before now either, so neither had an entry here.
+const SHOP_PATH_PATTERN = /^\/shop\/?$/;
+const WELCOME_PATH_PATTERN = /^\/welcome\/?$/;
 
 function isAllowedRedirectPath(path) {
   return (
@@ -58,7 +62,9 @@ function isAllowedRedirectPath(path) {
     JOIN_PATH_PATTERN.test(path) ||
     WORK_ROOT_PATH_PATTERN.test(path) ||
     WORK_BOOKS_PATH_PATTERN.test(path) ||
-    WORK_INTERVIEWS_PATH_PATTERN.test(path)
+    WORK_INTERVIEWS_PATH_PATTERN.test(path) ||
+    SHOP_PATH_PATTERN.test(path) ||
+    WELCOME_PATH_PATTERN.test(path)
   );
 }
 
@@ -114,11 +120,13 @@ function resolveManualRedirect(req, secret) {
   if (type === 'homeContent') return '/';
   // Singleton, one page — the Join page.
   if (type === 'joinContent') return '/join/';
-  // Singleton, seven pages — always resolves to the first, same pattern
+  // Singleton, eight pages — always resolves to the first, same pattern
   // as houseContent above.
   if (type === 'sitePageCopy') return '/the-porch/';
   // Singleton, two pages — always resolves to the listing page.
   if (type === 'writersPageSettings') return '/writers/';
+  // Singleton, one page — the standalone Welcome landing page.
+  if (type === 'welcomeContent') return '/welcome/';
   return null;
 }
 

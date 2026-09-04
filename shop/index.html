@@ -41,17 +41,17 @@
           The work comes first. The objects that carry it come next.
         </p>
 
-        <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.5rem;">
+        <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:1.5rem;" id="shop-description">
           Books. Prints. Things worth owning. Made the way the writing is made — without hurry, without apology, without anything on the shelf that doesn't deserve to be there.
         </p>
 
-        <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:3rem;">
+        <p style="font-family:var(--font-serif);font-size:1.1rem;line-height:1.8;color:var(--text-muted);margin-bottom:3rem;" id="shop-not-ready-line">
           We're not ready yet. When we are, you'll know.
         </p>
 
         <div class="section-rule" style="margin-bottom:2.5rem;"></div>
 
-        <p style="font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:1.5rem;">
+        <p style="font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:1.5rem;" id="shop-in-the-meantime">
           In the meantime
         </p>
 
@@ -70,6 +70,44 @@
       <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchSitePageCopy } from '../js/sanity.js'
+
+    // Same mechanism as every other preview-aware page — see
+    // the-porch/story/index.html for the full explanation.
+    function isPreviewing() {
+      return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+    }
+
+    function fetchCopy() {
+      if (!isPreviewing()) return fetchSitePageCopy()
+      return fetch('/api/preview-singleton?type=sitePageCopy')
+        .then(res => {
+          if (!res.ok) throw new Error('Preview fetch failed')
+          return res.json()
+        })
+        .then(data => data.result)
+        .catch(() => fetchSitePageCopy())
+    }
+
+    // The markup already carries the real, current copy as static
+    // fallback text, so a slow or failed fetch never shows an empty page.
+    fetchCopy()
+      .then(copy => {
+        if (!copy) return
+        const FIELDS = [
+          ['shop-description', 'shopDescription'],
+          ['shop-not-ready-line', 'shopNotReadyLine'],
+          ['shop-in-the-meantime', 'shopInTheMeantimeLabel'],
+        ]
+        FIELDS.forEach(([id, field]) => {
+          const el = document.getElementById(id)
+          if (el && copy[field]) el.textContent = copy[field]
+        })
+      })
+      .catch(() => {})
+  </script>
 
   <script src="../js/nav.js"></script>
 </body>

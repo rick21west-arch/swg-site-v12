@@ -260,12 +260,23 @@
    /* ── Site Page Copy ─────────────────────────────────────────── */
    /* Singleton, same convention as the other page-furniture documents —
       scattered small copy on The Porch, The Work (and its Books/
-      Bookshelf/Videos/Interviews subpages), and Events. None of these
-      pages had an existing settings document to extend. */
+      Bookshelf/Videos/Interviews subpages), Events, and Shop. None of
+      these pages had an existing settings document to extend. */
 
    export async function fetchSitePageCopy() {
      return sanityFetch(
        `*[_type == "sitePageCopy"][0]`
+     )
+   }
+
+   /* ── Welcome Content ────────────────────────────────────────── */
+   /* Singleton, same convention — the standalone Welcome landing page
+      (welcome/index.html). Separate from sitePageCopy since Welcome isn't
+      part of the main site nav that catch-all covers. */
+
+   export async function fetchWelcomeContent() {
+     return sanityFetch(
+       `*[_type == "welcomeContent"][0]`
      )
    }
 

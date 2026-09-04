@@ -14,7 +14,7 @@ const DATASET = 'production';
 const API_VERSION = '2024-01-01';
 const STUDIO_URL = 'https://swg-studio.sanity.studio';
 
-const ALLOWED_TYPES = new Set(['houseContent', 'homeContent', 'joinContent', 'sitePageCopy', 'writersPageSettings']);
+const ALLOWED_TYPES = new Set(['houseContent', 'homeContent', 'joinContent', 'sitePageCopy', 'writersPageSettings', 'welcomeContent']);
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' || !isValidPreviewRequest(req)) {

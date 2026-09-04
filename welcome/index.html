@@ -297,22 +297,22 @@
 
 <div class="stage">
   <div class="card">
-    <div class="mark">Southern Writers Guild</div>
+    <div class="mark" id="welcome-mark">Southern Writers Guild</div>
 
     <div class="form-state" id="formState">
-      <p class="pitch">Three unique voices &mdash; a little bit of yeehaw, a whole lot of rebel yell. <em>And a touch of Grace.</em></p>
+      <p class="pitch" id="welcome-pitch"><span id="welcome-pitch-main">Three unique voices &mdash; a little bit of yeehaw, a whole lot of rebel yell.</span> <em id="welcome-pitch-emphasis">And a touch of Grace.</em></p>
 
       <form id="joinForm">
         <input type="email" id="emailInput" placeholder="your email" required autocomplete="email" inputmode="email">
-        <button type="submit">Join the Porch</button>
+        <button type="submit" id="welcome-submit-btn">Join the Porch</button>
       </form>
       <div class="status" id="statusMsg"></div>
-      <a href="/the-porch/" class="skip-link">or just wander on in &rarr;</a>
+      <a href="/the-porch/" class="skip-link" id="welcome-skip-link">or just wander on in &rarr;</a>
     </div>
 
     <div class="success-state" id="successState">
-      <p class="success-line">Taking you to the Porch&hellip;</p>
-      <a href="/the-porch/" class="porch-link">Go now</a>
+      <p class="success-line" id="welcome-success-line">Taking you to the Porch&hellip;</p>
+      <a href="/the-porch/" class="porch-link" id="welcome-go-now">Go now</a>
     </div>
   </div>
   </div>
@@ -355,6 +355,53 @@
       statusMsg.textContent = "Something didn't work. Try again in a moment.";
     }
   });
+</script>
+
+<script type="module">
+  import { fetchWelcomeContent } from '/js/sanity.js'
+
+  // Same mechanism as every other preview-aware page — see
+  // the-porch/story/index.html for the full explanation.
+  function isPreviewing() {
+    return document.cookie.split('; ').some(c => c.indexOf('swg_preview_active=') === 0)
+  }
+
+  function fetchContent() {
+    if (!isPreviewing()) return fetchWelcomeContent()
+    return fetch('/api/preview-singleton?type=welcomeContent')
+      .then(res => {
+        if (!res.ok) throw new Error('Preview fetch failed')
+        return res.json()
+      })
+      .then(data => data.result)
+      .catch(() => fetchWelcomeContent())
+  }
+
+  // The markup already carries the real, current copy as static fallback
+  // text, so a slow or failed fetch never shows an empty page. This
+  // script is deliberately separate from the plain <script> above, which
+  // handles the join form and stays completely untouched.
+  fetchContent()
+    .then(content => {
+      if (!content) return
+      if (content.welcomePageTitle) document.title = content.welcomePageTitle
+      const TEXT_FIELDS = [
+        ['welcome-mark', 'welcomeMark'],
+        ['welcome-pitch-main', 'welcomePitchMain'],
+        ['welcome-pitch-emphasis', 'welcomePitchEmphasis'],
+        ['welcome-submit-btn', 'welcomeSubmitButtonText'],
+        ['welcome-skip-link', 'welcomeSkipLinkText'],
+        ['welcome-success-line', 'welcomeSuccessLine'],
+        ['welcome-go-now', 'welcomeGoNowText'],
+      ]
+      TEXT_FIELDS.forEach(([id, field]) => {
+        const el = document.getElementById(id)
+        if (el && content[field]) el.textContent = content[field]
+      })
+      const emailInput = document.getElementById('emailInput')
+      if (emailInput && content.welcomeEmailPlaceholder) emailInput.placeholder = content.welcomeEmailPlaceholder
+    })
+    .catch(() => {})
 </script>
 
 
