@@ -6,6 +6,12 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-05 — Vercel deploy pipeline re-confirmed working after the org transfer, but with an unexplained gap
+
+Last night's deploy-verification test (2026-09-04, commit `a297b11` — an inert HTML comment pushed to confirm Vercel still deploys from the new private Guild-org repo address) never actually reached the live site — checked directly this session with a forced no-cache fetch, twice, comment absent both times. Meanwhile an earlier change from the same day, pushed *before* the org move (the Bookshelf redirects from commit `ef40257`), was confirmed live. That gap pointed at Vercel's GitHub connection having broken exactly at the org transfer / privatization step.
+
+Pushed a second, fresh test comment (commit `2548d16`) and timed it: live on southernwritersguild.com within about 20 seconds of the push, confirmed by direct fetch. **So as of right now, Vercel is connected and deploying normally from the new repo.** What's still unexplained: why last night's push never went live. Two live possibilities, neither confirmed: (1) there was a real window where the connection was broken and it has since self-healed or been silently reconnected, or (2) that one specific build failed for an unrelated reason. Not chased further since the immediate question (is it working *now*) is answered — but if a future push silently fails to go live again, this is the second time, not the first, and is worth escalating to checking the Vercel dashboard directly rather than a third blind test push.
+
 ## 2026-09-04 (6) — Site repo switched to Private; full git history reviewed for a sensitive-exposure concern
 
 swg-site-v12 switched from Public to Private under the Organization — confirmed before and after the change, not assumed from the command alone.
