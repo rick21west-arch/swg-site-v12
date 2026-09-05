@@ -6,6 +6,10 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-05 (2) — Repo switched back to Public, manually, by Rick
+
+`southern-writers-guild/swg-site-v12` is Public again — Rick changed it back himself after the private switch logged 2026-09-04. Confirmed directly against GitHub, not assumed. This reverses the 2026-09-04 (6) entry below; that entry's own history review had already come back clean, so nothing about that concern is reopened by going back to Public. Noting only so this file doesn't sit stale and contradict what's actually live.
+
 ## 2026-09-05 — Vercel deploy pipeline re-confirmed working after the org transfer, but with an unexplained gap
 
 Last night's deploy-verification test (2026-09-04, commit `a297b11` — an inert HTML comment pushed to confirm Vercel still deploys from the new private Guild-org repo address) never actually reached the live site — checked directly this session with a forced no-cache fetch, twice, comment absent both times. Meanwhile an earlier change from the same day, pushed *before* the org move (the Bookshelf redirects from commit `ef40257`), was confirmed live. That gap pointed at Vercel's GitHub connection having broken exactly at the org transfer / privatization step.
