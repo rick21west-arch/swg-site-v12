@@ -72,7 +72,20 @@ function findNamedBackWords(reading, answers) {
   return Array.from(found);
 }
 
-async function requestReadingFromClaude(apiKey, voiceText, userPrompt) {
+// Real tarot ranks (14 per suit — Page and Knight both, not the standard
+// playing-card "Jack"), picked here in code with genuine, evenly-weighted
+// randomness. The model only ever invents the suit name; it never gets a
+// chance to default to the same safe "six"/"seven" middle-of-the-deck bias
+// that shows up when an LLM is asked to pick "something random" with no
+// actual constraint. This guarantees the distribution — nothing left to
+// hope a prompt achieves.
+const TAROT_RANKS = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Page', 'Knight', 'Queen', 'King'];
+
+function pickRandomRank() {
+  return TAROT_RANKS[Math.floor(Math.random() * TAROT_RANKS.length)];
+}
+
+async function requestReadingFromClaude(apiKey, voiceText, userPrompt, rank) {
   const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -109,11 +122,15 @@ async function requestReadingFromClaude(apiKey, voiceText, userPrompt) {
     throw new Error(`Could not parse JSON from Claude's response: ${rawText}`);
   }
 
-  if (typeof parsed.cardName !== 'string' || typeof parsed.reading !== 'string') {
-    throw new Error(`Parsed JSON missing cardName/reading: ${JSON.stringify(parsed)}`);
+  if (typeof parsed.suitName !== 'string' || typeof parsed.reading !== 'string') {
+    throw new Error(`Parsed JSON missing suitName/reading: ${JSON.stringify(parsed)}`);
   }
 
-  return { cardName: parsed.cardName, reading: parsed.reading };
+  // Rank is never taken from the model's own output — it was already
+  // decided in code before this call. Combined here, not trusted from
+  // whatever the model echoed back, so the guarantee holds regardless of
+  // what the model does with the rest of its answer.
+  return { cardName: `${rank} of ${parsed.suitName}`, reading: parsed.reading };
 }
 
 const MAX_NAMING_ATTEMPTS = 3;
@@ -130,8 +147,9 @@ async function runTextEngine(answers) {
     throw new Error('ANTHROPIC_API_KEY is not configured');
   }
 
+  const rank = pickRandomRank();
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const basePrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`;
+  const basePrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nThis card's rank has already been decided, before you were asked to write anything: it is the ${rank}. Do not invent a different rank or number, and do not second-guess it — invent ONLY the suit name, pulled from the image the reading produces, as specific and absurd as possible, exactly the way the voice instructions describe naming a card. The rank is a given fact, not yours to choose.\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"suitName": "...", "reading": "..."}`;
 
   let lastResult = null;
   let lastViolations = [];
@@ -141,7 +159,7 @@ async function runTextEngine(answers) {
       ? basePrompt
       : `${basePrompt}\n\nYour previous attempt still named these literal words back: ${lastViolations.join(', ')}. That is not allowed. Write a genuinely different reading that avoids every one of those words (and their obvious variants) entirely.`;
 
-    const result = await requestReadingFromClaude(apiKey, voice.fullText, prompt);
+    const result = await requestReadingFromClaude(apiKey, voice.fullText, prompt, rank);
     const violations = findNamedBackWords(result.reading, answers);
 
     if (violations.length === 0) {
