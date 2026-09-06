@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Jean-Paul's Tarot — Southern Writers Guild</title>
+  <link rel="stylesheet" href="/css/swg.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo-link">
+        <img src="/assets/images/swg-logo.png" alt="Southern Writers Guild" class="nav-logo">
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="/the-porch/">The Porch</a></li>
+        <li><a href="/the-work/">The Work</a></li>
+        <li><a href="/events/">Events</a></li>
+        <li><a href="/the-house/">The House</a></li>
+        <li><a href="/writers/">Writers</a></li>
+        <li class="nav-join"><a href="/join/">Join</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:var(--sp-sm);">
+    <div class="container" style="max-width:var(--content-w);">
+      <span class="hero-eyebrow">Private Demo &nbsp;·&nbsp; Not Linked From The Site</span>
+      <h1 class="hero-headline" style="font-size:clamp(1.8rem,3.5vw,2.6rem);">Jean-Paul's Tarot</h1>
+      <p class="hero-sub">Answer three questions. Jean-Paul draws you a card.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:var(--content-w);">
+
+      <div id="tarot-error" style="display:none;background:rgba(200,80,60,0.12);border:1px solid rgba(200,80,60,0.4);border-radius:8px;padding:var(--sp-md);margin-bottom:var(--sp-md);color:var(--text);"></div>
+
+      <form id="tarot-form">
+        <div id="tarot-questions">
+          <p style="color:var(--text-muted);">Drawing your questions…</p>
+        </div>
+        <button type="submit" id="tarot-submit" class="btn btn--primary" style="margin-top:var(--sp-md);" disabled>Draw My Card</button>
+      </form>
+
+      <div id="tarot-loading" style="display:none;margin-top:var(--sp-lg);">
+        <p style="color:var(--text-muted);font-style:italic;">Jean-Paul is thinking it over…</p>
+      </div>
+
+      <div id="tarot-result" style="display:none;margin-top:var(--sp-lg);">
+        <div style="max-width:480px;margin:0 auto;">
+          <img id="tarot-image" src="" alt="" style="width:100%;height:auto;display:block;border-radius:10px;margin-bottom:var(--sp-md);">
+          <h2 id="tarot-card-name" style="font-family:var(--font-serif);text-align:center;"></h2>
+          <p id="tarot-reading" class="prose" style="text-align:center;font-style:italic;"></p>
+          <div style="text-align:center;margin-top:var(--sp-lg);">
+            <button type="button" class="btn btn--ghost" disabled title="Coming soon" style="opacity:0.5;cursor:not-allowed;">Keep This Card — Coming Soon</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-text">© 2026 Southern Writers Guild</span>
+      <img src="/assets/images/icon-peacock.png" alt="Jean-Paul, the Guild's peacock" class="footer-peacock">
+    </div>
+  </footer>
+
+  <script type="module">
+    import { fetchTarotQuestions, esc } from '/js/sanity.js'
+
+    const questionsEl = document.getElementById('tarot-questions')
+    const submitBtn = document.getElementById('tarot-submit')
+    const form = document.getElementById('tarot-form')
+    const errorEl = document.getElementById('tarot-error')
+    const loadingEl = document.getElementById('tarot-loading')
+    const resultEl = document.getElementById('tarot-result')
+
+    function showFormError(msg) {
+      errorEl.textContent = msg
+      errorEl.style.display = 'block'
+    }
+
+    function pickThreeQuestions(all) {
+      const byCategory = {}
+      for (const q of all) {
+        if (!byCategory[q.category]) byCategory[q.category] = []
+        byCategory[q.category].push(q)
+      }
+      const categories = Object.keys(byCategory)
+      // Fisher-Yates shuffle, then take 3 distinct categories
+      for (let i = categories.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[categories[i], categories[j]] = [categories[j], categories[i]]
+      }
+      return categories.slice(0, 3).map(cat => {
+        const pool = byCategory[cat]
+        return pool[Math.floor(Math.random() * pool.length)]
+      })
+    }
+
+    function renderQuestions(questions) {
+      questionsEl.innerHTML = questions.map((q, i) => `
+        <div style="margin-bottom:var(--sp-md);">
+          <label for="tarot-answer-${i}" style="display:block;font-family:var(--font-serif);font-size:1.1rem;margin-bottom:8px;">${esc(q.questionText)}</label>
+          <input type="text" id="tarot-answer-${i}" data-question="${esc(q.questionText)}" required
+            style="width:100%;padding:10px 14px;background:transparent;border:1px solid var(--text-faint);border-radius:6px;color:var(--text);font-size:1rem;font-family:var(--font-body);">
+        </div>
+      `).join('')
+      submitBtn.disabled = false
+    }
+
+    async function init() {
+      try {
+        const all = await fetchTarotQuestions()
+        if (!Array.isArray(all) || all.length < 3) {
+          showFormError('Could not load enough questions right now. Try reloading.')
+          return
+        }
+        renderQuestions(pickThreeQuestions(all))
+      } catch (err) {
+        console.error('Failed to load tarot questions:', err)
+        showFormError('Could not load questions right now. Try reloading.')
+      }
+    }
+
+    async function callEngine(engine, answers) {
+      const res = await fetch(`/api/tarot?engine=${engine}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || data.error || `${engine} engine failed`)
+      return data
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      errorEl.style.display = 'none'
+
+      const inputs = questionsEl.querySelectorAll('input[data-question]')
+      const answers = Array.from(inputs).map(input => ({
+        question: input.dataset.question,
+        answer: input.value.trim(),
+      }))
+
+      if (answers.some(a => !a.answer)) {
+        showFormError('Please answer all three questions.')
+        return
+      }
+
+      form.style.display = 'none'
+      loadingEl.style.display = 'block'
+
+      try {
+        const [textResult, imageResult] = await Promise.all([
+          callEngine('text', answers),
+          callEngine('image', answers),
+        ])
+
+        document.getElementById('tarot-card-name').textContent = textResult.cardName
+        document.getElementById('tarot-reading').textContent = textResult.reading
+        const imgEl = document.getElementById('tarot-image')
+        imgEl.src = `data:${imageResult.mimeType};base64,${imageResult.data}`
+        imgEl.alt = textResult.cardName
+
+        loadingEl.style.display = 'none'
+        resultEl.style.display = 'block'
+      } catch (err) {
+        console.error('Tarot reading failed:', err)
+        loadingEl.style.display = 'none'
+        form.style.display = 'block'
+        showFormError(`Something went wrong drawing your card: ${err.message}`)
+      }
+    })
+
+    init()
+  </script>
+
+  <script src="/js/nav.js"></script>
+</body>
+</html>

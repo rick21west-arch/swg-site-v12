@@ -468,11 +468,9 @@ async function runImageEngine(answers) {
     lastViolation = reasons.join('; ');
   }
 
-  const failErr = new Error(
+  throw new Error(
     `Generated image still failed the check after ${MAX_IMAGE_ATTEMPTS} attempts: ${lastViolation}. Last attempt mime type: ${lastResult && lastResult.mimeType}`
   );
-  failErr.lastResult = lastResult; // temporary: lets ?debug=1 return the rejected image itself for inspection
-  throw failErr;
 }
 
 export default async function handler(req, res) {
@@ -482,26 +480,8 @@ export default async function handler(req, res) {
   }
 
   const engine = req.query && req.query.engine;
-  if (engine !== 'text' && engine !== 'image' && engine !== 'bootstrap-ref') {
+  if (engine !== 'text' && engine !== 'image') {
     return res.status(400).json({ error: 'engine must be "text" or "image"' });
-  }
-
-  // Temporary, one-time-use path: generates a single reference image from a
-  // literal prompt (bypassing the answers/voice-instructions flow) so the
-  // real four-image reference set can be assembled before this phase ships.
-  // Removed once that's done — never part of the real product surface.
-  if (engine === 'bootstrap-ref') {
-    const prompt = req.body && req.body.prompt;
-    if (typeof prompt !== 'string' || !prompt) {
-      return res.status(400).json({ error: 'prompt is required' });
-    }
-    try {
-      const result = await callGemini([{ text: prompt }]);
-      return res.status(200).json(result);
-    } catch (err) {
-      console.error('Tarot bootstrap-ref error:', err);
-      return res.status(502).json({ error: 'bootstrap-ref engine failed', detail: String(err.message || err) });
-    }
   }
 
   const answers = req.body && req.body.answers;
@@ -519,10 +499,6 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error(`Tarot ${engine} engine error:`, err);
-    const body = { error: `${engine} engine failed`, detail: String(err.message || err) };
-    if (req.query && req.query.debug === '1' && err.lastResult) {
-      body.lastResult = err.lastResult; // temporary debug-only field, not part of the real contract
-    }
-    return res.status(502).json(body);
+    return res.status(502).json({ error: `${engine} engine failed`, detail: String(err.message || err) });
   }
 }

@@ -21,6 +21,7 @@ const pages = [
   'events/event/index.html',
   'join/index.html',
   'shop/index.html',
+  'tarot/index.html',
   'the-house/index.html',
   'the-house/guidelines/index.html',
   'the-porch/index.html',

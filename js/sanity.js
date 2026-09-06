@@ -448,6 +448,16 @@
      )
    }
 
+   // Jean-Paul's Tarot private demo page (/tarot/) — every question, so the
+   // page can pick 3 across distinct categories client-side. Small dataset
+   // (81 documents, category + short string each), so one fetch of
+   // everything is simpler than a parameterized random-pick query.
+   export async function fetchTarotQuestions() {
+     return sanityFetch(
+       `*[_type == "tarotQuestion"]{questionText, category}`
+     )
+   }
+
   /* ── Card renderers ─────────────────────────────────────────── /* ── Card renderers ─────────────────────────────────────────── */
     
    export function renderPorchCard(story) {
