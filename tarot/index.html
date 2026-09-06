@@ -8,20 +8,56 @@
   <link rel="stylesheet" href="/css/swg.css">
   <style>
     /* Fixed, code-based card frame — same on every card regardless of what
-       the AI generated inside it. Layered box-shadow "rings" instead of a
-       single border: a thin dark inset line, a wide gold/brass band, then a
-       thin dark outer edge for definition against the page background. */
+       the AI generated inside it. A flat single-tone border read as plain;
+       this version uses a repeating metallic gradient for the border itself
+       (brushed light/dark bands instead of one flat gold), inset shadows for
+       a beveled/tarnished depth, a thin inner hairline, and small corner
+       flourishes for an ornamented, aged-gilt tarot-card feel. */
     .tarot-card-frame {
-      background: #241c13;
-      padding: 20px;
-      border-radius: 4px;
+      position: relative;
+      background:
+        radial-gradient(ellipse at 30% 15%, rgba(255,222,160,0.10), transparent 55%),
+        #241c13;
+      padding: 26px;
+      border-radius: 6px;
+      border: 16px solid transparent;
+      border-image-slice: 1;
+      border-image-source: repeating-linear-gradient(
+        135deg,
+        #5c4322 0px, #5c4322 4px,
+        #a97c3f 4px, #a97c3f 8px,
+        #e3b667 8px, #e3b667 12px,
+        #8a6530 12px, #8a6530 16px
+      );
       box-shadow:
-        0 0 0 2px #8b6b3d,
-        0 0 0 10px #cc9a4e,
-        0 0 0 12px #6b4e26,
-        0 12px 36px rgba(0,0,0,0.5);
+        0 0 0 2px #3a2a14,
+        inset 0 0 0 3px rgba(0,0,0,0.45),
+        inset 0 2px 6px rgba(255,224,160,0.22),
+        inset 0 -2px 10px rgba(0,0,0,0.5),
+        0 14px 40px rgba(0,0,0,0.55);
     }
-    .tarot-card-frame img { display: block; border-radius: 2px; }
+    .tarot-card-frame::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(227,182,103,0.35);
+      border-radius: 3px;
+      pointer-events: none;
+    }
+    .tarot-card-frame .frame-corner {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+      opacity: 0.85;
+      z-index: 2;
+    }
+    .tarot-card-frame .frame-corner svg { width: 100%; height: 100%; display: block; }
+    .tarot-card-frame .frame-corner--tl { top: 4px; left: 4px; }
+    .tarot-card-frame .frame-corner--tr { top: 4px; right: 4px; transform: scaleX(-1); }
+    .tarot-card-frame .frame-corner--bl { bottom: 4px; left: 4px; transform: scaleY(-1); }
+    .tarot-card-frame .frame-corner--br { bottom: 4px; right: 4px; transform: scale(-1,-1); }
+    .tarot-card-frame img { display: block; border-radius: 2px; position: relative; z-index: 1; }
   </style>
 </head>
 <body>
@@ -70,6 +106,10 @@
       <div id="tarot-result" style="display:none;margin-top:var(--sp-lg);">
         <div style="max-width:480px;margin:0 auto;">
           <div class="tarot-card-frame">
+            <span class="frame-corner frame-corner--tl"><svg viewBox="0 0 24 24"><path d="M2 22C2 22 2 10 10 6C14 4 20 6 20 2" stroke="#e3b667" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="20" cy="2" r="1.5" fill="#e3b667"/><circle cx="2" cy="22" r="1.5" fill="#e3b667"/></svg></span>
+            <span class="frame-corner frame-corner--tr"><svg viewBox="0 0 24 24"><path d="M2 22C2 22 2 10 10 6C14 4 20 6 20 2" stroke="#e3b667" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="20" cy="2" r="1.5" fill="#e3b667"/><circle cx="2" cy="22" r="1.5" fill="#e3b667"/></svg></span>
+            <span class="frame-corner frame-corner--bl"><svg viewBox="0 0 24 24"><path d="M2 22C2 22 2 10 10 6C14 4 20 6 20 2" stroke="#e3b667" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="20" cy="2" r="1.5" fill="#e3b667"/><circle cx="2" cy="22" r="1.5" fill="#e3b667"/></svg></span>
+            <span class="frame-corner frame-corner--br"><svg viewBox="0 0 24 24"><path d="M2 22C2 22 2 10 10 6C14 4 20 6 20 2" stroke="#e3b667" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="20" cy="2" r="1.5" fill="#e3b667"/><circle cx="2" cy="22" r="1.5" fill="#e3b667"/></svg></span>
             <img id="tarot-image" src="" alt="" style="width:100%;height:auto;margin-bottom:var(--sp-md);">
             <h2 id="tarot-card-name" style="font-family:var(--font-serif);text-align:center;"></h2>
             <p id="tarot-reading" class="prose" style="text-align:center;font-style:italic;"></p>
