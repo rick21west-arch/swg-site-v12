@@ -208,6 +208,68 @@ async function callGemini(parts) {
   return { mimeType: inline.mimeType || inline.mime_type, data: inline.data };
 }
 
+// Two concrete, binary "never" rules from tarotVoiceImage are checkable
+// against the actual generated pixels, unlike the fuzzy style/tone rules
+// (acrylic painting, Southern Gothic quality) which need human judgment:
+// (1) NEVER IN THE IMAGE — no text, numbers, border, or frame, since the
+//     site adds those itself; (2) SUBJECT — never literally recreate one
+//     of the four fixed reference scenes (dinner table, beach walk,
+//     garage, garden). A second, independent model (Claude, not Gemini)
+//     looks at the actual output and judges both, mirroring the text
+//     engine's generate-check-retry backstop but for pixels instead of
+//     words.
+async function classifyImageViolations(apiKey, imageBase64, mimeType) {
+  const prompt = `Look at this image and answer with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"hasTextOrBorder": true or false, "matchesForbiddenScene": true or false, "forbiddenSceneName": "..."}\n\nhasTextOrBorder: true if the image contains ANY visible text, numbers, letters, a border, or a frame anywhere in it.\nmatchesForbiddenScene: true if the image's main subject is a dinner-table scene, a beach walk, a garage scene, or a garden scene — these four specific scenes belong to a separate fixed reference set and must never be recreated as the actual output.\nforbiddenSceneName: if matchesForbiddenScene is true, which one of the four it matches (\"dinner table\", \"beach walk\", \"garage\", or \"garden\"); otherwise an empty string.`;
+
+  const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
+          { type: 'text', text: prompt },
+        ],
+      }],
+    }),
+  }, 30000);
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Anthropic vision-check API error ${res.status}: ${body}`);
+  }
+
+  const data = await res.json();
+  const textBlock = data && data.content && data.content.find(b => b.type === 'text');
+  const rawText = textBlock && textBlock.text;
+  if (!rawText) {
+    throw new Error(`Vision check response had no text content: ${JSON.stringify(data)}`);
+  }
+
+  let parsed;
+  try {
+    const cleaned = rawText.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+    parsed = JSON.parse(cleaned);
+  } catch (err) {
+    throw new Error(`Could not parse vision-check JSON: ${rawText}`);
+  }
+
+  return {
+    hasTextOrBorder: !!parsed.hasTextOrBorder,
+    matchesForbiddenScene: !!parsed.matchesForbiddenScene,
+    forbiddenSceneName: typeof parsed.forbiddenSceneName === 'string' ? parsed.forbiddenSceneName : '',
+  };
+}
+
+const MAX_IMAGE_ATTEMPTS = 3;
+
 async function runImageEngine(answers) {
   const client = sanityClient();
   const voice = await client.fetch('*[_type == "tarotVoiceImage"][0]{fullText}');
@@ -215,16 +277,44 @@ async function runImageEngine(answers) {
     throw new Error('tarotVoiceImage document not found in Sanity');
   }
 
+  const visionApiKey = process.env.ANTHROPIC_API_KEY;
+  if (!visionApiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not configured (needed for the image-check backstop)');
+  }
+
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const promptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above.`;
-
   const refImages = loadReferenceImages();
-  const parts = [
-    { text: promptText },
-    ...refImages.map(img => ({ inline_data: { mime_type: img.mimeType, data: img.data } })),
-  ];
+  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above.`;
 
-  return callGemini(parts);
+  let lastResult = null;
+  let lastViolation = '';
+
+  for (let attempt = 1; attempt <= MAX_IMAGE_ATTEMPTS; attempt++) {
+    const promptText = attempt === 1
+      ? basePromptText
+      : `${basePromptText}\n\nYour previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely.`;
+
+    const parts = [
+      { text: promptText },
+      ...refImages.map(img => ({ inline_data: { mime_type: img.mimeType, data: img.data } })),
+    ];
+
+    const result = await callGemini(parts);
+    const check = await classifyImageViolations(visionApiKey, result.data, result.mimeType);
+
+    if (!check.hasTextOrBorder && !check.matchesForbiddenScene) {
+      return result;
+    }
+
+    lastResult = result;
+    lastViolation = check.hasTextOrBorder
+      ? 'the image contained visible text, numbers, or a border/frame, which is never allowed — those get added by the site afterward'
+      : `the image recreated the forbidden "${check.forbiddenSceneName}" reference scene instead of inventing something new`;
+  }
+
+  throw new Error(
+    `Generated image still failed the check after ${MAX_IMAGE_ATTEMPTS} attempts: ${lastViolation}. Last attempt mime type: ${lastResult && lastResult.mimeType}`
+  );
 }
 
 export default async function handler(req, res) {
