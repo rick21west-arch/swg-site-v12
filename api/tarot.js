@@ -34,21 +34,44 @@ async function fetchWithTimeout(url, options, timeoutMs) {
   }
 }
 
-async function runTextEngine(answers) {
-  const client = sanityClient();
-  const voice = await client.fetch('*[_type == "tarotVoiceText"][0]{fullText}');
-  if (!voice || !voice.fullText) {
-    throw new Error('tarotVoiceText document not found in Sanity');
+// Deliberately small and blunt rather than linguistically clever — this is
+// a hard backstop against literal repeats of the answer text, not a style
+// checker. False negatives (a well-disguised synonym slipping through) are
+// acceptable; the prompt-level reminder is the first line of defense for
+// that. This just catches the literal word.
+const STOPWORDS = new Set([
+  'the','a','an','and','or','but','if','then','than','so','because','of','to','in','on','at','by','for',
+  'with','about','against','between','into','through','during','before','after','above','below','from',
+  'up','down','out','off','over','under','again','further','once','here','there','when','where','why',
+  'how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own',
+  'same','as','just','don','dont','you','your','yours','i','me','my','mine','we','our','ours','he','him',
+  'his','she','her','hers','it','its','they','them','their','theirs','what','which','who','whom','this',
+  'that','these','those','am','is','are','was','were','be','been','being','have','has','had','having',
+  'do','does','did','doing','will','would','shall','should','can','could','may','might','must','yes',
+  'always','never','really','actually','obviously','probably','definitely','totally','literally',
+  'honestly','basically','kind','sort','get','got','going','one','two','three','right','well','yeah',
+]);
+
+function significantWords(text) {
+  const matches = text.toLowerCase().match(/[a-z']+/g) || [];
+  return matches.filter(w => w.length >= 3 && !STOPWORDS.has(w));
+}
+
+function findNamedBackWords(reading, answers) {
+  const readingLower = reading.toLowerCase();
+  const found = new Set();
+  for (const a of answers) {
+    for (const w of significantWords(a.answer)) {
+      const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp(`\\b${escaped}\\b`, 'i').test(readingLower)) {
+        found.add(w);
+      }
+    }
   }
+  return Array.from(found);
+}
 
-  const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const userPrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`;
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY is not configured');
-  }
-
+async function requestReadingFromClaude(apiKey, voiceText, userPrompt) {
   const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -60,7 +83,7 @@ async function runTextEngine(answers) {
       model: 'claude-sonnet-5',
       max_tokens: 2048,
       output_config: { effort: 'low' },
-      system: voice.fullText,
+      system: voiceText,
       messages: [{ role: 'user', content: userPrompt }],
     }),
   }, 55000);
@@ -90,6 +113,47 @@ async function runTextEngine(answers) {
   }
 
   return { cardName: parsed.cardName, reading: parsed.reading };
+}
+
+const MAX_NAMING_ATTEMPTS = 3;
+
+async function runTextEngine(answers) {
+  const client = sanityClient();
+  const voice = await client.fetch('*[_type == "tarotVoiceText"][0]{fullText}');
+  if (!voice || !voice.fullText) {
+    throw new Error('tarotVoiceText document not found in Sanity');
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not configured');
+  }
+
+  const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
+  const basePrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`;
+
+  let lastResult = null;
+  let lastViolations = [];
+
+  for (let attempt = 1; attempt <= MAX_NAMING_ATTEMPTS; attempt++) {
+    const prompt = attempt === 1
+      ? basePrompt
+      : `${basePrompt}\n\nYour previous attempt still named these literal words back: ${lastViolations.join(', ')}. That is not allowed. Write a genuinely different reading that avoids every one of those words (and their obvious variants) entirely.`;
+
+    const result = await requestReadingFromClaude(apiKey, voice.fullText, prompt);
+    const violations = findNamedBackWords(result.reading, answers);
+
+    if (violations.length === 0) {
+      return result;
+    }
+
+    lastResult = result;
+    lastViolations = violations;
+  }
+
+  throw new Error(
+    `Reading still named back "${lastViolations.join(', ')}" after ${MAX_NAMING_ATTEMPTS} attempts. Last attempt: ${JSON.stringify(lastResult)}`
+  );
 }
 
 function loadReferenceImages() {
