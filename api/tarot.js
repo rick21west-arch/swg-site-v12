@@ -58,7 +58,8 @@ async function runTextEngine(answers) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-5',
-      max_tokens: 600,
+      max_tokens: 2048,
+      output_config: { effort: 'low' },
       system: voice.fullText,
       messages: [{ role: 'user', content: userPrompt }],
     }),
@@ -70,7 +71,8 @@ async function runTextEngine(answers) {
   }
 
   const data = await res.json();
-  const rawText = data && data.content && data.content[0] && data.content[0].text;
+  const textBlock = data && data.content && data.content.find(b => b.type === 'text');
+  const rawText = textBlock && textBlock.text;
   if (!rawText) {
     throw new Error(`Anthropic response had no text content: ${JSON.stringify(data)}`);
   }
