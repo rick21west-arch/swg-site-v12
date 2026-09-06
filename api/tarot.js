@@ -42,7 +42,7 @@ async function runTextEngine(answers) {
   }
 
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const userPrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`;
+  const userPrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
