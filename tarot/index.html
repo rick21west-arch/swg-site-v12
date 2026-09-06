@@ -6,6 +6,23 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Jean-Paul's Tarot — Southern Writers Guild</title>
   <link rel="stylesheet" href="/css/swg.css">
+  <style>
+    /* Fixed, code-based card frame — same on every card regardless of what
+       the AI generated inside it. Layered box-shadow "rings" instead of a
+       single border: a thin dark inset line, a wide gold/brass band, then a
+       thin dark outer edge for definition against the page background. */
+    .tarot-card-frame {
+      background: #241c13;
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow:
+        0 0 0 2px #8b6b3d,
+        0 0 0 10px #cc9a4e,
+        0 0 0 12px #6b4e26,
+        0 12px 36px rgba(0,0,0,0.5);
+    }
+    .tarot-card-frame img { display: block; border-radius: 2px; }
+  </style>
 </head>
 <body>
 
@@ -52,9 +69,11 @@
 
       <div id="tarot-result" style="display:none;margin-top:var(--sp-lg);">
         <div style="max-width:480px;margin:0 auto;">
-          <img id="tarot-image" src="" alt="" style="width:100%;height:auto;display:block;border-radius:10px;margin-bottom:var(--sp-md);">
-          <h2 id="tarot-card-name" style="font-family:var(--font-serif);text-align:center;"></h2>
-          <p id="tarot-reading" class="prose" style="text-align:center;font-style:italic;"></p>
+          <div class="tarot-card-frame">
+            <img id="tarot-image" src="" alt="" style="width:100%;height:auto;margin-bottom:var(--sp-md);">
+            <h2 id="tarot-card-name" style="font-family:var(--font-serif);text-align:center;"></h2>
+            <p id="tarot-reading" class="prose" style="text-align:center;font-style:italic;"></p>
+          </div>
           <div style="text-align:center;margin-top:var(--sp-lg);">
             <button type="button" class="btn btn--ghost" disabled title="Coming soon" style="opacity:0.5;cursor:not-allowed;">Keep This Card — Coming Soon</button>
           </div>

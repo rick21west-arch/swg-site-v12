@@ -221,6 +221,7 @@
             <div class="identity-rule"></div>
             <div class="writer-bio" style="max-width:520px;">${renderParagraphs(w.writerBio)}</div>
             ${renderLinks(w.links)}
+            ${w.slug === 'jean-paul' ? `<a href="/tarot/" style="display:inline-block;margin-top:14px;padding:6px 14px;border:1px solid var(--text-faint);border-radius:4px;color:var(--text-muted);font-family:var(--font-ui);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;">I do tarot.</a>` : ''}
           </div>
           <div class="jp-photo-col">
             <a href="${href}" class="jp-photo-wrap" style="display:block;">
