@@ -211,6 +211,9 @@
       if (w.characterBio) {
         body += `<div style="height:2rem;"></div><h2>${isCharacterOnly ? 'More' : 'The Character'}</h2>${renderParagraphs(w.characterBio)}`
       }
+      if (slug === 'jean-paul') {
+        body += `<p style="margin-top:2rem;"><a href="/tarot/" style="color:var(--text-dim);text-decoration:underline;">I do tarot.</a></p>`
+      }
       bodyEl.innerHTML = body
 
       if (slug !== 'jean-paul') {
