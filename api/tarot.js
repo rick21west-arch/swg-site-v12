@@ -468,9 +468,11 @@ async function runImageEngine(answers) {
     lastViolation = reasons.join('; ');
   }
 
-  throw new Error(
+  const failErr = new Error(
     `Generated image still failed the check after ${MAX_IMAGE_ATTEMPTS} attempts: ${lastViolation}. Last attempt mime type: ${lastResult && lastResult.mimeType}`
   );
+  failErr.lastResult = lastResult; // temporary: lets ?debug=1 return the rejected image itself for inspection
+  throw failErr;
 }
 
 export default async function handler(req, res) {
@@ -517,6 +519,10 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error(`Tarot ${engine} engine error:`, err);
-    return res.status(502).json({ error: `${engine} engine failed`, detail: String(err.message || err) });
+    const body = { error: `${engine} engine failed`, detail: String(err.message || err) };
+    if (req.query && req.query.debug === '1' && err.lastResult) {
+      body.lastResult = err.lastResult; // temporary debug-only field, not part of the real contract
+    }
+    return res.status(502).json(body);
   }
 }
