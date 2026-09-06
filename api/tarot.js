@@ -429,7 +429,7 @@ async function runImageEngine(answers) {
 
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const refImages = loadReferenceImages();
-  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.`;
+  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.`;
 
   let lastResult = null;
   let lastViolation = '';
@@ -437,7 +437,7 @@ async function runImageEngine(answers) {
   for (let attempt = 1; attempt <= MAX_IMAGE_ATTEMPTS; attempt++) {
     const promptText = attempt === 1
       ? basePromptText
-      : `${basePromptText}\n\nYour previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely.`;
+      : `${basePromptText}\n\nYour previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely — if it was rejected for recreating a forbidden reference scene, pick a completely different concrete subject, not just a different angle on the same setting.`;
 
     const parts = [
       { text: promptText },
