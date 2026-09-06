@@ -512,8 +512,26 @@ export default async function handler(req, res) {
   }
 
   const engine = req.query && req.query.engine;
-  if (engine !== 'text' && engine !== 'image') {
+  if (engine !== 'text' && engine !== 'image' && engine !== 'bootstrap-ref') {
     return res.status(400).json({ error: 'engine must be "text" or "image"' });
+  }
+
+  // Temporary, one-time-use again: completing the reference-image set
+  // (still only 1 of 4 since Phase 3) so the image engine has real
+  // "proof of range" to work from instead of a wall of text describing
+  // three scenes it's never actually seen. Removed once done.
+  if (engine === 'bootstrap-ref') {
+    const prompt = req.body && req.body.prompt;
+    if (typeof prompt !== 'string' || !prompt) {
+      return res.status(400).json({ error: 'prompt is required' });
+    }
+    try {
+      const result = await callGemini([{ text: prompt }]);
+      return res.status(200).json(result);
+    } catch (err) {
+      console.error('Tarot bootstrap-ref error:', err);
+      return res.status(502).json({ error: 'bootstrap-ref engine failed', detail: String(err.message || err) });
+    }
   }
 
   const answers = req.body && req.body.answers;
