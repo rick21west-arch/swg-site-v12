@@ -1,6 +1,7 @@
 import { createClient } from '@sanity/client';
 import { readFileSync, readdirSync } from 'fs';
 import path from 'path';
+import zlib from 'zlib';
 
 // One shared function for both Jean-Paul's Tarot engines, dispatched by
 // ?engine=. Same reason as preview-singleton.js: the project sits at
@@ -268,6 +269,150 @@ async function classifyImageViolations(apiKey, imageBase64, mimeType) {
   };
 }
 
+// Direct pixel check for a flat-colored border/frame — the vision model
+// missed a real off-white matted border in production testing, so this
+// doesn't rely on a model noticing at all. Only handles standard 8-bit,
+// non-interlaced PNG (what Gemini has returned in every test so far);
+// deliberately declines to check anything else rather than guess.
+function decodePngPixels(buffer) {
+  const PNG_SIG = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  if (buffer.length < 8 || !buffer.subarray(0, 8).equals(PNG_SIG)) return null;
+
+  let offset = 8;
+  let width, height, bitDepth, colorType, interlace;
+  const idatChunks = [];
+
+  while (offset + 8 <= buffer.length) {
+    const len = buffer.readUInt32BE(offset);
+    const type = buffer.toString('ascii', offset + 4, offset + 8);
+    const dataStart = offset + 8;
+    const data = buffer.subarray(dataStart, dataStart + len);
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      bitDepth = data.readUInt8(8);
+      colorType = data.readUInt8(9);
+      interlace = data.readUInt8(12);
+    } else if (type === 'IDAT') {
+      idatChunks.push(data);
+    } else if (type === 'IEND') {
+      break;
+    }
+    offset = dataStart + len + 4;
+  }
+
+  if (!width || !height || bitDepth !== 8 || interlace !== 0) return null;
+
+  let channels;
+  if (colorType === 2) channels = 3;
+  else if (colorType === 6) channels = 4;
+  else if (colorType === 0) channels = 1;
+  else if (colorType === 4) channels = 2;
+  else return null;
+
+  let raw;
+  try {
+    raw = zlib.inflateSync(Buffer.concat(idatChunks));
+  } catch {
+    return null;
+  }
+
+  const stride = width * channels;
+  const pixels = Buffer.alloc(height * stride);
+  let rawOffset = 0;
+
+  for (let y = 0; y < height; y++) {
+    const filterType = raw[rawOffset];
+    rawOffset += 1;
+    const rowStart = y * stride;
+    const prevRowStart = (y - 1) * stride;
+
+    for (let x = 0; x < stride; x++) {
+      const rawByte = raw[rawOffset + x];
+      const a = x >= channels ? pixels[rowStart + x - channels] : 0;
+      const b = y > 0 ? pixels[prevRowStart + x] : 0;
+      const c = (x >= channels && y > 0) ? pixels[prevRowStart + x - channels] : 0;
+
+      let value;
+      switch (filterType) {
+        case 0: value = rawByte; break;
+        case 1: value = rawByte + a; break;
+        case 2: value = rawByte + b; break;
+        case 3: value = rawByte + Math.floor((a + b) / 2); break;
+        case 4: {
+          const p = a + b - c;
+          const pa = Math.abs(p - a);
+          const pb = Math.abs(p - b);
+          const pc = Math.abs(p - c);
+          value = rawByte + (pa <= pb && pa <= pc ? a : pb <= pc ? b : c);
+          break;
+        }
+        default: return null;
+      }
+      pixels[rowStart + x] = value & 0xff;
+    }
+    rawOffset += stride;
+  }
+
+  return { width, height, channels, pixels };
+}
+
+function edgeStripStats(img, side, stripSize) {
+  const { width, height, channels, pixels } = img;
+  let sumR = 0, sumG = 0, sumB = 0, sumSqR = 0, sumSqG = 0, sumSqB = 0, count = 0;
+
+  const sampleAt = (x, y) => {
+    const idx = (y * width + x) * channels;
+    const r = pixels[idx];
+    const g = channels >= 2 ? pixels[idx + 1] : r;
+    const b = channels >= 3 ? pixels[idx + 2] : r;
+    sumR += r; sumG += g; sumB += b;
+    sumSqR += r * r; sumSqG += g * g; sumSqB += b * b;
+    count++;
+  };
+
+  if (side === 'top') {
+    for (let y = 0; y < stripSize; y++) for (let x = 0; x < width; x++) sampleAt(x, y);
+  } else if (side === 'bottom') {
+    for (let y = height - stripSize; y < height; y++) for (let x = 0; x < width; x++) sampleAt(x, y);
+  } else if (side === 'left') {
+    for (let x = 0; x < stripSize; x++) for (let y = 0; y < height; y++) sampleAt(x, y);
+  } else {
+    for (let x = width - stripSize; x < width; x++) for (let y = 0; y < height; y++) sampleAt(x, y);
+  }
+
+  const meanR = sumR / count, meanG = sumG / count, meanB = sumB / count;
+  const varR = sumSqR / count - meanR * meanR;
+  const varG = sumSqG / count - meanG * meanG;
+  const varB = sumSqB / count - meanB * meanB;
+  return {
+    stdDev: Math.sqrt(Math.max(0, (varR + varG + varB) / 3)),
+    luminance: 0.299 * meanR + 0.587 * meanG + 0.114 * meanB,
+  };
+}
+
+// Flags a border only when ALL FOUR edges are simultaneously flat-colored
+// AND light — that specific combination is what a matted/framed border
+// looks like. A real edge-to-edge painted scene would need pure coincidence
+// on all four sides at once to trip this, which is why it's safe as a hard
+// reject rather than just a warning.
+function detectFlatBorder(imageBase64, mimeType) {
+  if (!mimeType || !mimeType.includes('png')) {
+    return { checked: false, hasBorder: false };
+  }
+  const img = decodePngPixels(Buffer.from(imageBase64, 'base64'));
+  if (!img) {
+    return { checked: false, hasBorder: false };
+  }
+
+  const stripSize = Math.max(6, Math.round(Math.min(img.width, img.height) * 0.03));
+  const sides = ['top', 'bottom', 'left', 'right'].map(side => edgeStripStats(img, side, stripSize));
+  const allFlat = sides.every(s => s.stdDev < 10);
+  const allLight = sides.every(s => s.luminance > 195);
+
+  return { checked: true, hasBorder: allFlat && allLight };
+}
+
 const MAX_IMAGE_ATTEMPTS = 3;
 
 async function runImageEngine(answers) {
@@ -300,16 +445,27 @@ async function runImageEngine(answers) {
     ];
 
     const result = await callGemini(parts);
-    const check = await classifyImageViolations(visionApiKey, result.data, result.mimeType);
+    const [visionCheck, pixelCheck] = await Promise.all([
+      classifyImageViolations(visionApiKey, result.data, result.mimeType),
+      Promise.resolve(detectFlatBorder(result.data, result.mimeType)),
+    ]);
 
-    if (!check.hasTextOrBorder && !check.matchesForbiddenScene) {
+    if (!visionCheck.hasTextOrBorder && !visionCheck.matchesForbiddenScene && !pixelCheck.hasBorder) {
       return result;
     }
 
     lastResult = result;
-    lastViolation = check.hasTextOrBorder
-      ? 'the image contained visible text, numbers, or a border/frame, which is never allowed — those get added by the site afterward'
-      : `the image recreated the forbidden "${check.forbiddenSceneName}" reference scene instead of inventing something new`;
+    const reasons = [];
+    if (pixelCheck.hasBorder) {
+      reasons.push('direct pixel analysis of the image edges found a uniform flat-colored border/frame around it');
+    }
+    if (visionCheck.hasTextOrBorder) {
+      reasons.push('the image contained visible text, numbers, or a border/frame, which is never allowed — those get added by the site afterward');
+    }
+    if (visionCheck.matchesForbiddenScene) {
+      reasons.push(`the image recreated the forbidden "${visionCheck.forbiddenSceneName}" reference scene instead of inventing something new`);
+    }
+    lastViolation = reasons.join('; ');
   }
 
   throw new Error(
