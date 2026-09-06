@@ -72,7 +72,7 @@ async function runTextEngine(answers) {
   const data = await res.json();
   const rawText = data && data.content && data.content[0] && data.content[0].text;
   if (!rawText) {
-    throw new Error('Anthropic response had no text content');
+    throw new Error(`Anthropic response had no text content: ${JSON.stringify(data)}`);
   }
 
   let parsed;
