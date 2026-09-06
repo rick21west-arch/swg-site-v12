@@ -9,7 +9,7 @@ import zlib from 'zlib';
 // engines have to live in one file, not two. The two engines stay fully
 // independent in code (separate functions below, no shared state, the
 // image engine never receives the reading) even though they share a file.
-export const config = { maxDuration: 120 };
+export const config = { maxDuration: 280 };
 
 const PROJECT_ID = 'fe6l0kiy';
 const DATASET = 'production';
@@ -185,7 +185,7 @@ async function callGemini(parts) {
       headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts }] }),
     },
-    90000
+    40000 // tightened from 90s now that a single attempt can be tried up to 6x within one request's overall budget
   );
 
   if (!res.ok) {
@@ -435,7 +435,13 @@ function detectFlatBorder(imageBase64, mimeType) {
   return { checked: true, hasBorder: allFlat && allLight };
 }
 
-const MAX_IMAGE_ATTEMPTS = 3;
+// Real production logs show the model's per-attempt failure rate on the
+// text/border check is high enough that 3 attempts isn't a reliable
+// budget — the check itself has never let a bad image through, the
+// problem is running out of tries. Raised from 3: if per-attempt failure
+// is roughly p, total failure is p^N, so doubling N here is a real,
+// compounding improvement, not a hopeful prompt tweak.
+const MAX_IMAGE_ATTEMPTS = 6;
 
 async function runImageEngine(answers) {
   const client = sanityClient();
