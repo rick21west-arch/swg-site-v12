@@ -6,6 +6,16 @@ Read this at the start of any SWG session, same as `CLAUDE.md`.
 
 ---
 
+## 2026-09-05 (night) — New product concept, decided: "Jean-Paul's Tarot"
+
+A paid, one-of-one card generator, played completely straight in the Guild's established voice.
+
+**Mechanic, settled:** 12 categories of 6 pre-written questions each (72 total, a real writing project on its own — not yet started). Each session draws 3 categories at random, one question from each. The user's 3 raw answers feed two separate, independent generations — one produces the card's image, one produces its name and reading — neither sees the other's output. The resulting mismatch/tension between image and text is the intended product, not a flaw to reconcile. Deliberately not a fixed 78-card deck — every card is generated fresh, one-of-one, never repeated.
+
+**Technical shape:** a real bank of 72 written questions (needs writing). Image generation via Google's Nano Banana (Gemini image API) — confirmed to have a real, standard developer API, same integration pattern as existing Sanity/Kit keys. Text (card name + reading) generated via an automated Claude call, same underlying skill as tonight's prototype card, run without a live conversation. Payment gate via Stripe once that's connected. Real per-image cost checked: roughly $0.005–$0.05 depending on quality tier — cheap at this scale.
+
+**Not yet started:** writing the 72 questions, obtaining a Nano Banana API key, building the actual generation pipeline, nailing a consistent visual "look" across cards (flagged as the real hard part — style consistency across independent generations takes deliberate iteration, not a first-try guarantee).
+
 ## 2026-09-05 (2) — Repo switched back to Public, manually, by Rick
 
 `southern-writers-guild/swg-site-v12` is Public again — Rick changed it back himself after the private switch logged 2026-09-04. Confirmed directly against GitHub, not assumed. This reverses the 2026-09-04 (6) entry below; that entry's own history review had already come back clean, so nothing about that concern is reopened by going back to Public. Noting only so this file doesn't sit stale and contradict what's actually live.
