@@ -202,11 +202,33 @@ async function callGemini(parts) {
   const imagePart = responseParts.find(p => p.inlineData || p.inline_data);
   if (!imagePart) {
     const textPart = responseParts.find(p => p.text);
-    throw new Error(`Gemini returned no image. Text response: ${textPart ? textPart.text : JSON.stringify(data)}`);
+    const finishReason = data.candidates[0].finishReason;
+    const safetyRatings = data.candidates[0].safetyRatings;
+    const promptFeedback = data.promptFeedback;
+    const err = new Error(
+      `Gemini returned no image. finishReason: ${finishReason}. promptFeedback: ${JSON.stringify(promptFeedback)}. safetyRatings: ${JSON.stringify(safetyRatings)}. Text response: ${textPart ? textPart.text : '(none)'}`
+    );
+    err.isNoImageReturned = true; // lets callers retry this specific failure fast, outside the content-quality attempt budget
+    throw err;
   }
 
   const inline = imagePart.inlineData || imagePart.inline_data;
   return { mimeType: inline.mimeType || inline.mime_type, data: inline.data };
+}
+
+// The "no image at all" failure (as opposed to a real content-quality
+// rejection) showed up in testing on completely neutral inputs, with no
+// clear content-based cause — worth treating as a possible transient API
+// hiccup rather than immediately burning one of the 3 content-quality
+// attempts on it. One immediate, fast retry, same parts, no backoff.
+async function callGeminiWithFastRetry(parts) {
+  try {
+    return await callGemini(parts);
+  } catch (err) {
+    if (!err.isNoImageReturned) throw err;
+    console.error('Gemini returned no image on first try, retrying once immediately:', err.message);
+    return await callGemini(parts);
+  }
 }
 
 // Two concrete, binary "never" rules from tarotVoiceImage are checkable
@@ -429,7 +451,11 @@ async function runImageEngine(answers) {
 
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const refImages = loadReferenceImages();
-  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.\n\nColor: rich, saturated color, matching the vividness of the four reference images — never muted, desaturated, washed-out, or monochrome.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.`;
+  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.\n\nColor: rich, saturated color, matching the vividness of the four reference images — never muted, desaturated, washed-out, or monochrome.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.
+
+FINAL RULE, ABSOLUTE, NO EXCEPTIONS: ABSOLUTELY NO text, letters, numbers, signage, or writing of any kind, anywhere in the image, under any circumstances — this includes signs, labels, tags, price stickers, license plates, book/magazine covers, screens, gauges, clocks, graffiti, embroidery, or writing reflected in glass or water. Every single generation gets checked by software for this specific thing and is thrown away and regenerated if it fails. If you are even slightly unsure whether something you're about to paint counts as text, leave it out.
+
+SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers resembles a dinner table, a beach, a garage, or a garden scene, you MUST transform it into a genuinely different concrete scene that captures the same feeling — never paint the literal forbidden scene itself, no exceptions, even if the answer names it directly or seems to leave no other option. Every single generation gets checked by software for exactly this and is thrown away and regenerated if it fails. Find the adjacent object or moment instead of the setting itself.`;
 
   let lastResult = null;
   let lastViolation = '';
@@ -444,7 +470,7 @@ async function runImageEngine(answers) {
       ...refImages.map(img => ({ inline_data: { mime_type: img.mimeType, data: img.data } })),
     ];
 
-    const result = await callGemini(parts);
+    const result = await callGeminiWithFastRetry(parts);
     const [visionCheck, pixelCheck] = await Promise.all([
       classifyImageViolations(visionApiKey, result.data, result.mimeType),
       Promise.resolve(detectFlatBorder(result.data, result.mimeType)),
