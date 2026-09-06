@@ -127,7 +127,7 @@
       questionsEl.innerHTML = questions.map((q, i) => `
         <div style="margin-bottom:var(--sp-md);">
           <label for="tarot-answer-${i}" style="display:block;font-family:var(--font-serif);font-size:1.1rem;margin-bottom:8px;">${esc(q.questionText)}</label>
-          <input type="text" id="tarot-answer-${i}" data-question="${esc(q.questionText)}" required
+          <input type="text" id="tarot-answer-${i}" data-question="${esc(q.questionText)}" required autocomplete="off"
             style="width:100%;padding:10px 14px;background:transparent;border:1px solid var(--text-faint);border-radius:6px;color:var(--text);font-size:1rem;font-family:var(--font-body);">
         </div>
       `).join('')
@@ -192,10 +192,14 @@
         loadingEl.style.display = 'none'
         resultEl.style.display = 'block'
       } catch (err) {
+        // Real error logged here for debugging; never shown raw to the
+        // visitor — the internal detail (which check failed, mime types,
+        // attempt counts) means nothing to someone just trying to get a
+        // reading and reads as broken rather than honest.
         console.error('Tarot reading failed:', err)
         loadingEl.style.display = 'none'
         form.style.display = 'block'
-        showFormError(`Something went wrong drawing your card: ${err.message}`)
+        showFormError(`Jean-Paul's having trouble seeing this one clearly. Try again?`)
       }
     })
 
