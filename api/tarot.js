@@ -537,6 +537,75 @@ function pickRandomStyleRegister() {
   return IMAGE_STYLE_REGISTERS[Math.floor(Math.random() * IMAGE_STYLE_REGISTERS.length)];
 }
 
+// Real evidence from a retest batch: when an answer sits directly on top of
+// one of the four forbidden reference scenes (e.g. "never mowing the lawn"
+// for garden, "my aunt, at a crawfish boil" for dinner table), the model
+// kept painting the literal forbidden scene across all 6 real attempts —
+// generic wording telling it to "pick something different" wasn't enough
+// friction against a strongly-associated answer. Same fix as the rank and
+// style-register problems: don't just ask the model to invent its own way
+// out and hope, hand it an actual concrete alternative chosen in code.
+// These keyword lists and idea lists are deliberately blunt, not clever —
+// false positives just mean a card gets extra, harmless steering it didn't
+// strictly need; false negatives are the real risk, so it's fine to
+// overmatch a little.
+const FORBIDDEN_SCENES = {
+  'dinner table': {
+    keywords: ['dinner', 'supper', 'the table', 'family meal', 'family dinner', 'sunday dinner', 'feast', 'potluck', 'thanksgiving', 'crawfish boil', 'casserole', 'place setting', 'tablecloth', 'mealtime'],
+    safeIdeas: [
+      'a single fork left standing upright in a half-eaten pie, no table visible',
+      'a casserole dish cooling alone on a porch rail',
+      'a stack of paper plates blown into a ditch after the party is over',
+      'a lone folding chair left out overnight with a plate balanced on the arm',
+    ],
+  },
+  'beach walk': {
+    keywords: ['beach', 'ocean', 'shore', 'shoreline', 'seaside', 'boardwalk', 'the tide', 'the waves', 'the surf'],
+    safeIdeas: [
+      'a sunburn peeling on someone\'s shoulder, seen inside a truck cab',
+      'a flip-flop half-buried in a truck bed',
+      'a jar of sand sitting on a windowsill',
+      'a beach towel drying on a porch rail, no ocean anywhere in view',
+    ],
+  },
+  garage: {
+    keywords: ['garage', 'mechanic', 'engine repair', 'workshop', 'tool bench', 'car repair', 'oil change', 'the wrench'],
+    safeIdeas: [
+      'a single wrench left sitting on a porch step',
+      'a car battery sitting alone at the curb',
+      'an oil-stained rag hanging off a fence post',
+      'a jack stand abandoned in tall grass',
+    ],
+  },
+  garden: {
+    keywords: ['garden', 'the yard', 'the lawn', 'mowing', 'mow the', 'flower bed', 'flowerbed', 'planting', 'weeding', 'backyard', 'gardening', 'the grass'],
+    safeIdeas: [
+      'a single garden glove draped over a fence post, no yard visible',
+      'a rusted watering can tipped over on a porch',
+      'a pair of muddy boots left by a back door',
+      'a wheelbarrow parked crooked against a shed wall, weeds growing up through its wheel',
+    ],
+  },
+};
+
+function pickSafeIdea(category) {
+  const ideas = FORBIDDEN_SCENES[category].safeIdeas;
+  return ideas[Math.floor(Math.random() * ideas.length)];
+}
+
+// Pre-generation check against the raw answers, not the model's output —
+// catches the collision before the first attempt is even made, instead of
+// waiting to discover it after a wasted generation.
+function detectForbiddenSceneRisk(answers) {
+  const combinedText = answers.map(a => a.answer).join(' \n ').toLowerCase();
+  const hits = [];
+  for (const [category, { keywords }] of Object.entries(FORBIDDEN_SCENES)) {
+    const matched = keywords.find(kw => combinedText.includes(kw));
+    if (matched) hits.push({ category, matched });
+  }
+  return hits;
+}
+
 async function runImageEngine(answers) {
   const client = sanityClient();
   const voice = await client.fetch('*[_type == "tarotVoiceImage"][0]{fullText}');
@@ -552,7 +621,22 @@ async function runImageEngine(answers) {
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const refImages = loadReferenceImages();
   const styleRegister = pickRandomStyleRegister();
-  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.\n\nSTYLE FOR THIS SPECIFIC CARD, already decided, not yours to choose: ${styleRegister.instruction}\n\nColor and tone, applies no matter which style above: warm and vivid, bright and lively, not dark or heavy. Do NOT default to gray, beige, sepia, faded, dim lighting, or a muted horror-movie palette — that is a real, common mistake this exact model makes whenever a scene feels the least bit odd or uncanny, pulling toward gloom by association. Resist that pull. Look at the actual saturation in the four reference images attached to this request — deep golds, saturated oranges, rich greens, vivid blues — that is the target, not a desaturated version of it. If a choice must be made between "more haunted/somber" and "more warm and vivid," always choose warm and vivid.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.
+
+  // Real evidence: answers that sit directly on top of a forbidden scene
+  // (a lawn-mowing answer for "garden", a crawfish-boil answer for "dinner
+  // table") made the model paint the literal forbidden scene across all 6
+  // real attempts, even with the general warning below already in place.
+  // When that collision is detected up front, hand the model an actual
+  // concrete alternative chosen in code, right from attempt 1 — not just a
+  // stronger version of the same generic instruction it already ignored.
+  const sceneRisk = detectForbiddenSceneRisk(answers);
+  const collisionWarning = sceneRisk.length
+    ? `\n\nCOLLISION WARNING FOR TODAY'S ANSWERS SPECIFICALLY: ${sceneRisk.map(({ category, matched }) =>
+        `one of today's answers ("${matched}") sits very close to the forbidden "${category}" scene. Do not paint anything resembling ${category} in response to it. Concrete starting idea for this specific card, already chosen for you — you may adapt it, but do not default back to the literal ${category} scene instead: ${pickSafeIdea(category)}.`
+      ).join(' ')}`
+    : '';
+
+  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.${collisionWarning}\n\nSTYLE FOR THIS SPECIFIC CARD, already decided, not yours to choose: ${styleRegister.instruction}\n\nColor and tone, applies no matter which style above: warm and vivid, bright and lively, not dark or heavy. Do NOT default to gray, beige, sepia, faded, dim lighting, or a muted horror-movie palette — that is a real, common mistake this exact model makes whenever a scene feels the least bit odd or uncanny, pulling toward gloom by association. Resist that pull. Look at the actual saturation in the four reference images attached to this request — deep golds, saturated oranges, rich greens, vivid blues — that is the target, not a desaturated version of it. If a choice must be made between "more haunted/somber" and "more warm and vivid," always choose warm and vivid.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.
 
 FINAL RULE, ABSOLUTE, NO EXCEPTIONS: ABSOLUTELY NO text, letters, numbers, signage, or writing of any kind, anywhere in the image, under any circumstances — this includes signs, labels, tags, price stickers, license plates, book/magazine covers, screens, gauges, clocks, graffiti, embroidery, or writing reflected in glass or water. Every single generation gets checked by software for this specific thing and is thrown away and regenerated if it fails. If you are even slightly unsure whether something you're about to paint counts as text, leave it out.
 
@@ -561,6 +645,7 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
   const engineStart = Date.now();
   let lastResult = null;
   let lastViolation = '';
+  let lastForbiddenCategory = '';
 
   for (let attempt = 1; attempt <= MAX_IMAGE_ATTEMPTS; attempt++) {
     // Real evidence from today's testing: a slow or failed connection to
@@ -580,9 +665,19 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
       );
     }
 
+    // Same lesson as the pre-generation collision warning above: after an
+    // actual forbidden-scene rejection, don't just repeat "pick something
+    // different" and hope harder — hand it a fresh, concrete, code-picked
+    // alternative for that exact category. A different idea than any
+    // pre-generation suggestion, or than a previous retry's, since it's
+    // picked fresh from the list each time.
+    const retryFeedback = lastForbiddenCategory
+      ? `Your previous attempt was rejected: ${lastViolation}. You painted the literal "${lastForbiddenCategory}" scene again — stop defaulting to it. Concrete alternative idea for this retry, already chosen for you — you may adapt it, but do not paint ${lastForbiddenCategory} instead: ${pickSafeIdea(lastForbiddenCategory)}.`
+      : `Your previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely.`;
+
     const promptText = attempt === 1
       ? basePromptText
-      : `${basePromptText}\n\nYour previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely — if it was rejected for recreating a forbidden reference scene, pick a completely different concrete subject, not just a different angle on the same setting.`;
+      : `${basePromptText}\n\n${retryFeedback}`;
 
     const parts = [
       { text: promptText },
@@ -621,8 +716,18 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
     if (visionCheck.hasTextOrBorder) {
       reasons.push('the image contained visible text, numbers, or a border/frame, which is never allowed — those get added by the site afterward');
     }
-    if (visionCheck.matchesForbiddenScene) {
+    // Only trusted as a target for the next retry's concrete suggestion
+    // when it's one of the four categories this code actually has safe
+    // ideas for — the vision model's own wording could in principle drift,
+    // and a lookup on an unrecognized category would throw.
+    if (visionCheck.matchesForbiddenScene && FORBIDDEN_SCENES[visionCheck.forbiddenSceneName]) {
       reasons.push(`the image recreated the forbidden "${visionCheck.forbiddenSceneName}" reference scene instead of inventing something new`);
+      lastForbiddenCategory = visionCheck.forbiddenSceneName;
+    } else {
+      if (visionCheck.matchesForbiddenScene) {
+        reasons.push(`the image recreated a forbidden reference scene ("${visionCheck.forbiddenSceneName}")`);
+      }
+      lastForbiddenCategory = '';
     }
     lastViolation = reasons.join('; ');
   }
