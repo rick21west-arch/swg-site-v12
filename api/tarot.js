@@ -621,6 +621,7 @@ async function runImageEngine(answers) {
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const refImages = loadReferenceImages();
   const styleRegister = pickRandomStyleRegister();
+  console.log(`[tarot style-register audit] picked: ${styleRegister.name}`); // temporary, for verifying real distribution in production logs
 
   // Real evidence: answers that sit directly on top of a forbidden scene
   // (a lawn-mowing answer for "garden", a crawfish-boil answer for "dinner
