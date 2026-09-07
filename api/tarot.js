@@ -444,14 +444,27 @@ function edgeStripStats(img, side, stripSize) {
   return {
     stdDev: Math.sqrt(Math.max(0, (varR + varG + varB) / 3)),
     luminance: 0.299 * meanR + 0.587 * meanG + 0.114 * meanB,
+    // Highest channel minus lowest — near zero for a neutral gray/cream/white
+    // mat, meaningfully higher for anything actually painted in color. The
+    // voice instructions require rich, saturated color everywhere in the
+    // image, so a flat AND colorless edge is never a legitimate painted
+    // scene — it's a mat, whatever its exact brightness.
+    chroma: Math.max(meanR, meanG, meanB) - Math.min(meanR, meanG, meanB),
   };
 }
 
-// Flags a border only when ALL FOUR edges are simultaneously flat-colored
-// AND light — that specific combination is what a matted/framed border
-// looks like. A real edge-to-edge painted scene would need pure coincidence
-// on all four sides at once to trip this, which is why it's safe as a hard
-// reject rather than just a warning.
+// Flags a border when ALL FOUR edges are simultaneously flat-colored AND
+// either light or colorless (low chroma) — that combination is what a
+// matted/framed border looks like, a light photo-frame mat or a duller
+// neutral gray/cream one alike. A real edge-to-edge painted scene would
+// need pure coincidence on all four sides at once to trip this, which is
+// why it's safe as a hard reject rather than just a warning.
+//
+// The "light" check alone missed a real mat in production testing — its
+// luminance measured ~184, just under the >195 cutoff, because it wasn't
+// pure white, just an off-white/gray canvas tone. Its chroma (~10) gave it
+// away instead: virtually colorless, unlike every legitimately painted
+// edge in this card set, which always carries real hue even when dark.
 function detectFlatBorder(imageBase64, mimeType) {
   if (!mimeType || !mimeType.includes('png')) {
     return { checked: false, hasBorder: false };
@@ -465,8 +478,9 @@ function detectFlatBorder(imageBase64, mimeType) {
   const sides = ['top', 'bottom', 'left', 'right'].map(side => edgeStripStats(img, side, stripSize));
   const allFlat = sides.every(s => s.stdDev < 10);
   const allLight = sides.every(s => s.luminance > 195);
+  const allColorless = sides.every(s => s.chroma < 25);
 
-  return { checked: true, hasBorder: allFlat && allLight };
+  return { checked: true, hasBorder: allFlat && (allLight || allColorless) };
 }
 
 // Real production logs show the model's per-attempt failure rate on the
