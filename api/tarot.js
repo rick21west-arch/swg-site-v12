@@ -14,7 +14,12 @@ export const config = { maxDuration: 280 };
 const PROJECT_ID = 'fe6l0kiy';
 const DATASET = 'production';
 const API_VERSION = '2024-01-01';
-const REFS_DIR = path.join(process.cwd(), 'api', '_lib', 'tarot-refs');
+// Court-rank cards (Page/Knight/Queen/King) reach for a different reference
+// set than the default four — see REFERENCE_SETS below, near where the
+// image engine picks which one to use for a given call.
+const REFS_DIR_DEFAULT = path.join(process.cwd(), 'api', '_lib', 'tarot-refs');
+const REFS_DIR_MATURE = path.join(process.cwd(), 'api', '_lib', 'tarot-refs-mature');
+const REFS_DIR_ACTIVE = path.join(process.cwd(), 'api', '_lib', 'tarot-refs-active');
 
 function sanityClient() {
   return createClient({ projectId: PROJECT_ID, dataset: DATASET, apiVersion: API_VERSION, useCdn: true });
@@ -73,32 +78,16 @@ function findNamedBackWords(reading, answers) {
 }
 
 // Real tarot ranks (14 per suit — Page and Knight both, not the standard
-// playing-card "Jack"), picked here in code with genuine, evenly-weighted
-// randomness. The model only ever invents the suit name; it never gets a
-// chance to default to the same safe "six"/"seven" middle-of-the-deck bias
-// that shows up when an LLM is asked to pick "something random" with no
-// actual constraint. This guarantees the distribution — nothing left to
-// hope a prompt achieves.
+// playing-card "Jack"). The genuine, evenly-weighted random pick — and the
+// rare 1-in-20 "Major card" (name only, no rank) roll — now happens once on
+// the client, before either engine is called, and is sent to both (see
+// validateRankPayload below): the text and image engines are two fully
+// independent serverless calls with no shared state, and the image engine
+// needs to know the same rank the text engine names the card with, to reach
+// for the matching court-rank reference set. TAROT_RANKS itself stays here
+// for validating that client-sent value and for stripping a leaked rank
+// word out of the model's own suitName output (below).
 const TAROT_RANKS = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Page', 'Knight', 'Queen', 'King'];
-
-function pickRandomRank() {
-  return TAROT_RANKS[Math.floor(Math.random() * TAROT_RANKS.length)];
-}
-
-// The original voice document specifies a rare exception, never coded until
-// now: "a reading that touches all three answers at once can stand alone
-// with just a name, no suit or number." Forcing a rank onto every single
-// card (above) silently made this case impossible — a real side effect of
-// that fix, not a decision anyone made on purpose. Restored the same way as
-// everything else in this file: a genuine, code-level roll, not left to the
-// model's own judgment about how rare "rare" should be. One in twenty
-// matches the document's own sense of how often something like this
-// happens elsewhere in the voice instructions.
-const MAJOR_CARD_CHANCE = 1 / 20;
-
-function isMajorCardDraw() {
-  return Math.random() < MAJOR_CARD_CHANCE;
-}
 
 const RANK_ALTERNATION = TAROT_RANKS.map(r => r.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
 const LEADING_RANK_RE = new RegExp(`^\\s*(?:${RANK_ALTERNATION})\\s+of\\s+`, 'i');
@@ -176,7 +165,14 @@ async function requestReadingFromClaude(apiKey, voiceText, userPrompt, rank) {
 
 const MAX_NAMING_ATTEMPTS = 3;
 
-async function runTextEngine(answers) {
+// rank/isMajor are decided by the client once per reading and sent to both
+// engines — the text and image engines are two fully independent
+// serverless calls (see the file-level comment at the top), with no shared
+// state between them. Court-rank reference images (below) need the image
+// engine to know the same rank the text engine names the card with, so the
+// roll can no longer happen separately inside each engine; the caller
+// (handler, from req.body) now decides and passes it into both.
+async function runTextEngine(answers, rank, isMajor) {
   const client = sanityClient();
   const voice = await client.fetch('*[_type == "tarotVoiceText"][0]{fullText}');
   if (!voice || !voice.fullText) {
@@ -188,8 +184,6 @@ async function runTextEngine(answers) {
     throw new Error('ANTHROPIC_API_KEY is not configured');
   }
 
-  const isMajor = isMajorCardDraw();
-  const rank = isMajor ? null : pickRandomRank();
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const basePrompt = isMajor
     ? `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nThis is one of the rare cards, already decided before you were asked to write anything: it stands alone with just a name — no rank, no suit, no number. This is the "name only" case the voice instructions describe, for a reading that touches all three answers at once. Write a reading that genuinely braids all three answers together, rather than seizing on just one the way most readings do. Then invent a single cardName for it, pulled directly from the image the reading produces — as specific and absurd as possible, but with no rank word anywhere in it (not "Six", not "Queen", not any of the fourteen) and no "of" structure. Just a name on its own, e.g. "The Overgrown Pond" or "Somebody Else's Casserole".\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`
@@ -219,17 +213,17 @@ async function runTextEngine(answers) {
   );
 }
 
-function loadReferenceImages() {
+function loadReferenceImages(dir) {
   let files;
   try {
-    files = readdirSync(REFS_DIR).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    files = readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
   } catch {
     return [];
   }
   return files.map(f => {
     const ext = path.extname(f).slice(1).toLowerCase();
     const mimeType = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
-    const data = readFileSync(path.join(REFS_DIR, f)).toString('base64');
+    const data = readFileSync(path.join(dir, f)).toString('base64');
     return { mimeType, data };
   });
 }
@@ -308,14 +302,15 @@ async function callGeminiWithFastRetry(parts) {
 // against the actual generated pixels, unlike the fuzzy style/tone rules
 // (acrylic painting, Southern Gothic quality) which need human judgment:
 // (1) NEVER IN THE IMAGE — no text, numbers, border, or frame, since the
-//     site adds those itself; (2) SUBJECT — never literally recreate one
-//     of the four fixed reference scenes (dinner table, beach walk,
-//     garage, garden). A second, independent model (Claude, not Gemini)
-//     looks at the actual output and judges both, mirroring the text
-//     engine's generate-check-retry backstop but for pixels instead of
-//     words.
-async function classifyImageViolations(apiKey, imageBase64, mimeType) {
-  const prompt = `Look at this image and answer with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"hasTextOrBorder": true or false, "matchesForbiddenScene": true or false, "forbiddenSceneName": "..."}\n\nhasTextOrBorder: true if the image contains ANY visible text, numbers, letters, a border, or a frame anywhere in it.\nmatchesForbiddenScene: true if the image's main subject is a dinner-table scene, a beach walk, a garage scene, or a garden scene — these four specific scenes belong to a separate fixed reference set and must never be recreated as the actual output.\nforbiddenSceneName: if matchesForbiddenScene is true, which one of the four it matches (\"dinner table\", \"beach walk\", \"garage\", or \"garden\"); otherwise an empty string.`;
+//     site adds those itself; (2) SUBJECT — never literally recreate one of
+//     the fixed reference scenes actually attached to THIS call (a
+//     different set depending on rank — see REFERENCE_SETS). A second,
+//     independent model (Claude, not Gemini) looks at the actual output and
+//     judges both, mirroring the text engine's generate-check-retry
+//     backstop but for pixels instead of words.
+async function classifyImageViolations(apiKey, imageBase64, mimeType, sceneNames) {
+  const sceneList = sceneNames.map(n => `a ${n} scene`).join(', ');
+  const prompt = `Look at this image and answer with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"hasTextOrBorder": true or false, "matchesForbiddenScene": true or false, "forbiddenSceneName": "..."}\n\nhasTextOrBorder: true if the image contains ANY visible text, numbers, letters, a border, or a frame anywhere in it.\nmatchesForbiddenScene: true if the image's main subject is one of these specific scenes: ${sceneList} — these belong to a separate fixed reference set and must never be recreated as the actual output.\nforbiddenSceneName: if matchesForbiddenScene is true, which one it matches, using this exact wording: ${sceneNames.map(n => `"${n}"`).join(', ')}; otherwise an empty string.`;
 
   const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -566,75 +561,172 @@ function pickRandomStyleRegister() {
 }
 
 // Real evidence from a retest batch: when an answer sits directly on top of
-// one of the four forbidden reference scenes (e.g. "never mowing the lawn"
-// for garden, "my aunt, at a crawfish boil" for dinner table), the model
-// kept painting the literal forbidden scene across all 6 real attempts —
-// generic wording telling it to "pick something different" wasn't enough
-// friction against a strongly-associated answer. Same fix as the rank and
+// one of the forbidden reference scenes (e.g. "never mowing the lawn" for
+// garden, "my aunt, at a crawfish boil" for dinner table), the model kept
+// painting the literal forbidden scene across all 6 real attempts — generic
+// wording telling it to "pick something different" wasn't enough friction
+// against a strongly-associated answer. Same fix as the rank and
 // style-register problems: don't just ask the model to invent its own way
 // out and hope, hand it an actual concrete alternative chosen in code.
 // These keyword lists and idea lists are deliberately blunt, not clever —
 // false positives just mean a card gets extra, harmless steering it didn't
 // strictly need; false negatives are the real risk, so it's fine to
 // overmatch a little.
-const FORBIDDEN_SCENES = {
-  'dinner table': {
-    keywords: ['dinner', 'supper', 'the table', 'family meal', 'family dinner', 'sunday dinner', 'feast', 'potluck', 'thanksgiving', 'crawfish boil', 'casserole', 'place setting', 'tablecloth', 'mealtime'],
-    safeIdeas: [
-      'a single fork left standing upright in a half-eaten pie, no table visible',
-      'a casserole dish cooling alone on a porch rail',
-      'a stack of paper plates blown into a ditch after the party is over',
-      'a lone folding chair left out overnight with a plate balanced on the arm',
-    ],
+//
+// Grouped by which reference set they belong to (see REFERENCE_SETS below)
+// because only the scenes actually attached to a given Gemini call can
+// realistically get recreated by it — a court-rank call never sees the
+// dinner-table/beach/garage/garden images at all, so checking for those
+// there would be meaningless noise, and vice versa.
+const FORBIDDEN_SCENES_BY_SET = {
+  default: {
+    'dinner table': {
+      keywords: ['dinner', 'supper', 'the table', 'family meal', 'family dinner', 'sunday dinner', 'feast', 'potluck', 'thanksgiving', 'crawfish boil', 'casserole', 'place setting', 'tablecloth', 'mealtime'],
+      safeIdeas: [
+        'a single fork left standing upright in a half-eaten pie, no table visible',
+        'a casserole dish cooling alone on a porch rail',
+        'a stack of paper plates blown into a ditch after the party is over',
+        'a lone folding chair left out overnight with a plate balanced on the arm',
+      ],
+    },
+    'beach walk': {
+      keywords: ['beach', 'ocean', 'shore', 'shoreline', 'seaside', 'boardwalk', 'the tide', 'the waves', 'the surf'],
+      safeIdeas: [
+        'a sunburn peeling on someone\'s shoulder, seen inside a truck cab',
+        'a flip-flop half-buried in a truck bed',
+        'a jar of sand sitting on a windowsill',
+        'a beach towel drying on a porch rail, no ocean anywhere in view',
+      ],
+    },
+    garage: {
+      keywords: ['garage', 'mechanic', 'engine repair', 'workshop', 'tool bench', 'car repair', 'oil change', 'the wrench'],
+      safeIdeas: [
+        'a single wrench left sitting on a porch step',
+        'a car battery sitting alone at the curb',
+        'an oil-stained rag hanging off a fence post',
+        'a jack stand abandoned in tall grass',
+      ],
+    },
+    garden: {
+      keywords: ['garden', 'the yard', 'the lawn', 'mowing', 'mow the', 'flower bed', 'flowerbed', 'planting', 'weeding', 'backyard', 'gardening', 'the grass'],
+      safeIdeas: [
+        'a single garden glove draped over a fence post, no yard visible',
+        'a rusted watering can tipped over on a porch',
+        'a pair of muddy boots left by a back door',
+        'a wheelbarrow parked crooked against a shed wall, weeds growing up through its wheel',
+      ],
+    },
   },
-  'beach walk': {
-    keywords: ['beach', 'ocean', 'shore', 'shoreline', 'seaside', 'boardwalk', 'the tide', 'the waves', 'the surf'],
-    safeIdeas: [
-      'a sunburn peeling on someone\'s shoulder, seen inside a truck cab',
-      'a flip-flop half-buried in a truck bed',
-      'a jar of sand sitting on a windowsill',
-      'a beach towel drying on a porch rail, no ocean anywhere in view',
-    ],
+  // Queen/King — mature, settled energy.
+  mature: {
+    'guitarist by the sea': {
+      keywords: ['guitar', 'guitarist', 'played guitar', 'plays guitar', 'strumming'],
+      safeIdeas: [
+        'a lone guitar pick left on a porch rail',
+        'a coiled guitar cable hanging on a nail in a shed',
+        'a guitar case propped open and empty against a fence, waves nowhere in sight',
+        'a single tuning peg glinting on a windowsill',
+      ],
+    },
+    'guitarist on stage, spotlit': {
+      keywords: ['on stage', 'spotlight', 'spotlit', 'performing on stage', 'stage performance', 'the stage'],
+      safeIdeas: [
+        'a folding chair set up facing an empty stage, no performer on it',
+        'a spotlight left on, aimed at an empty stool',
+        'a set list taped to a floor, torn and abandoned',
+        'a single microphone stand catching light in an otherwise dark room',
+      ],
+    },
+    'elderly couple at a kitchen table': {
+      keywords: ['elderly couple', 'grandparents', 'old married couple', 'aging together', 'my grandma and grandpa'],
+      safeIdeas: [
+        'two coffee mugs left steaming on an empty porch swing',
+        'a pair of reading glasses folded on a folded newspaper',
+        'two wedding rings resting in a small dish by a window',
+        'a cardigan draped over the back of an empty kitchen chair',
+      ],
+    },
+    'woman painting in a greenhouse': {
+      keywords: ['painting', 'greenhouse', 'painter at an easel', 'watercolor', 'canvas and brush', 'the easel'],
+      safeIdeas: [
+        'a paint-splattered smock hanging on a greenhouse hook',
+        'a single wet brush resting across an open paint tin',
+        'a blank canvas propped against potted ferns, no one at it',
+        'a jar of brushes soaking in murky water on a potting bench',
+      ],
+    },
+    'woman riding a bicycle through an orchard': {
+      keywords: ['bicycle', 'riding a bike', 'orchard', 'bike ride', 'the bike'],
+      safeIdeas: [
+        'a bicycle bell sitting alone on a fence post',
+        'a wicker basket full of fallen citrus, no bike in sight',
+        'bike tire tracks through orchard dust, the rider long gone',
+        'a sunhat hanging from a bicycle\'s handlebar, propped against a tree',
+      ],
+    },
   },
-  garage: {
-    keywords: ['garage', 'mechanic', 'engine repair', 'workshop', 'tool bench', 'car repair', 'oil change', 'the wrench'],
-    safeIdeas: [
-      'a single wrench left sitting on a porch step',
-      'a car battery sitting alone at the curb',
-      'an oil-stained rag hanging off a fence post',
-      'a jack stand abandoned in tall grass',
-    ],
-  },
-  garden: {
-    keywords: ['garden', 'the yard', 'the lawn', 'mowing', 'mow the', 'flower bed', 'flowerbed', 'planting', 'weeding', 'backyard', 'gardening', 'the grass'],
-    safeIdeas: [
-      'a single garden glove draped over a fence post, no yard visible',
-      'a rusted watering can tipped over on a porch',
-      'a pair of muddy boots left by a back door',
-      'a wheelbarrow parked crooked against a shed wall, weeds growing up through its wheel',
-    ],
+  // Page/Knight — active, youthful energy.
+  active: {
+    'friends laughing together at a night market': {
+      keywords: ['friends laughing', 'night market', 'group of friends', 'hanging out with friends', 'friends out at night'],
+      safeIdeas: [
+        'a row of half-finished drinks left on a market railing',
+        'string lights reflected in a puddle after everyone\'s gone home',
+        'a food-truck receipt blowing across empty pavement',
+        'a single dropped glow-stick bracelet on the ground',
+      ],
+    },
+    'boy playing with toy trucks': {
+      keywords: ['toy trucks', 'toy cars', 'playing with toys', 'little boy playing', 'his toy trucks'],
+      safeIdeas: [
+        'a toy truck abandoned mid-dirt-pile, no child in sight',
+        'a small pile of toy trucks lined up on a porch step',
+        'a single miniature dump truck half-buried in a sandbox',
+        'a child\'s muddy handprint on a windowsill, toys scattered below',
+      ],
+    },
   },
 };
 
-function pickSafeIdea(category) {
-  const ideas = FORBIDDEN_SCENES[category].safeIdeas;
+// One place that ties a reference-image folder to the forbidden-scene list
+// that actually applies to it — which set gets used for a given card is
+// decided by pickReferenceSetKey(rank) in runImageEngine.
+const REFERENCE_SETS = {
+  default: { dir: REFS_DIR_DEFAULT, scenes: FORBIDDEN_SCENES_BY_SET.default },
+  mature: { dir: REFS_DIR_MATURE, scenes: FORBIDDEN_SCENES_BY_SET.mature },
+  active: { dir: REFS_DIR_ACTIVE, scenes: FORBIDDEN_SCENES_BY_SET.active },
+};
+
+// Queen/King reach for the mature reference set, Page/Knight for the active
+// one, everything else (Ace-Ten, and the rare rank === null Major card)
+// uses the original default four — matching Rick's explicit spec, decided
+// in code from the rank already chosen, never left to the model to guess.
+function pickReferenceSetKey(rank) {
+  if (rank === 'Queen' || rank === 'King') return 'mature';
+  if (rank === 'Page' || rank === 'Knight') return 'active';
+  return 'default';
+}
+
+function pickSafeIdea(setKey, category) {
+  const ideas = REFERENCE_SETS[setKey].scenes[category].safeIdeas;
   return ideas[Math.floor(Math.random() * ideas.length)];
 }
 
 // Pre-generation check against the raw answers, not the model's output —
 // catches the collision before the first attempt is even made, instead of
-// waiting to discover it after a wasted generation.
-function detectForbiddenSceneRisk(answers) {
+// waiting to discover it after a wasted generation. Scoped to whichever
+// reference set this specific call is using.
+function detectForbiddenSceneRisk(answers, setKey) {
   const combinedText = answers.map(a => a.answer).join(' \n ').toLowerCase();
   const hits = [];
-  for (const [category, { keywords }] of Object.entries(FORBIDDEN_SCENES)) {
+  for (const [category, { keywords }] of Object.entries(REFERENCE_SETS[setKey].scenes)) {
     const matched = keywords.find(kw => combinedText.includes(kw));
     if (matched) hits.push({ category, matched });
   }
   return hits;
 }
 
-async function runImageEngine(answers) {
+async function runImageEngine(answers, rank) {
   const client = sanityClient();
   const voice = await client.fetch('*[_type == "tarotVoiceImage"][0]{fullText}');
   if (!voice || !voice.fullText) {
@@ -646,8 +738,18 @@ async function runImageEngine(answers) {
     throw new Error('ANTHROPIC_API_KEY is not configured (needed for the image-check backstop)');
   }
 
+  // Same rank the text engine names the card with, decided once by the
+  // client and passed to both — see the comment on runTextEngine. Queen/King
+  // reach for the mature reference set, Page/Knight the active one,
+  // everything else (including the rare Major/no-rank draw) uses the
+  // original default four.
+  const setKey = pickReferenceSetKey(rank);
+  const refSet = REFERENCE_SETS[setKey];
+  const sceneNames = Object.keys(refSet.scenes);
+
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const refImages = loadReferenceImages();
+  const refImages = loadReferenceImages(refSet.dir);
+  console.log(`[tarot ref-set audit] rank=${rank} setKey=${setKey} dir=${refSet.dir} loadedImages=${refImages.length}`); // temporary, verifying court-rank archetype wiring
   const styleRegister = pickRandomStyleRegister();
 
   // Real evidence: answers that sit directly on top of a forbidden scene
@@ -657,18 +759,19 @@ async function runImageEngine(answers) {
   // When that collision is detected up front, hand the model an actual
   // concrete alternative chosen in code, right from attempt 1 — not just a
   // stronger version of the same generic instruction it already ignored.
-  const sceneRisk = detectForbiddenSceneRisk(answers);
+  const sceneRisk = detectForbiddenSceneRisk(answers, setKey);
   const collisionWarning = sceneRisk.length
     ? `\n\nCOLLISION WARNING FOR TODAY'S ANSWERS SPECIFICALLY: ${sceneRisk.map(({ category, matched }) =>
-        `one of today's answers ("${matched}") sits very close to the forbidden "${category}" scene. Do not paint anything resembling ${category} in response to it. Concrete starting idea for this specific card, already chosen for you — you may adapt it, but do not default back to the literal ${category} scene instead: ${pickSafeIdea(category)}.`
+        `one of today's answers ("${matched}") sits very close to the forbidden "${category}" scene. Do not paint anything resembling ${category} in response to it. Concrete starting idea for this specific card, already chosen for you — you may adapt it, but do not default back to the literal ${category} scene instead: ${pickSafeIdea(setKey, category)}.`
       ).join(' ')}`
     : '';
 
-  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the four forbidden reference categories (a dinner table, a beach, a garage, a garden), do NOT paint that category directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.${collisionWarning}\n\nSTYLE FOR THIS SPECIFIC CARD, already decided, not yours to choose: ${styleRegister.instruction}\n\nColor and tone, applies no matter which style above: warm and vivid, bright and lively, not dark or heavy. Do NOT default to gray, beige, sepia, faded, dim lighting, or a muted horror-movie palette — that is a real, common mistake this exact model makes whenever a scene feels the least bit odd or uncanny, pulling toward gloom by association. Resist that pull. Look at the actual saturation in the four reference images attached to this request — deep golds, saturated oranges, rich greens, vivid blues — that is the target, not a desaturated version of it. If a choice must be made between "more haunted/somber" and "more warm and vivid," always choose warm and vivid.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.
+  const sceneListProse = sceneNames.map(n => `a ${n} scene`).join(', ');
+  const basePromptText = `${voice.fullText}\n\nHere are today's three raw answers:\n\n${answerBlock}\n\nGenerate one new image following every rule above. Hard requirement, checked automatically: the image itself must contain NO text, NO letters, NO numbers, and NO border or frame of any kind — not a card border, not a title, not a caption, nothing. Render only the painted scene, edge to edge. All of that (the card's name, its border) is added separately afterward by the website — if you include any of it, the image will be rejected.\n\nWatch for this specific trap: if one of today's answers literally names or strongly implies one of the forbidden reference scenes for this specific card (${sceneListProse}), do NOT paint that scene directly just because the answer mentions it. Find a different concrete object or scene that the answer evokes some other way instead — something adjacent to it, not the setting itself. Example: an answer about the beach could become a sunburn peeling, a flip-flop half-buried in a truck bed, a jar of sand on a windowsill — not a person walking on a shoreline.${collisionWarning}\n\nSTYLE FOR THIS SPECIFIC CARD, already decided, not yours to choose: ${styleRegister.instruction}\n\nColor and tone, applies no matter which style above: warm and vivid, bright and lively, not dark or heavy. Do NOT default to gray, beige, sepia, faded, dim lighting, or a muted horror-movie palette — that is a real, common mistake this exact model makes whenever a scene feels the least bit odd or uncanny, pulling toward gloom by association. Resist that pull. Look at the actual saturation in the reference images attached to this request — deep golds, saturated oranges, rich greens, vivid blues — that is the target, not a desaturated version of it. If a choice must be made between "more haunted/somber" and "more warm and vivid," always choose warm and vivid.\n\nDo not drop any of the three answers just because one is harder to render than the others — this applies especially when an answer names a real person: represent that answer's influence obliquely (an object tied to them, a silhouette, an instrument, a mood) rather than omitting it from the image entirely. All three answers must leave a real trace in the final image.\n\nIf an answer names a real brand, company, or product (a store name, a logo, a chain), do NOT render its actual logo, mascot, or signage text — that counts as text on the image and will be rejected same as any other text. Represent it obliquely instead: its color palette, the general feeling of the place, an unbranded stand-in object.\n\nConfirmed real problem in testing, not theoretical: roadside/gas-station/motel-type scenes keep growing a lit sign or storefront sign with readable letters on it, even with no brand named. Any building, vehicle, or storefront in the scene must have blank, worn, or turned-away signage — no legible words anywhere, not even an invented placeholder word. Also do not add a stylized artist signature or initials in a corner, the way a painter signs a canvas — that is text too and will be rejected.
 
 FINAL RULE, ABSOLUTE, NO EXCEPTIONS: ABSOLUTELY NO text, letters, numbers, signage, or writing of any kind, anywhere in the image, under any circumstances — this includes signs, labels, tags, price stickers, license plates, book/magazine covers, screens, gauges, clocks, graffiti, embroidery, or writing reflected in glass or water. Every single generation gets checked by software for this specific thing and is thrown away and regenerated if it fails. If you are even slightly unsure whether something you're about to paint counts as text, leave it out.
 
-SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers resembles a dinner table, a beach, a garage, or a garden scene, you MUST transform it into a genuinely different concrete scene that captures the same feeling — never paint the literal forbidden scene itself, no exceptions, even if the answer names it directly or seems to leave no other option. Every single generation gets checked by software for exactly this and is thrown away and regenerated if it fails. Find the adjacent object or moment instead of the setting itself.`;
+SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers resembles ${sceneListProse}, you MUST transform it into a genuinely different concrete scene that captures the same feeling — never paint the literal forbidden scene itself, no exceptions, even if the answer names it directly or seems to leave no other option. Every single generation gets checked by software for exactly this and is thrown away and regenerated if it fails. Find the adjacent object or moment instead of the setting itself.`;
 
   const engineStart = Date.now();
   let lastResult = null;
@@ -700,7 +803,7 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
     // pre-generation suggestion, or than a previous retry's, since it's
     // picked fresh from the list each time.
     const retryFeedback = lastForbiddenCategory
-      ? `Your previous attempt was rejected: ${lastViolation}. You painted the literal "${lastForbiddenCategory}" scene again — stop defaulting to it. Concrete alternative idea for this retry, already chosen for you — you may adapt it, but do not paint ${lastForbiddenCategory} instead: ${pickSafeIdea(lastForbiddenCategory)}.`
+      ? `Your previous attempt was rejected: ${lastViolation}. You painted the literal "${lastForbiddenCategory}" scene again — stop defaulting to it. Concrete alternative idea for this retry, already chosen for you — you may adapt it, but do not paint ${lastForbiddenCategory} instead: ${pickSafeIdea(setKey, lastForbiddenCategory)}.`
       : `Your previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely.`;
 
     const promptText = attempt === 1
@@ -723,7 +826,7 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
     let visionCheck, pixelCheck;
     try {
       [visionCheck, pixelCheck] = await Promise.all([
-        classifyImageViolations(visionApiKey, result.data, result.mimeType),
+        classifyImageViolations(visionApiKey, result.data, result.mimeType, sceneNames),
         Promise.resolve(detectFlatBorder(result.data, result.mimeType)),
       ]);
     } catch (err) {
@@ -745,10 +848,10 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
       reasons.push('the image contained visible text, numbers, or a border/frame, which is never allowed — those get added by the site afterward');
     }
     // Only trusted as a target for the next retry's concrete suggestion
-    // when it's one of the four categories this code actually has safe
-    // ideas for — the vision model's own wording could in principle drift,
-    // and a lookup on an unrecognized category would throw.
-    if (visionCheck.matchesForbiddenScene && FORBIDDEN_SCENES[visionCheck.forbiddenSceneName]) {
+    // when it's one of the categories this specific call's reference set
+    // actually has safe ideas for — the vision model's own wording could in
+    // principle drift, and a lookup on an unrecognized category would throw.
+    if (visionCheck.matchesForbiddenScene && refSet.scenes[visionCheck.forbiddenSceneName]) {
       reasons.push(`the image recreated the forbidden "${visionCheck.forbiddenSceneName}" reference scene instead of inventing something new`);
       lastForbiddenCategory = visionCheck.forbiddenSceneName;
     } else {
@@ -763,6 +866,20 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
   throw new Error(
     `Generated image still failed the check after ${MAX_IMAGE_ATTEMPTS} attempts: ${lastViolation}. Last attempt mime type: ${lastResult && lastResult.mimeType}`
   );
+}
+
+// The text and image engines are two independent serverless calls with no
+// shared state (see the file-level comment at the top) — for the image
+// engine to reach for the matching court-rank reference set, both calls
+// need to agree on the same rank. The client rolls it once per reading and
+// sends it to both; validated here against the real rank list rather than
+// trusted as-is, since this value gets interpolated directly into the
+// prompts sent to Claude and Gemini.
+function validateRankPayload(body) {
+  if (body.isMajor === true) return { rank: null, isMajor: true };
+  const rank = body.rank;
+  if (typeof rank !== 'string' || !TAROT_RANKS.includes(rank)) return null;
+  return { rank, isMajor: false };
 }
 
 export default async function handler(req, res) {
@@ -781,12 +898,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'answers must be an array of exactly 3 {question, answer} objects' });
   }
 
+  const rankInfo = validateRankPayload(req.body || {});
+  if (!rankInfo) {
+    return res.status(400).json({ error: 'rank must be one of the 14 real tarot ranks, or isMajor must be true' });
+  }
+
   try {
     if (engine === 'text') {
-      const result = await runTextEngine(answers);
+      const result = await runTextEngine(answers, rankInfo.rank, rankInfo.isMajor);
       return res.status(200).json(result);
     } else {
-      const result = await runImageEngine(answers);
+      const result = await runImageEngine(answers, rankInfo.rank);
       return res.status(200).json(result);
     }
   } catch (err) {

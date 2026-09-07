@@ -188,11 +188,26 @@
       }
     }
 
-    async function callEngine(engine, answers) {
+    // The text and image engines are two separate serverless calls (see
+    // api/tarot.js) with no shared state between them, but the image engine
+    // needs to know the same rank the text engine names the card with, so it
+    // can reach for the matching court-rank reference set (Queen/King ->
+    // mature, Page/Knight -> active). So the roll happens here, once per
+    // reading, and gets sent to both calls — mirrors the same rank list and
+    // 1-in-20 Major-card chance the server validates against.
+    const TAROT_RANKS = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Page', 'Knight', 'Queen', 'King']
+    const MAJOR_CARD_CHANCE = 1 / 20
+
+    function rollRank() {
+      const isMajor = Math.random() < MAJOR_CARD_CHANCE
+      return isMajor ? { rank: null, isMajor: true } : { rank: TAROT_RANKS[Math.floor(Math.random() * TAROT_RANKS.length)], isMajor: false }
+    }
+
+    async function callEngine(engine, answers, rankRoll) {
       const res = await fetch(`/api/tarot?engine=${engine}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, rank: rankRoll.rank, isMajor: rankRoll.isMajor }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || data.error || `${engine} engine failed`)
@@ -218,9 +233,10 @@
       loadingEl.style.display = 'block'
 
       try {
+        const rankRoll = rollRank()
         const [textResult, imageResult] = await Promise.all([
-          callEngine('text', answers),
-          callEngine('image', answers),
+          callEngine('text', answers, rankRoll),
+          callEngine('image', answers, rankRoll),
         ])
 
         document.getElementById('tarot-card-name').textContent = textResult.cardName
