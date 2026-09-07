@@ -206,6 +206,17 @@ function loadReferenceImages() {
   });
 }
 
+// Real evidence from today's testing: successful Gemini image generations
+// on this prompt regularly took 60-90+ seconds, well past the 40s this was
+// previously tightened to (to make room for more retries within one
+// request's overall budget). That tradeoff was a mistake — it meant this
+// code was routinely killing generations that were still working and would
+// have succeeded. Raised back up to match real observed latency, not a
+// guess. The other half of that fix is below: a single slow attempt no
+// longer burns the whole request, so raising this doesn't cost as many
+// retries as it used to.
+const GEMINI_TIMEOUT_MS = 90000;
+
 async function callGemini(parts) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -219,7 +230,7 @@ async function callGemini(parts) {
       headers: { 'x-goog-api-key': apiKey, 'content-type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts }] }),
     },
-    40000 // tightened from 90s now that a single attempt can be tried up to 6x within one request's overall budget
+    GEMINI_TIMEOUT_MS
   );
 
   if (!res.ok) {
@@ -489,7 +500,20 @@ function detectFlatBorder(imageBase64, mimeType) {
 // problem is running out of tries. Raised from 3: if per-attempt failure
 // is roughly p, total failure is p^N, so doubling N here is a real,
 // compounding improvement, not a hopeful prompt tweak.
+//
+// This is a ceiling, not a guarantee — ENGINE_TIME_BUDGET_MS below is what
+// actually decides whether another attempt is safe to start, now that each
+// one can legitimately take up to GEMINI_TIMEOUT_MS.
 const MAX_IMAGE_ATTEMPTS = 6;
+
+// The function itself gets killed outright (config.maxDuration, 280s) if a
+// request runs past this — not a graceful error, just a dead connection.
+// Before starting another attempt, check whether there's realistically
+// enough time left for one to finish (worst case: a full GEMINI_TIMEOUT_MS
+// Gemini call plus a slower vision check plus margin) — if not, stop and
+// return a real, honest error instead of gambling on a hard kill.
+const ENGINE_TIME_BUDGET_MS = 260000; // 20s under maxDuration for the Sanity fetch, response serialization, etc.
+const WORST_CASE_ATTEMPT_MS = GEMINI_TIMEOUT_MS + 35000; // one Gemini call + vision check + slack
 
 // Same lesson as the rank fix above: a model asked to "vary itself" across
 // independent calls doesn't reliably self-balance — nudged toward "comic,"
@@ -534,10 +558,28 @@ FINAL RULE, ABSOLUTE, NO EXCEPTIONS: ABSOLUTELY NO text, letters, numbers, signa
 
 SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers resembles a dinner table, a beach, a garage, or a garden scene, you MUST transform it into a genuinely different concrete scene that captures the same feeling — never paint the literal forbidden scene itself, no exceptions, even if the answer names it directly or seems to leave no other option. Every single generation gets checked by software for exactly this and is thrown away and regenerated if it fails. Find the adjacent object or moment instead of the setting itself.`;
 
+  const engineStart = Date.now();
   let lastResult = null;
   let lastViolation = '';
 
   for (let attempt = 1; attempt <= MAX_IMAGE_ATTEMPTS; attempt++) {
+    // Real evidence from today's testing: a slow or failed connection to
+    // Gemini on a single attempt used to crash this whole function
+    // immediately, skipping every remaining attempt — the retry loop below
+    // only ever caught content-quality rejections (a bad scene, a visible
+    // border), never a transport failure. That's the real cause behind
+    // "operation was aborted" reaching visitors: it wasn't attempt 6 of 6
+    // failing, it was attempt 1 of 6 failing and the other 5 never running.
+    // Both the Gemini call and the post-generation checks are wrapped here
+    // so any failure — timeout, a malformed response, a safety block —
+    // consumes one attempt and moves on, the same as a content rejection
+    // already did.
+    if (attempt > 1 && Date.now() - engineStart + WORST_CASE_ATTEMPT_MS > ENGINE_TIME_BUDGET_MS) {
+      throw new Error(
+        `Ran out of safe time budget before attempt ${attempt} of ${MAX_IMAGE_ATTEMPTS} (this function gets killed outright past ${ENGINE_TIME_BUDGET_MS}ms). Last problem: ${lastViolation || '(first attempt never completed)'}`
+      );
+    }
+
     const promptText = attempt === 1
       ? basePromptText
       : `${basePromptText}\n\nYour previous attempt was rejected: ${lastViolation}. Generate a genuinely different image that avoids that problem entirely — if it was rejected for recreating a forbidden reference scene, pick a completely different concrete subject, not just a different angle on the same setting.`;
@@ -547,11 +589,25 @@ SECOND FINAL RULE, ABSOLUTE, NO EXCEPTIONS: if any of today's three answers rese
       ...refImages.map(img => ({ inline_data: { mime_type: img.mimeType, data: img.data } })),
     ];
 
-    const result = await callGeminiWithFastRetry(parts);
-    const [visionCheck, pixelCheck] = await Promise.all([
-      classifyImageViolations(visionApiKey, result.data, result.mimeType),
-      Promise.resolve(detectFlatBorder(result.data, result.mimeType)),
-    ]);
+    let result;
+    try {
+      result = await callGeminiWithFastRetry(parts);
+    } catch (err) {
+      lastViolation = `the image generation call itself failed: ${err.message}`;
+      continue;
+    }
+
+    let visionCheck, pixelCheck;
+    try {
+      [visionCheck, pixelCheck] = await Promise.all([
+        classifyImageViolations(visionApiKey, result.data, result.mimeType),
+        Promise.resolve(detectFlatBorder(result.data, result.mimeType)),
+      ]);
+    } catch (err) {
+      lastResult = result;
+      lastViolation = `the post-generation check itself failed: ${err.message}`;
+      continue;
+    }
 
     if (!visionCheck.hasTextOrBorder && !visionCheck.matchesForbiddenScene && !pixelCheck.hasBorder) {
       return result;
