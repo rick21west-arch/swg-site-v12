@@ -749,7 +749,6 @@ async function runImageEngine(answers, rank) {
 
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
   const refImages = loadReferenceImages(refSet.dir);
-  console.log(`[tarot ref-set audit] rank=${rank} setKey=${setKey} dir=${refSet.dir} loadedImages=${refImages.length}`); // temporary, verifying court-rank archetype wiring
   const styleRegister = pickRandomStyleRegister();
 
   // Real evidence: answers that sit directly on top of a forbidden scene
