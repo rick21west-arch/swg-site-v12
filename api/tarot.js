@@ -85,6 +85,21 @@ function pickRandomRank() {
   return TAROT_RANKS[Math.floor(Math.random() * TAROT_RANKS.length)];
 }
 
+// The original voice document specifies a rare exception, never coded until
+// now: "a reading that touches all three answers at once can stand alone
+// with just a name, no suit or number." Forcing a rank onto every single
+// card (above) silently made this case impossible — a real side effect of
+// that fix, not a decision anyone made on purpose. Restored the same way as
+// everything else in this file: a genuine, code-level roll, not left to the
+// model's own judgment about how rare "rare" should be. One in twenty
+// matches the document's own sense of how often something like this
+// happens elsewhere in the voice instructions.
+const MAJOR_CARD_CHANCE = 1 / 20;
+
+function isMajorCardDraw() {
+  return Math.random() < MAJOR_CARD_CHANCE;
+}
+
 const RANK_ALTERNATION = TAROT_RANKS.map(r => r.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
 const LEADING_RANK_RE = new RegExp(`^\\s*(?:${RANK_ALTERNATION})\\s+of\\s+`, 'i');
 
@@ -129,6 +144,16 @@ async function requestReadingFromClaude(apiKey, voiceText, userPrompt, rank) {
     throw new Error(`Could not parse JSON from Claude's response: ${rawText}`);
   }
 
+  // rank === null is the rare "name only" draw, already decided in code
+  // before this call — Claude is asked for a plain cardName directly in
+  // that case, not a suitName to be combined with a rank.
+  if (rank === null) {
+    if (typeof parsed.cardName !== 'string' || typeof parsed.reading !== 'string') {
+      throw new Error(`Parsed JSON missing cardName/reading: ${JSON.stringify(parsed)}`);
+    }
+    return { cardName: stripLeadingRankPrefix(parsed.cardName.trim()), reading: parsed.reading };
+  }
+
   if (typeof parsed.suitName !== 'string' || typeof parsed.reading !== 'string') {
     throw new Error(`Parsed JSON missing suitName/reading: ${JSON.stringify(parsed)}`);
   }
@@ -163,9 +188,12 @@ async function runTextEngine(answers) {
     throw new Error('ANTHROPIC_API_KEY is not configured');
   }
 
-  const rank = pickRandomRank();
+  const isMajor = isMajorCardDraw();
+  const rank = isMajor ? null : pickRandomRank();
   const answerBlock = answers.map((a, i) => `${i + 1}. ${a.question}\n   ${a.answer}`).join('\n');
-  const basePrompt = `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nThis card's rank has already been decided, before you were asked to write anything: it is the ${rank}. Do not invent a different rank or number, and do not second-guess it. suitName must be ONLY the invented suit/object name itself (e.g. "Overgrown Pond", "Idling Engines") — as specific and absurd as possible, exactly the way the voice instructions describe naming a card. Do not prefix it with a rank — not "${rank}", not any other rank word (Ace, Two through Ten, Page, Knight, Queen, King), and not the word "of" at the start. The website builds the final name as "${rank} of [your suitName]" automatically — your own suitName output must never contain a rank at all, only the suit half.\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"suitName": "...", "reading": "..."}`;
+  const basePrompt = isMajor
+    ? `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nThis is one of the rare cards, already decided before you were asked to write anything: it stands alone with just a name — no rank, no suit, no number. This is the "name only" case the voice instructions describe, for a reading that touches all three answers at once. Write a reading that genuinely braids all three answers together, rather than seizing on just one the way most readings do. Then invent a single cardName for it, pulled directly from the image the reading produces — as specific and absurd as possible, but with no rank word anywhere in it (not "Six", not "Queen", not any of the fourteen) and no "of" structure. Just a name on its own, e.g. "The Overgrown Pond" or "Somebody Else's Casserole".\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"cardName": "...", "reading": "..."}`
+    : `Here are the three raw answers for this reading:\n\n${answerBlock}\n\nThis card's rank has already been decided, before you were asked to write anything: it is the ${rank}. Do not invent a different rank or number, and do not second-guess it. suitName must be ONLY the invented suit/object name itself (e.g. "Overgrown Pond", "Idling Engines") — as specific and absurd as possible, exactly the way the voice instructions describe naming a card. Do not prefix it with a rank — not "${rank}", not any other rank word (Ace, Two through Ten, Page, Knight, Queen, King), and not the word "of" at the start. The website builds the final name as "${rank} of [your suitName]" automatically — your own suitName output must never contain a rank at all, only the suit half.\n\nBefore finalizing, check: does your reading contain any of the literal words (or obvious synonyms/variants of the specific noun) from any of the three answers above? If yes, that breaks the "never name the specific noun or object back" rule from the voice instructions — rewrite the reading so it doesn't, then check again. Only output the final, already-checked version.\n\nRespond with ONLY valid JSON, no other text, no code fences, in exactly this shape:\n{"suitName": "...", "reading": "..."}`;
 
   let lastResult = null;
   let lastViolations = [];
